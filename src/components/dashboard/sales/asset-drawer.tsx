@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { X, ChevronDown, CalendarClock, ClipboardList, Package, UserPlus, ExternalLink, FileText, ScrollText, PencilRuler, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
-import { ASSET_DETAILS, ASSET_CONDITION, sensorFaultsFor, type AssetDetail, type AssetReading, type AssetCondition } from "@/lib/sales-data";
+import { ASSET_DETAILS, ASSET_CONDITION, DGA_TRENDS, DGA_MONTHS, sensorFaultsFor, type AssetDetail, type AssetReading, type AssetCondition, type GasTrend } from "@/lib/sales-data";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS } from "@/lib/operations-data";
 import { REPORTS_AWAITING } from "@/lib/field-reports-data";
 import { ASSET_SERVICE_HISTORY } from "@/lib/asset-history-data";
@@ -82,8 +82,71 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
   );
 }
 
+/* One row per dissolved gas: a sparkline of its six-month trend, its current
+   reading, and its limit. Absolute values differ by three orders of magnitude,
+   so each sparkline is scaled to its own gas rather than a shared axis. */
+function GasSparkline({ points, over }: { points: number[]; over: boolean }) {
+  const w = 56, h = 18;
+  const max = Math.max(...points), min = Math.min(...points);
+  const span = max - min || 1;
+  const d = points
+    .map((v, i) => `${(i * w) / (points.length - 1)},${h - ((v - min) / span) * (h - 3) - 1.5}`)
+    .join(" L");
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="shrink-0">
+      <path d={`M${d}`} fill="none" stroke={over ? "#171717" : "#A3A3A3"} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function GasTrends({ gases }: { gases: GasTrend[] }) {
+  const over = gases.filter((g) => g.current > g.limit).length;
+  return (
+    <Card>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-base text-gray-900">Dissolved gas analysis</h3>
+        <span className="text-xs text-gray-400">
+          {DGA_MONTHS[0]}-{DGA_MONTHS[DGA_MONTHS.length - 1]} · {over > 0 ? `${over} over limit` : "all within limits"}
+        </span>
+      </div>
+      <div className="flex flex-col">
+        {gases.map((g) => {
+          const isOver = g.current > g.limit;
+          const rise = g.points[g.points.length - 1] - g.points[0];
+          return (
+            <div key={g.gas} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
+              <span className="w-24 shrink-0 min-w-0">
+                <span className="block text-sm text-gray-800">{g.gas}</span>
+                <span className="block text-[10px] text-gray-400 truncate">{g.name}</span>
+              </span>
+              <GasSparkline points={g.points} over={isOver} />
+              <span className="flex-1 text-right">
+                <span className={`block text-sm tabular-nums ${isOver ? "text-gray-900" : "text-gray-600"}`}>
+                  {g.current.toLocaleString()} {g.unit}
+                </span>
+                <span className="block text-[10px] text-gray-400">
+                  limit {g.limit.toLocaleString()} · {rise > 0 ? "+" : ""}
+                  {rise.toLocaleString()} over 6 mo
+                </span>
+              </span>
+              <span
+                className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${
+                  isOver ? "bg-black text-white" : "border border-gray-200 text-gray-400"
+                }`}
+              >
+                {isOver ? "Over limit" : "Normal"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
 export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: AssetDetail; cond: AssetCondition | null; nameplate?: Nameplate; assetId?: string; onAction: (prompt: string) => void }) {
   const faults = assetId ? sensorFaultsFor(assetId) : [];
+  const gases = assetId ? DGA_TRENDS[assetId] ?? [] : [];
   return (
     <div className="flex flex-col gap-4">
       {/* Context summary */}
@@ -193,6 +256,9 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
           ))}
         </div>
       </Card>
+
+      {/* Dissolved gas analysis - every gas, not just hydrogen */}
+      {gases.length > 0 && <GasTrends gases={gases} />}
 
       {/* Parameter trend */}
       {cond && (

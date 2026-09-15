@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import AlertsWidget from "@/components/dashboard/alerts-widget";
 import AssetDrawer from "./asset-drawer";
-import { ASSET_ALERTS, ASSET_DETAILS, type AssetAlert, type AssetCategory } from "@/lib/sales-data";
+import { ASSET_ALERTS, ASSET_DETAILS, sensorFaultsFor, type AssetAlert, type AssetCategory } from "@/lib/sales-data";
 import { buildPlaybook } from "@/lib/alert-playbooks";
 import { withImpact, type AlertItem, type AlertUrgency } from "@/lib/alerts";
 
@@ -21,6 +21,10 @@ interface AssetAlertsProps {
   title?: string;
 }
 
+/* Faults the asset's own sensors are reporting right now, folded into the
+   alert list alongside the analyst-written ones. */
+const SENSOR_TYPE = "Sensor fault";
+
 export default function AssetAlerts({
   alerts = ASSET_ALERTS,
   categoryOptions = CATEGORY_OPTIONS,
@@ -37,6 +41,35 @@ export default function AssetAlerts({
   const typeOptions = useMemo(
     () => categoryOptions.filter((o) => o.value !== "all").map((o) => o.label),
     [categoryOptions]
+  );
+
+  // Live sensor faults for whichever assets this widget covers.
+  const faultItems = useMemo<AlertItem[]>(
+    () =>
+      alerts.flatMap((a) =>
+        sensorFaultsFor(a.id).map((f) => ({
+          id: f.id,
+          customer: ASSET_DETAILS[a.id]?.related.customer ?? a.code,
+          type: SENSOR_TYPE,
+          urgency: (f.severity === "critical" ? "critical" : "at-risk") as AlertUrgency,
+          title: `${f.fault} · ${a.code}`,
+          detail: `${f.sensor} is reading ${f.value} against a limit of ${f.limit}. Live since ${f.detected}, active ${f.active}.`,
+          meta: [
+            { label: "Asset", value: a.code },
+            { label: "Sensor", value: f.sensor },
+            { label: "Reading", value: `${f.value} / ${f.limit}` },
+            { label: "Active", value: f.active },
+          ],
+          action: "Schedule inspection",
+          entity: { kind: "asset" as const, id: a.id },
+          playbook: buildPlaybook("Schedule inspection", `${a.code}: ${f.sensor} reading ${f.value} against a ${f.limit} limit, active ${f.active}.`, {
+            title: f.fault,
+            assetId: a.id,
+          }),
+          detailId: a.id,
+        }))
+      ),
+    [alerts]
   );
 
   const items = useMemo<AlertItem[]>(
@@ -74,11 +107,18 @@ export default function AssetAlerts({
     [alerts, labelFor]
   );
 
+  // Sensor faults lead - they are happening now.
+  const allAlerts = useMemo(() => [...faultItems, ...items], [faultItems, items]);
+  const allTypes = useMemo(
+    () => (faultItems.length > 0 ? [SENSOR_TYPE, ...typeOptions] : typeOptions),
+    [faultItems, typeOptions]
+  );
+
   return (
     <AlertsWidget
       title={title}
-      alerts={items}
-      typeOptions={typeOptions}
+      alerts={allAlerts}
+      typeOptions={allTypes}
       onOpenDetail={(a) => setDrawerId(a.detailId)}
       emptyLabel="No assets match the selected filters."
     >

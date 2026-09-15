@@ -110,6 +110,64 @@ export interface AssetReading {
   value: string;
   state: "ok" | "watch" | "alert";
 }
+/* ── Dissolved gas analysis ──────────────────────────────────────────
+   The full DGA suite per IEC 60599, not just hydrogen: each gas carries
+   its own limit and a six-month trend so rising ratios are visible. */
+export interface GasTrend {
+  gas: string;
+  name: string;
+  unit: string;
+  current: number;
+  limit: number;
+  /** Six monthly readings, oldest first. */
+  points: number[];
+}
+
+export const DGA_MONTHS = ["Mar", "Apr", "May", "Jun", "Jul", "Aug"];
+
+export const DGA_TRENDS: Record<string, GasTrend[]> = {
+  // Thermal fault: ethylene and methane climbing, acetylene just over.
+  "ast-001": [
+    { gas: "H₂", name: "Hydrogen", unit: "ppm", current: 480, limit: 150, points: [180, 225, 280, 340, 410, 480] },
+    { gas: "CH₄", name: "Methane", unit: "ppm", current: 210, limit: 120, points: [95, 118, 142, 166, 188, 210] },
+    { gas: "C₂H₄", name: "Ethylene", unit: "ppm", current: 168, limit: 60, points: [48, 66, 89, 115, 142, 168] },
+    { gas: "C₂H₆", name: "Ethane", unit: "ppm", current: 74, limit: 65, points: [52, 56, 60, 65, 70, 74] },
+    { gas: "C₂H₂", name: "Acetylene", unit: "ppm", current: 3, limit: 2, points: [0, 0, 1, 1, 2, 3] },
+    { gas: "CO", name: "Carbon monoxide", unit: "ppm", current: 520, limit: 600, points: [430, 448, 470, 489, 505, 520] },
+    { gas: "CO₂", name: "Carbon dioxide", unit: "ppm", current: 4200, limit: 5000, points: [3600, 3740, 3880, 3990, 4100, 4200] },
+  ],
+  // Mechanical wear, gases broadly stable.
+  "ast-002": [
+    { gas: "H₂", name: "Hydrogen", unit: "ppm", current: 96, limit: 150, points: [78, 82, 85, 88, 92, 96] },
+    { gas: "CH₄", name: "Methane", unit: "ppm", current: 62, limit: 120, points: [55, 57, 58, 59, 61, 62] },
+    { gas: "C₂H₄", name: "Ethylene", unit: "ppm", current: 34, limit: 60, points: [28, 29, 31, 32, 33, 34] },
+    { gas: "C₂H₆", name: "Ethane", unit: "ppm", current: 41, limit: 65, points: [36, 37, 38, 39, 40, 41] },
+    { gas: "C₂H₂", name: "Acetylene", unit: "ppm", current: 0, limit: 2, points: [0, 0, 0, 0, 0, 0] },
+    { gas: "CO", name: "Carbon monoxide", unit: "ppm", current: 388, limit: 600, points: [352, 360, 368, 374, 381, 388] },
+    { gas: "CO₂", name: "Carbon dioxide", unit: "ppm", current: 3100, limit: 5000, points: [2850, 2900, 2950, 3000, 3050, 3100] },
+  ],
+  // Ratios within limits - the report's "trend monitoring only".
+  "ast-003": [
+    { gas: "H₂", name: "Hydrogen", unit: "ppm", current: 64, limit: 150, points: [58, 59, 60, 61, 63, 64] },
+    { gas: "CH₄", name: "Methane", unit: "ppm", current: 48, limit: 120, points: [44, 45, 45, 46, 47, 48] },
+    { gas: "C₂H₄", name: "Ethylene", unit: "ppm", current: 22, limit: 60, points: [19, 20, 20, 21, 21, 22] },
+    { gas: "C₂H₆", name: "Ethane", unit: "ppm", current: 30, limit: 65, points: [27, 28, 28, 29, 29, 30] },
+    { gas: "C₂H₂", name: "Acetylene", unit: "ppm", current: 0, limit: 2, points: [0, 0, 0, 0, 0, 0] },
+    { gas: "CO", name: "Carbon monoxide", unit: "ppm", current: 290, limit: 600, points: [268, 273, 278, 282, 286, 290] },
+    { gas: "CO₂", name: "Carbon dioxide", unit: "ppm", current: 2450, limit: 5000, points: [2280, 2310, 2350, 2390, 2420, 2450] },
+  ],
+  // Arcing signature on the tap-changer: acetylene clearly present.
+  "ast-004": [
+    { gas: "H₂", name: "Hydrogen", unit: "ppm", current: 172, limit: 150, points: [96, 110, 126, 142, 158, 172] },
+    { gas: "CH₄", name: "Methane", unit: "ppm", current: 88, limit: 120, points: [64, 69, 74, 79, 84, 88] },
+    { gas: "C₂H₄", name: "Ethylene", unit: "ppm", current: 55, limit: 60, points: [31, 36, 41, 46, 51, 55] },
+    { gas: "C₂H₆", name: "Ethane", unit: "ppm", current: 38, limit: 65, points: [33, 34, 35, 36, 37, 38] },
+    { gas: "C₂H₂", name: "Acetylene", unit: "ppm", current: 14, limit: 2, points: [1, 2, 4, 7, 10, 14] },
+    { gas: "CO", name: "Carbon monoxide", unit: "ppm", current: 410, limit: 600, points: [372, 380, 389, 396, 403, 410] },
+    { gas: "CO₂", name: "Carbon dioxide", unit: "ppm", current: 3350, limit: 5000, points: [3080, 3140, 3200, 3250, 3300, 3350] },
+  ],
+};
+
 /* ── Live sensor faults ──────────────────────────────────────────────
    Conditions the asset's own instrumentation is reporting right now, as
    opposed to a finding written up in a field report. */
