@@ -254,7 +254,7 @@ function DrawerBody({ d, onAction }: { d: CustomerDetail; onAction: (prompt: str
           <RelatedGroup label="Customer" icon={<Building2 size={15} className="text-gray-400" />} refs={[d.related.customer]} />
           <RelatedGroup label="Contract" icon={<FileText size={15} className="text-gray-400" />} refs={[d.related.contract]} />
           <RelatedGroup label="Assets" icon={<Cpu size={15} className="text-gray-400" />} refs={d.related.assets} />
-          <RelatedGroup label="Originating opportunity" icon={<TrendingUp size={15} className="text-gray-400" />} refs={[d.related.opportunity]} />
+          <RelatedGroup label="Originating lead" icon={<TrendingUp size={15} className="text-gray-400" />} refs={[d.related.opportunity]} />
         </div>
       </Card>
     </div>

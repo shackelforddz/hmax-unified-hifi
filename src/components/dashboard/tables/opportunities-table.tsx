@@ -8,10 +8,10 @@ import { OPPORTUNITIES, OPPORTUNITY_DETAILS, type Opportunity, type OpportunityD
 function detailFor(opp: Opportunity): OpportunityDetail {
   return (
     OPPORTUNITY_DETAILS[opp.id] ?? {
-      summary: `${opp.account} — ${opp.title}. A ${opp.value} opportunity currently at the ${opp.stage} stage.`,
+      summary: `${opp.account} - ${opp.title}. A ${opp.value} lead currently at the ${opp.stage} stage.`,
       recommendations: [opp.recommendedAction],
       assets: [],
-      related: { customer: opp.account, contract: "New opportunity", region: "North America" },
+      related: { customer: opp.account, contract: "New lead", region: "North America" },
     }
   );
 }
@@ -27,7 +27,7 @@ function StatusBadge({ status }: { status: Opportunity["status"] }) {
 
 const COLUMNS: Column<Opportunity>[] = [
   { header: "Account", cell: (o) => <span className="text-gray-900">{o.account}</span> },
-  { header: "Opportunity", cell: (o) => <span className="text-gray-700">{o.title}</span> },
+  { header: "Lead", cell: (o) => <span className="text-gray-700">{o.title}</span> },
   { header: "Value", cell: (o) => <span className="text-gray-700">{o.value}</span> },
   { header: "Stage", cell: (o) => <span className="text-gray-500">{o.stage}</span> },
   { header: "Status", cell: (o) => <StatusBadge status={o.status} /> },
@@ -40,8 +40,8 @@ export default function OpportunitiesTable() {
     <>
       <OpportunityDrawer opp={drawer?.opp ?? null} detail={drawer?.detail ?? null} onClose={() => setDrawer(null)} />
       <DataTable
-        title="Opportunities"
-        subtitle={`${OPPORTUNITIES.length} opportunities`}
+        title="Leads"
+        subtitle={`${OPPORTUNITIES.length} leads`}
         columns={COLUMNS}
         rows={OPPORTUNITIES}
         getKey={(o) => o.id}

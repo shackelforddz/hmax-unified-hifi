@@ -4,26 +4,25 @@ import { useEffect, useState, useRef } from "react";
 import { X, ChevronDown, Check, Circle, Cpu, FileText, ClipboardCheck, UserPlus, ArrowUpRight, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
-import { OPP_STAGES, OPPORTUNITIES, type Opportunity, type OpportunityDetail } from "@/lib/sales-data";
+import { OPP_STAGES, OPPORTUNITIES, leadMeta, type Opportunity, type OpportunityDetail } from "@/lib/sales-data";
 import OwnerBadge from "./owner-badge";
 import DocumentViewer, { type ViewDoc } from "./document-viewer";
 
-// The opportunity rendered as a full brief document.
+// The lead rendered as a full brief document.
 function opportunityDoc(opp: Opportunity, detail: OpportunityDetail): ViewDoc {
   const readyCount = opp.requirements.filter((r) => r.done).length;
   const statusLabel = opp.status === "on-track" ? "On track" : opp.status === "at-risk" ? "At risk" : "Stalled";
   return {
     kind: "contract",
-    docType: "Opportunity brief",
-    title: `${opp.account} — ${opp.title}`,
+    docType: "Lead brief",
+    title: `${opp.account} - ${opp.title}`,
     ref: opp.id.toUpperCase(),
     preview: "text",
     fields: [
       { label: "Account", value: opp.account },
-      { label: "Value", value: opp.value },
       { label: "Stage", value: opp.stage },
-      { label: "Owner", value: opp.owner },
       { label: "Status", value: statusLabel },
+      ...leadMeta(opp),
       { label: "Offer readiness", value: `${readyCount} of ${opp.requirements.length}` },
     ],
     sections: [
@@ -40,7 +39,7 @@ function opportunityDoc(opp: Opportunity, detail: OpportunityDetail): ViewDoc {
         : []),
       {
         heading: "Assets in scope",
-        text: detail.assets.length > 0 ? detail.assets.map((a) => `${a.code} — ${a.note}`).join("; ") : "None scoped yet — still in discovery.",
+        text: detail.assets.length > 0 ? detail.assets.map((a) => `${a.code} - ${a.note}`).join("; ") : "None scoped yet - still in discovery.",
       },
     ],
   };
@@ -120,6 +119,19 @@ function DrawerBody({ opp, detail, onAction }: { opp: Opportunity; detail: Oppor
         <StageProgress current={opp.stage} />
       </Card>
 
+      {/* Bid cycle - the same meta the alert card shows, laid out to read */}
+      <Card>
+        <SectionTitle>Bid cycle</SectionTitle>
+        <div className="grid grid-cols-3 gap-x-6 gap-y-4">
+          {leadMeta(opp).map((m) => (
+            <div key={m.label}>
+              <p className="text-[11px] text-gray-400 tracking-wider">{m.label}</p>
+              <p className="text-sm text-gray-800 mt-0.5 break-words">{m.value}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
       {/* Summary + recommendations */}
       <Card>
         <SectionTitle>Context summary</SectionTitle>
@@ -181,7 +193,7 @@ function DrawerBody({ opp, detail, onAction }: { opp: Opportunity; detail: Oppor
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-400">No specific assets scoped yet — still in discovery.</p>
+          <p className="text-sm text-gray-400">No specific assets scoped yet - still in discovery.</p>
         )}
       </Card>
 
@@ -218,7 +230,7 @@ export default function OpportunityDrawer({ opp, detail, onClose }: Props) {
 
   const runAction = (prompt: string) => {
     onClose();
-    // Only known opportunities have a context-pane record; proposed ones
+    // Only known leads have a context-pane record; proposed ones
     // (prop-*) fall back to customer detection like before.
     const known = opp && OPPORTUNITIES.some((o) => o.id === opp.id);
     launch({ context: opp?.account, prompt, entity: known ? { kind: "opportunity", id: opp!.id } : undefined });
@@ -275,10 +287,9 @@ export default function OpportunityDrawer({ opp, detail, onClose }: Props) {
               </div>
               <div className="flex flex-wrap gap-x-8 gap-y-3 mt-4">
                 {[
-                  { label: "Value", value: opp.value },
-                  { label: "Owner", value: opp.owner },
                   { label: "Stage", value: opp.stage },
                   { label: "Status", value: opp.status === "on-track" ? "On track" : opp.status === "at-risk" ? "At risk" : "Stalled" },
+                  ...leadMeta(opp),
                 ].map((s) => (
                   <div key={s.label}>
                     <p className="text-[11px] text-gray-400 tracking-wider">{s.label}</p>
@@ -297,18 +308,18 @@ export default function OpportunityDrawer({ opp, detail, onClose }: Props) {
             <div className="shrink-0 flex gap-3 px-6 py-4 border-t border-gray-100">
               <Button
                 variant="outline"
-                onClick={() => runAction(`Tell me about the ${opp.account} opportunity`)}
+                onClick={() => runAction(`Tell me about the ${opp.account} lead`)}
                 className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer"
               >
                 Create A Conversation
               </Button>
-              <ActionsMenu onAction={(label) => runAction(`${label} for the ${opp.account} opportunity`)} />
+              <ActionsMenu onAction={(label) => runAction(`${label} for the ${opp.account} lead`)} />
             </div>
           </>
         )}
       </div>
 
-      {/* Full opportunity document */}
+      {/* Full lead document */}
       <DocumentViewer
         doc={viewDoc}
         onClose={() => setViewDoc(null)}
@@ -316,7 +327,7 @@ export default function OpportunityDrawer({ opp, detail, onClose }: Props) {
           setViewDoc(null);
           onClose();
           const known = opp && OPPORTUNITIES.some((o) => o.id === opp.id);
-          launch({ context: opp?.account, prompt: `Walk me through the ${opp?.account} opportunity brief`, entity: known ? { kind: "opportunity", id: opp!.id } : undefined });
+          launch({ context: opp?.account, prompt: `Walk me through the ${opp?.account} lead brief`, entity: known ? { kind: "opportunity", id: opp!.id } : undefined });
         }}
       />
     </>

@@ -9,7 +9,9 @@ import {
 import ContextPanel from "./context-panel";
 import EntityContextPanel from "./context-panel-entity";
 import DocPanel from "./doc-panel";
-import { ChatThread, type ChatMsg, type StoredConversation } from "./chat-panel";
+import ConversationPeople from "./conversation-people";
+import { ChatThread, type AssignedTask, type ChatMsg, type StoredConversation } from "./chat-panel";
+import { PEOPLE, type Person } from "@/lib/people-data";
 import { answerQuery, detectCustomer, suggestNext, visualFor } from "@/lib/knowledge-base";
 import { flowFor, flowById } from "@/lib/guided-flows";
 import { type Playbook } from "@/lib/alert-playbooks";
@@ -47,7 +49,7 @@ const WELCOME_BY_ROLE: Record<string, WelcomeSet> = {
   },
   Sales: {
     suggestions: [
-      { icon: TrendingUp, label: "Build a new opportunity" },
+      { icon: TrendingUp, label: "Build a new lead" },
       { icon: RefreshCw, label: "Prepare an SLA renewal" },
       { icon: FileText, label: "Draft a service offer" },
       { icon: Heart, label: "Evaluate asset risk/health" },
@@ -56,20 +58,20 @@ const WELCOME_BY_ROLE: Record<string, WelcomeSet> = {
     ],
     starters: [
       "What's my pipeline value?",
-      "Which opportunities need attention?",
+      "Which leads need attention?",
       "Which SLAs renew soon?",
       "What's the weighted forecast?",
       "Which assets are critical?",
       "Show fleet health",
     ],
-    defaultPrompt: "Summarize my opportunity pipeline",
+    defaultPrompt: "Summarize my lead pipeline",
   },
   Operations: {
     suggestions: [
       { icon: ClipboardList, label: "Raise a change order" },
       { icon: RefreshCw, label: "Rebalance the crew" },
       { icon: Calendar, label: "Adjust a contract schedule" },
-      { icon: Wrench, label: "Create a work order" },
+      { icon: Wrench, label: "Create a contract" },
       { icon: BarChart2, label: "Create an impact report" },
       { icon: FileText, label: "Create an invoice" },
     ],
@@ -134,7 +136,7 @@ interface Props {
   context?: string;
   /** When launched from a widget: the user's typed prompt to seed the chat. */
   initialPrompt?: string;
-  /** The record this conversation is about — drives the left context pane. */
+  /** The record this conversation is about - drives the left context pane. */
   entity?: ContextEntity;
   /** An alert playbook to open with: situation + recommendation + next steps. */
   playbook?: Playbook;
@@ -156,6 +158,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
   const [activeContext, setActiveContext] = useState<string | undefined>(undefined);
   const [activeEntity, setActiveEntity] = useState<ContextEntity | null>(null);
   const [detectedCustomer, setDetectedCustomer] = useState<string | null>(null);
+  const [participants, setParticipants] = useState<Person[]>([]);
   const [viewDoc, setViewDoc] = useState<ViewDoc | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -172,21 +175,21 @@ export default function ConversationOverlay({ visible, onClose, context, initial
 
   const push = (msg: Omit<ChatMsg, "id">) => setMessages((m) => [...m, { id: nextId(), ...msg }]);
 
-  // Generate the assistant's reply — mobilization / opportunity prompts open a
+  // Generate the assistant's reply - mobilization / lead prompts open a
   // guided wizard, everything else is answered from the knowledge base.
   const respond = (text: string, ctx?: string) => {
     setTyping(true);
     clearTimers();
     const q = text.toLowerCase();
     const isMob = /mobili[sz]|mobilization plan|mobilisation plan/.test(q);
-    const isOpp = /opportunit/.test(q) && /(build|create|new|start|open)/.test(q);
+    const isOpp = /opportunit|\blead/.test(q) && /(build|create|new|start|open)/.test(q);
     const flow = !isMob && !isOpp ? flowFor(text) : undefined;
     if (isMob) {
       // The demo mobilization plan is tied to the Xcel Energy contract
-      // (Sherco HVDC) — surface its detail in the context pane.
+      // (Sherco HVDC) - surface its detail in the context pane.
       setActiveEntity((prev) => prev ?? { kind: "contract", id: "ct-sherco" });
       timers.current.push(
-        setTimeout(() => push({ role: "ai", kind: "text", text: "Of course — let's confirm a few details and I'll draft the plan." }), 1000)
+        setTimeout(() => push({ role: "ai", kind: "text", text: "Of course - let's confirm a few details and I'll draft the plan." }), 1000)
       );
       timers.current.push(
         setTimeout(() => {
@@ -197,7 +200,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
     } else if (isOpp) {
       setWizardStep(1);
       timers.current.push(
-        setTimeout(() => push({ role: "ai", kind: "text", text: "Let's build a new opportunity — I'll walk you through it and pre-fill what I can." }), 1000)
+        setTimeout(() => push({ role: "ai", kind: "text", text: "Let's build a new lead - I'll walk you through it and pre-fill what I can." }), 1000)
       );
       timers.current.push(
         setTimeout(() => {
@@ -240,8 +243,23 @@ export default function ConversationOverlay({ visible, onClose, context, initial
     respond(t, ctx ?? activeContext);
   };
 
+  // Coworkers join in-thread, so the transcript shows when they arrived
+  // relative to what had already been said.
+  const addPerson = (person: Person) => {
+    if (participants.some((p) => p.id === person.id)) return;
+    setParticipants((prev) => [...prev, person]);
+    push({ role: "ai", kind: "event", text: `${person.name} · ${person.role} joined the conversation` });
+  };
+
+  const removePerson = (person: Person) => {
+    setParticipants((prev) => prev.filter((p) => p.id !== person.id));
+    push({ role: "ai", kind: "event", text: `${person.name} left the conversation` });
+  };
+
+  const assignTask = (task: AssignedTask) => push({ role: "ai", kind: "task", task });
+
   // Open an alert conversation with a grounded playbook: the situation (data),
-  // a recommendation, then next-step buttons — many of which start a wizard.
+  // a recommendation, then next-step buttons - many of which start a wizard.
   const startPlaybook = (pb: Playbook, action: string, ctx?: string) => {
     if (!sessionIdRef.current) sessionIdRef.current = `conv-${Date.now()}`;
     setStarted(true);
@@ -257,7 +275,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
         const recommendation: Omit<ChatMsg, "id"> = {
           role: "ai",
           kind: "text",
-          text: `Recommendation — ${pb.recommendation}`,
+          text: `Recommendation - ${pb.recommendation}`,
           suggestions: { prompts: [], actions: pb.steps },
         };
         // For a recap (e.g. a reviewed document) the flow reads best as
@@ -292,6 +310,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
       setActiveContext(undefined);
       setActiveEntity(null);
       setDetectedCustomer(null);
+      setParticipants([]);
       setViewDoc(null);
       idRef.current = 0;
       sessionIdRef.current = null;
@@ -305,13 +324,16 @@ export default function ConversationOverlay({ visible, onClose, context, initial
       setActiveContext(restore.context);
       setActiveEntity(restore.entity ?? null);
       setDetectedCustomer(restore.detectedCustomer ?? null);
+      setParticipants(
+        (restore.participantIds ?? []).map((id) => PEOPLE.find((p) => p.id === id)).filter((p): p is Person => !!p)
+      );
       if (restore.messages.length > 0) {
         // Restore the existing thread
         idRef.current = restore.messages.reduce((m, x) => Math.max(m, x.id), 0);
         setMessages(restore.messages);
         setStarted(true);
       } else {
-        // Seed conversation with no thread yet — run its prompt fresh
+        // Seed conversation with no thread yet - run its prompt fresh
         send(restore.seedPrompt || restore.title, restore.context);
       }
     }
@@ -348,10 +370,11 @@ export default function ConversationOverlay({ visible, onClose, context, initial
       context: activeContext,
       entity: activeEntity ?? undefined,
       detectedCustomer,
+      participantIds: participants.map((p) => p.id),
       messages,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, started, activeContext, activeEntity, detectedCustomer]);
+  }, [messages, started, activeContext, activeEntity, detectedCustomer, participants]);
 
   useEffect(() => clearTimers, []);
 
@@ -375,7 +398,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
     else if (t) send(t);
   };
 
-  // Final step of the opportunity wizard — confirm creation.
+  // Final step of the lead wizard - confirm creation.
   const oppCreate = () => {
     setTyping(true);
     clearTimers();
@@ -386,12 +409,12 @@ export default function ConversationOverlay({ visible, onClose, context, initial
           role: "ai",
           kind: "text",
           text:
-            "✓ Opportunity created and added to your pipeline.\n\nDuke Energy — Fleet reliability program is now in Discovery ($5.4M, Premium). Next steps: qualify the budget and capture the account & shipping details to move it toward Scoping.",
+            "✓ Lead created and added to your pipeline.\n\nDuke Energy - Fleet reliability program is now in Discovery ($5.4M, Premium). Next steps: qualify the budget and capture the account & shipping details to move it toward Scoping.",
           suggestions: {
             prompts: ["What's needed to reach the Offer stage?", "Show the Duke Energy fleet", "Draft a qualification plan"],
             actions: [
               { label: "Capture account details", prompt: "Capture account and shipping details for Duke Energy" },
-              { label: "Assign owner", prompt: "Assign an owner to the Duke Energy opportunity" },
+              { label: "Assign owner", prompt: "Assign an owner to the Duke Energy lead" },
             ],
           },
         });
@@ -399,7 +422,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
     );
   };
 
-  // Final step of a generic guided flow — confirm the action.
+  // Final step of a generic guided flow - confirm the action.
   const flowComplete = (flowId: string) => {
     const flow = flowById(flowId);
     setTyping(true);
@@ -419,8 +442,8 @@ export default function ConversationOverlay({ visible, onClose, context, initial
     );
   };
 
-  // The left context pane only ever shows detail content for a real record —
-  // an asset, contract, opportunity, or customer. It appears when a record is
+  // The left context pane only ever shows detail content for a real record -
+  // an asset, contract, lead, or customer. It appears when a record is
   // pinned (activeEntity) or a customer is identified from the conversation;
   // otherwise there is no pane (no placeholder / default account).
   const showPanel = started && (!!activeEntity || !!detectedCustomer);
@@ -447,7 +470,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
       {/* Backdrop click closes only before a conversation has started */}
       {!started && <div className="absolute inset-0" onClick={onClose} />}
 
-      {/* Close button — the header X only exists once a conversation starts */}
+      {/* Close button - the header X only exists once a conversation starts */}
       {!started && (
         <button
           onClick={onClose}
@@ -458,7 +481,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
         </button>
       )}
 
-      {/* Left — customer context. For widget-launched chats it stays hidden
+      {/* Left - customer context. For widget-launched chats it stays hidden
           until the conversation is tied to a specific customer. */}
       <div
         className={`relative z-10 rounded-lg shrink-0 overflow-hidden transition-[width] duration-500 ease-in-out ${
@@ -478,11 +501,11 @@ export default function ConversationOverlay({ visible, onClose, context, initial
         </div>
       </div>
 
-      {/* Right — welcome → conversation (prompt box is the fixed anchor) */}
+      {/* Right - welcome → conversation (prompt box is the fixed anchor) */}
       <div className="relative z-10 flex-1 min-w-0 flex flex-col">
-        {/* Header — fades in once started */}
+        {/* Header - fades in once started */}
         <div
-          className={`shrink-0 transition-all duration-500 ${
+          className={`relative z-20 shrink-0 transition-all duration-500 ${
             started ? "opacity-100 max-h-20" : "opacity-0 max-h-0 overflow-hidden"
           }`}
         >
@@ -491,9 +514,12 @@ export default function ConversationOverlay({ visible, onClose, context, initial
               {activeContext ?? messages.find((m) => m.role === "user")?.text ?? "New conversation"}
             </h2>
             <div className="flex items-center gap-1 shrink-0">
-              <button className="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:bg-black/5 transition-colors cursor-pointer">
-                <UserRoundPlus size={17} strokeWidth={1.5} />
-              </button>
+              <ConversationPeople
+                participants={participants}
+                onAdd={addPerson}
+                onRemove={removePerson}
+                onAssign={assignTask}
+              />
               <button
                 onClick={onClose}
                 aria-label="Close conversation"
@@ -545,7 +571,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
           </div>
         </div>
 
-        {/* Persistent prompt box — the anchor that never swaps out */}
+        {/* Persistent prompt box - the anchor that never swaps out */}
         <div className="shrink-0 pb-6 pt-2">
           {/* Suggested starter prompts (welcome screen only) */}
           {!started && (
@@ -583,7 +609,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
         </div>
       </div>
 
-      {/* Document panel — pushes in from the right, mirroring the context panel */}
+      {/* Document panel - pushes in from the right, mirroring the context panel */}
       <div
         className={`relative z-10 shrink-0 overflow-hidden transition-[width] duration-500 ease-in-out ${
           docVisible ? "w-[460px]" : "w-0"

@@ -17,7 +17,7 @@ export const RECOMMENDED_TASKS: Record<string, RecommendedTask[]> = {
   Sales: [
     { label: "What's my weighted pipeline forecast?", prompt: "What is my weighted pipeline forecast this quarter?" },
     { label: "Which SLA renewals are coming up?", prompt: "Which SLA renewals are coming up and which are at risk?" },
-    { label: "Summarise opportunities at offer stage", prompt: "Summarise my opportunities at offer stage or beyond." },
+    { label: "Summarise leads at offer stage", prompt: "Summarise my leads at offer stage or beyond." },
     { label: "Which accounts have asset alerts?", prompt: "Which accounts have open asset alerts I should know about?" },
   ],
   Operations: [
@@ -44,17 +44,17 @@ export function recommendedTasksFor(role: string): RecommendedTask[] {
   return RECOMMENDED_TASKS[role] ?? RECOMMENDED_TASKS["Project Manager"];
 }
 
-/* Action-oriented tasks — things to create/do, not just ask. Some (mobilization
-   plan, new opportunity) hook into the assistant's guided wizards. */
+/* Action-oriented tasks - things to create/do, not just ask. Some (mobilization
+   plan, new lead) hook into the assistant's guided wizards. */
 export const RECOMMENDED_ACTIONS: Record<string, RecommendedTask[]> = {
   "Project Manager": [
     { label: "Create a mobilization plan", prompt: "Create a mobilization plan for Xcel Energy" },
-    { label: "Raise a new work order", prompt: "Raise a new work order" },
+    { label: "Raise a new contract", prompt: "Raise a new contract" },
     { label: "Create an impact report", prompt: "Create an impact report" },
     { label: "Create an invoice", prompt: "Create an invoice" },
   ],
   Sales: [
-    { label: "Create a new opportunity", prompt: "Create a new opportunity" },
+    { label: "Create a new lead", prompt: "Create a new lead" },
     { label: "Create a mobilization plan", prompt: "Create a mobilization plan for Xcel Energy" },
     { label: "Draft a renewal quote", prompt: "Draft a renewal quote" },
     { label: "Create an impact report", prompt: "Create an impact report" },
@@ -67,12 +67,12 @@ export const RECOMMENDED_ACTIONS: Record<string, RecommendedTask[]> = {
   ],
   "Reliability Engineer": [
     { label: "Create an inspection plan", prompt: "Create an inspection plan" },
-    { label: "Raise a new work order", prompt: "Raise a new work order" },
+    { label: "Raise a new contract", prompt: "Raise a new contract" },
     { label: "Draft a feasibility review", prompt: "Draft a feasibility review" },
     { label: "Create an impact report", prompt: "Create an impact report" },
   ],
   Diagnostics: [
-    { label: "Raise a corrective work order", prompt: "Raise a corrective work order" },
+    { label: "Raise a corrective contract", prompt: "Raise a corrective contract" },
     { label: "Schedule a field engineer", prompt: "Schedule a field engineer" },
     { label: "Create a diagnostics summary", prompt: "Create a diagnostics summary" },
     { label: "Create an impact report", prompt: "Create an impact report" },

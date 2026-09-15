@@ -123,13 +123,13 @@ export default function GoogleFleetMap({ apiKey }: { apiKey: string }) {
     <div className="relative rounded-xl overflow-hidden border border-gray-200 h-full min-h-[420px] bg-gray-100">
       <AssetDrawer assetId={drawerId} onClose={() => setDrawerId(null)} />
 
-      {/* Map — CSS grayscale keeps it on-brand regardless of tile colours */}
+      {/* Map - CSS grayscale keeps it on-brand regardless of tile colours */}
       <div ref={ref} className="absolute inset-0 grayscale" />
 
       {!ready && !failed && <div className="absolute inset-0 bg-gray-100 animate-pulse" />}
       {failed && (
         <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
-          <p className="text-sm text-gray-400">Couldn&apos;t load Google Maps — check the API key.</p>
+          <p className="text-sm text-gray-400">Couldn&apos;t load Google Maps - check the API key.</p>
         </div>
       )}
 

@@ -15,7 +15,7 @@ interface Props {
 
 export default function ConversationsPanel({ conversations, onNewConversation, onSelect, onStartPrompt }: Props) {
   const selectedRole = useAppSelector((s) => s.auth.selectedRole);
-  // One merged list of things to try — deep-dive questions and quick actions
+  // One merged list of things to try - deep-dive questions and quick actions
   // interleaved so the two kinds alternate rather than grouping together.
   const asks = recommendedTasksFor(selectedRole).map((t) => ({ ...t, kind: "ask" as const }));
   const tasks = recommendedActionsFor(selectedRole).map((t) => ({ ...t, kind: "task" as const }));
@@ -69,7 +69,7 @@ export default function ConversationsPanel({ conversations, onNewConversation, o
         )}
       </div>
 
-      {/* Bottom section — recommendations (when empty) + New Conversation */}
+      {/* Bottom section - recommendations (when empty) + New Conversation */}
       <div className="shrink-0 border-t border-zinc-800">
         {conversations.length === 0 && (
           <div className="px-4 pt-4">
@@ -77,7 +77,7 @@ export default function ConversationsPanel({ conversations, onNewConversation, o
               <span className="text-[11px] tracking-wider text-zinc-500">Recommended for you</span>
             </div>
 
-            {/* Horizontal scroll card list — deep-dives and quick actions together.
+            {/* Horizontal scroll card list - deep-dives and quick actions together.
                 Left aligns with the header; right bleeds for scroll affordance. */}
             <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mr-4 pr-4 pl-1 snap-x">
               {cards.map((card) => (

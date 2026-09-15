@@ -236,15 +236,15 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
               {d ? (
                 <DrawerBody w={w} d={d} onAction={runAction} />
               ) : (
-                <p className="text-sm text-gray-400">No further detail recorded for this work order yet.</p>
+                <p className="text-sm text-gray-400">No further detail recorded for this contract yet.</p>
               )}
             </div>
 
             <div className="shrink-0 flex gap-3 px-6 py-4 border-t border-gray-100">
-              <Button variant="outline" onClick={() => runAction(`Tell me about work order ${w.code}`)} className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer">
+              <Button variant="outline" onClick={() => runAction(`Tell me about contract ${w.code}`)} className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer">
                 Create A Conversation
               </Button>
-              <ActionsMenu onAction={(label) => runAction(`${label} for work order ${w.code}`)} />
+              <ActionsMenu onAction={(label) => runAction(`${label} for contract ${w.code}`)} />
             </div>
           </>
         )}

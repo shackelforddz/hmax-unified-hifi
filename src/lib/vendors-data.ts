@@ -1,4 +1,4 @@
-/* Alternative suppliers for the "Reassign Vendor" CTA — the Delta Coils
+/* Alternative suppliers for the "Reassign Vendor" CTA - the Delta Coils
    concentration on HVDC winding sets. */
 
 export interface AltVendor {
@@ -37,7 +37,7 @@ export const ALT_VENDORS: AltVendor[] = [
   },
   {
     id: "v-hitachi",
-    name: "Hitachi Energy — Chennai",
+    name: "Hitachi Energy - Chennai",
     scope: "Winding sets (internal supply)",
     leadTime: "14 weeks",
     costDelta: "-3%",

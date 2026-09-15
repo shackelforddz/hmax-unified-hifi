@@ -1,4 +1,4 @@
-/* ── PM team — people & allocation ───────────────────────────────── */
+/* ── PM team - people & allocation ───────────────────────────────── */
 
 export interface Certification {
   name: string;
@@ -11,8 +11,10 @@ export interface Person {
   location: string;
   allocation: number;      // % utilisation
   avatar: string;
-  /** Work order ids this person is assigned to (see work-orders-data). */
-  taskIds: string[];
+  /** Contract ids this person is assigned to (see OPS_CONTRACTS). */
+  contractIds: string[];
+  /** Lead ids this person owns (see OPPORTUNITIES). Sales roles only. */
+  leadIds?: string[];
   /** On-site field engineer (does inspections). */
   field?: boolean;
   competencies: string[];
@@ -27,7 +29,7 @@ export const PEOPLE: Person[] = [
     location: "Chicago, IL",
     allocation: 92,
     avatar: "/avatars/12.jpg",
-    taskIds: ["wo-2041", "wo-2019"],
+    contractIds: ["ct-sherco"],
     field: true,
     competencies: ["HV authorised", "Thermography Lvl 2", "HVDC commissioning"],
     certifications: [
@@ -42,7 +44,7 @@ export const PEOPLE: Person[] = [
     location: "Aberdeen, UK",
     allocation: 96,
     avatar: "/avatars/5.jpg",
-    taskIds: ["wo-2038", "wo-2027"],
+    contractIds: ["ct-northsea", "ct-baltic"],
     field: true,
     competencies: ["Lifting supervisor", "Offshore operations"],
     certifications: [
@@ -57,7 +59,7 @@ export const PEOPLE: Person[] = [
     location: "Hamburg, DE",
     allocation: 74,
     avatar: "/avatars/9.jpg",
-    taskIds: ["wo-2035", "wo-2024"],
+    contractIds: ["ct-pacific"],
     field: true,
     competencies: ["HV competent", "Oil sampling", "DGA analysis"],
     certifications: [
@@ -72,7 +74,7 @@ export const PEOPLE: Person[] = [
     location: "Columbus, OH",
     allocation: 61,
     avatar: "/avatars/14.jpg",
-    taskIds: ["wo-2031", "wo-2012"],
+    contractIds: ["ct-baltic"],
     field: true,
     competencies: ["Vibration analysis (Cat III)", "PD testing", "Power factor"],
     certifications: [
@@ -87,7 +89,7 @@ export const PEOPLE: Person[] = [
     location: "Manchester, UK",
     allocation: 68,
     avatar: "/avatars/15.jpg",
-    taskIds: ["wo-2019"],
+    contractIds: ["ct-sherco"],
     field: true,
     competencies: ["Commissioning", "Protection & control", "SCADA"],
     certifications: [
@@ -97,5 +99,53 @@ export const PEOPLE: Person[] = [
   },
 ];
 
-// On-site field engineers — used by the Diagnostics view.
+// On-site field engineers - used by the Diagnostics view.
+/* ── Sales team ──────────────────────────────────────────────────────
+   Account-facing owners. They carry the leads in OPPORTUNITIES and the
+   service contracts on those same accounts. */
+export const SALES_PEOPLE: Person[] = [
+  {
+    id: "p-elena",
+    name: "Elena Novak",
+    role: "Account Director",
+    location: "Denver, CO",
+    allocation: 88,
+    avatar: "/avatars/33.jpg",
+    contractIds: ["ct-sherco"],
+    leadIds: ["opp-xcel", "opp-nv"],
+    competencies: [],
+    certifications: [],
+  },
+  {
+    id: "p-tomas",
+    name: "Tomás Ruiz",
+    role: "Senior Account Manager",
+    location: "Chicago, IL",
+    allocation: 94,
+    avatar: "/avatars/11.jpg",
+    contractIds: ["ct-northsea", "ct-baltic"],
+    leadIds: ["opp-comed", "opp-duke"],
+    competencies: [],
+    certifications: [],
+  },
+  {
+    id: "p-hannah",
+    name: "Hannah Cole",
+    role: "Account Manager",
+    location: "Columbus, OH",
+    allocation: 71,
+    avatar: "/avatars/13.jpg",
+    contractIds: ["ct-pacific"],
+    leadIds: ["opp-aep", "opp-pacific"],
+    competencies: [],
+    certifications: [],
+  },
+];
+
 export const FIELD_ENGINEERS: Person[] = PEOPLE.filter((p) => p.field);
+
+/** Delivery-side team - the people who run contracts, not leads. */
+export const DELIVERY_TEAM: Person[] = PEOPLE;
+
+/** Everyone who owns a lead - the sales-facing view of the team. */
+export const SALES_TEAM: Person[] = SALES_PEOPLE;

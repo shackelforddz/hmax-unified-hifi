@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Asterisk, Info, Check, AlertTriangle, ChevronLeft, ChevronRight, X, Plus, GripVertical, BarChart2 } from "lucide-react";
+import { Asterisk, Info, Check, AlertTriangle, ChevronLeft, ChevronRight, X, Plus, GripVertical, BarChart2, ClipboardCheck, CalendarClock, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type Suggestions } from "@/lib/knowledge-base";
 import { type CustomWidgetConfig } from "@/lib/custom-widget";
@@ -10,6 +10,7 @@ import { ChartBody } from "@/components/dashboard/sales/custom-widget-view";
 import { flowById, type GuidedFlow, type FlowField } from "@/lib/guided-flows";
 import { type PlaybookPanel } from "@/lib/alert-playbooks";
 import { DocContent, type ViewDoc } from "@/components/dashboard/sales/document-viewer";
+import { OPS_CONTRACT_DETAILS } from "@/lib/operations-data";
 
 /* ── Typing indicator ────────────────────────────────────────────── */
 function TypingBubble() {
@@ -91,7 +92,7 @@ function StepCase() {
         <p className="text-xs text-gray-400 tracking-widest mb-1">Step 1 of 5</p>
         <h3 className="text-2xl text-gray-900 mb-1 font-patrick-hand">Case details</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
-          Confirm or update the case basics. The system has pre-filled from the linked opportunity OPP-441.
+          Confirm or update the case basics. The system has pre-filled from the linked lead OPP-441.
         </p>
       </div>
       <InfoBanner
@@ -147,13 +148,13 @@ function StepCase() {
 function StepScope() {
   const [urgency, setUrgency] = useState("High");
   const [workTypes, setWorkTypes] = useState(["Inspection", "Diagnostic testing"]);
-  const [outage, setOutage] = useState("Yes — planned outage");
+  const [outage, setOutage] = useState("Yes - planned outage");
 
   const workTypeOpts = [
     "Inspection", "Diagnostic testing", "Condition assessment", "Repair / replacement",
     "Parts installation", "Commissioning", "Monitoring setup", "Documentation / report",
   ];
-  const outageOpts = ["Yes — planned outage", "No — live working", "Partial outage"];
+  const outageOpts = ["Yes - planned outage", "No - live working", "Partial outage"];
 
   return (
     <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
@@ -192,7 +193,7 @@ function StepScope() {
         <label className="text-xs text-gray-500 mb-1 block">
           Work types needed <span className="text-gray-400">*</span>
         </label>
-        <p className="text-xs text-gray-400 mb-2">Select all that apply — pre-selected based on field signals</p>
+        <p className="text-xs text-gray-400 mb-2">Select all that apply - pre-selected based on field signals</p>
         <div className="flex flex-wrap gap-2">
           {workTypeOpts.map((w) => {
             const active = workTypes.includes(w);
@@ -259,7 +260,7 @@ const STAFF_DIRECTORY: Record<string, StaffMember> = {
   liam: { id: "liam", name: "Liam O.", role: "Field technician", skills: "HV competent · Lifting supervisor", avail: "Committed until 24 Aug", conflict: true, img: "/avatars/13.jpg" },
   jordan: { id: "jordan", name: "Jordan P.", role: "Lead engineer", skills: "HV authorised · DGA certified", avail: "Available · no conflicts", img: "/avatars/14.jpg" },
   tom: { id: "tom", name: "Tom H.", role: "Reliability engineer", skills: "PD testing · Power factor", avail: "Available from 19 Aug", img: "/avatars/15.jpg" },
-  kara: { id: "kara", name: "Kara M.", role: "HSE officer", skills: "Offshore BOSIET · Confined space", avail: "Available — no conflicts", img: "/avatars/9.jpg" },
+  kara: { id: "kara", name: "Kara M.", role: "HSE officer", skills: "Offshore BOSIET · Confined space", avail: "Available - no conflicts", img: "/avatars/9.jpg" },
 };
 
 function StaffCard({
@@ -375,7 +376,7 @@ function StepStaffing() {
       </div>
       <InfoBanner
         title="Suggested from availability calendar and certification database."
-        sub="1 conflict detected — review below."
+        sub="1 conflict detected - review below."
       />
 
       {/* Staffed */}
@@ -574,10 +575,19 @@ const CALENDAR_CELLS: Cell[] = [
 
 const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
+/* The mobilization demo runs against the Sherco contract, so its customer-side
+   contact is who the schedule goes to for confirmation. */
+const SCHEDULE_CONTACT = OPS_CONTRACT_DETAILS["ct-sherco"]?.contacts[0];
+
 function StepSchedule() {
   const [events, setEvents] = useState<CalEvent[]>(INITIAL_EVENTS);
   const dragId = useRef<string | null>(null);
   const [overDay, setOverDay] = useState<number | null>(null);
+  const [sent, setSent] = useState(false);
+
+  // The window the schedule spans, recomputed as events are dragged.
+  const days = events.map((e) => e.day);
+  const span = `${Math.min(...days)}-${Math.max(...days)} August 2026`;
 
   const moveEvent = (day: number) => {
     const id = dragId.current;
@@ -668,6 +678,42 @@ function StepSchedule() {
           })}
         </div>
       </div>
+
+      {/* Send the schedule to the customer for confirmation */}
+      {sent ? (
+        <div className="flex items-start gap-3 border border-gray-200 rounded-xl px-4 py-3">
+          <span className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center shrink-0 mt-0.5">
+            <Check size={13} strokeWidth={2.5} className="text-white" />
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-gray-900">Sent to {SCHEDULE_CONTACT?.name ?? "the customer"} for confirmation</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {events.length} events · {span}
+              {SCHEDULE_CONTACT ? ` · ${SCHEDULE_CONTACT.email}` : ""}
+            </p>
+          </div>
+          <button
+            onClick={() => setSent(false)}
+            className="shrink-0 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
+          >
+            Undo
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-gray-900">Confirm the window with the customer</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {events.length} events · {span}
+              {SCHEDULE_CONTACT ? ` · ${SCHEDULE_CONTACT.name}, ${SCHEDULE_CONTACT.role}` : ""}
+            </p>
+          </div>
+          <Button onClick={() => setSent(true)} className="rounded-full h-auto px-4 py-2 text-sm cursor-pointer shrink-0">
+            <Send size={14} strokeWidth={1.5} />
+            Confirm with customer
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -691,7 +737,7 @@ function WizardCard({
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
       <StepTabs current={step} />
 
-      {/* Step content — cross-fades when the step changes */}
+      {/* Step content - cross-fades when the step changes */}
       <div key={step} className="animate-step-in">
         {step === 1 && <StepCase />}
         {step === 2 && <StepScope />}
@@ -700,7 +746,7 @@ function WizardCard({
         {step === 5 && <StepSchedule />}
       </div>
 
-      {/* Footer — Back (left) once past the first step, Continue (right) until the last */}
+      {/* Footer - Back (left) once past the first step, Continue (right) until the last */}
       {(!isFirst || !isLast) && (
         <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100">
           {!isFirst ? (
@@ -726,7 +772,7 @@ function WizardCard({
   );
 }
 
-/* ── Opportunity creation wizard ─────────────────────────────────── */
+/* ── Lead creation wizard ────────────────────────────────────────── */
 const OPP_STEP_DEFS = [
   { num: 1, label: "Account" },
   { num: 2, label: "Scope" },
@@ -785,13 +831,13 @@ function OppChips({ label, options, initial }: { label: string; options: string[
 function OppStepAccount() {
   return (
     <OppFieldGroup>
-      <OppHeader n={1} title="Account & opportunity" sub="Start with who the opportunity is for. The system has suggested details from portfolio signals." />
-      <InfoBanner title="Suggested from portfolio signals" sub="Duke Energy fleet health is declining — a strong reliability-program candidate." />
+      <OppHeader n={1} title="Account & lead" sub="Start with who the lead is for. The system has suggested details from portfolio signals." />
+      <InfoBanner title="Suggested from portfolio signals" sub="Duke Energy fleet health is declining - a strong reliability-program candidate." />
       <div className="grid grid-cols-2 gap-3">
         <OppInput label="Customer" value="Duke Energy" star />
         <OppInput label="Region" value="North America" />
       </div>
-      <OppInput label="Opportunity title" value="Fleet reliability program" star />
+      <OppInput label="Lead title" value="Fleet reliability program" star />
       <OppInput label="Estimated value" value="$5.4M" />
     </OppFieldGroup>
   );
@@ -799,8 +845,8 @@ function OppStepAccount() {
 function OppStepScope() {
   return (
     <OppFieldGroup>
-      <OppHeader n={2} title="Scope & assets" sub="Define what the opportunity covers and which assets are involved." />
-      <OppChips label="Opportunity type" options={["Service agreement", "Replacement", "Upgrade", "Retrofit"]} initial="Service agreement" />
+      <OppHeader n={2} title="Scope & assets" sub="Define what the lead covers and which assets are involved." />
+      <OppChips label="Lead type" options={["Service agreement", "Replacement", "Upgrade", "Retrofit"]} initial="Service agreement" />
       <OppInput label="Assets in scope" value="Fleet-wide · 12 converter stations" />
       <div>
         <label className="text-xs text-gray-500 mb-1.5 block">Technical requirements</label>
@@ -829,14 +875,14 @@ function OppStepCommercials() {
 function OppStepReview() {
   const rows = [
     { label: "Customer", value: "Duke Energy · North America" },
-    { label: "Opportunity", value: "Fleet reliability program" },
+    { label: "Lead", value: "Fleet reliability program" },
     { label: "Value", value: "$5.4M · Premium · 18% margin" },
     { label: "Scope", value: "Service agreement · fleet-wide (12 stations)" },
     { label: "Entry stage", value: "Discovery" },
   ];
   return (
     <OppFieldGroup>
-      <OppHeader n={4} title="Review & create" sub="Confirm the details — the opportunity will enter your pipeline at Discovery." />
+      <OppHeader n={4} title="Review & create" sub="Confirm the details - the lead will enter your pipeline at Discovery." />
       <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
         {rows.map((r, i) => (
           <div key={r.label} className={`flex items-start gap-4 px-4 py-3 ${i < rows.length - 1 ? "border-b border-gray-100" : ""}`}>
@@ -883,7 +929,7 @@ function OppWizardCard({
         )}
         {isLast ? (
           <Button onClick={onCreate} className="rounded-full h-auto px-6 py-2 text-sm cursor-pointer">
-            Create opportunity
+            Create lead
           </Button>
         ) : (
           <Button onClick={onContinue} className="rounded-full h-auto px-6 py-2 text-sm cursor-pointer">
@@ -1056,14 +1102,28 @@ function SourcesLine() {
 }
 
 /* ── Chat thread ─────────────────────────────────────────────────── */
+/** A task handed to a coworker who has been added to the conversation. */
+export interface AssignedTask {
+  assigneeId: string;
+  assignee: string;
+  role: string;
+  avatar: string;
+  title: string;
+  /** ISO date, or "" when no date was set. */
+  due: string;
+  note?: string;
+}
+
 export interface ChatMsg {
   id: number;
   role: "user" | "ai";
-  kind?: "text" | "wizard" | "opp-wizard" | "flow" | "panel";
+  kind?: "text" | "wizard" | "opp-wizard" | "flow" | "panel" | "event" | "task";
   /** For kind === "flow": which guided flow to render. */
   flowId?: string;
   /** For kind === "panel": the interactive alert-playbook panel. */
   panel?: PlaybookPanel;
+  /** For kind === "task": the assignment card. */
+  task?: AssignedTask;
   text?: string;
   suggestions?: Suggestions;
   visual?: CustomWidgetConfig;
@@ -1080,6 +1140,8 @@ export interface StoredConversation {
   /** The record this conversation is about (drives the left context pane). */
   entity?: ContextEntity;
   messages: ChatMsg[];
+  /** Coworkers added to the conversation (people-data ids). */
+  participantIds?: string[];
   /** For seed conversations with no thread yet: the prompt to run on open. */
   seedPrompt?: string;
 }
@@ -1233,6 +1295,49 @@ function PanelBlock({ panel, onSend, onOpenDoc }: { panel: PlaybookPanel; onSend
   );
 }
 
+/* ── Participant joined / left ───────────────────────────────────── */
+function EventLine({ text }: { text: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-5 animate-message-in">
+      <hr className="flex-1 border-gray-200" />
+      <p className="text-xs text-gray-400 shrink-0">{text}</p>
+      <hr className="flex-1 border-gray-200" />
+    </div>
+  );
+}
+
+/* ── An assigned task ────────────────────────────────────────────── */
+function TaskCard({ task }: { task: AssignedTask }) {
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-gray-100 flex items-center gap-2">
+        <ClipboardCheck size={14} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+        <p className="text-xs text-gray-500">Task assigned</p>
+      </div>
+      <div className="px-4 py-3">
+        <p className="text-sm text-gray-900 leading-snug mb-2">{task.title}</p>
+        {task.note && <p className="text-sm text-gray-500 leading-relaxed mb-3">{task.note}</p>}
+        <div className="flex items-center gap-4 flex-wrap">
+          <span className="flex items-center gap-2 min-w-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={task.avatar} alt="" aria-hidden className="w-6 h-6 rounded-full object-cover bg-gray-200 shrink-0 grayscale" />
+            <span className="min-w-0">
+              <span className="block text-xs text-gray-700 truncate">{task.assignee}</span>
+              <span className="block text-[11px] text-gray-400 truncate">{task.role}</span>
+            </span>
+          </span>
+          {task.due && (
+            <span className="flex items-center gap-1.5 text-xs text-gray-500 whitespace-nowrap">
+              <CalendarClock size={13} strokeWidth={1.5} className="text-gray-400" />
+              Due {task.due}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface ThreadProps {
   messages: ChatMsg[];
   typing: boolean;
@@ -1254,7 +1359,16 @@ export function ChatThread({ messages, typing, context, wizardStep, onWizardStep
       {context && <ContextCard context={context} />}
 
       {messages.map((m) =>
-        m.role === "user" ? (
+        m.kind === "event" ? (
+          <EventLine key={m.id} text={m.text ?? ""} />
+        ) : m.kind === "task" && m.task ? (
+          <div key={m.id} className="flex items-start gap-3 mb-5 animate-message-in">
+            <AiAvatar />
+            <div className="flex-1 min-w-0">
+              <TaskCard task={m.task} />
+            </div>
+          </div>
+        ) : m.role === "user" ? (
           <div key={m.id} className="flex items-start gap-3 mb-5 animate-message-in">
             <div className="flex-1 bg-white border border-gray-100 rounded-2xl px-4 py-3">
               <p className="text-sm text-gray-800 whitespace-pre-line">{m.text}</p>
@@ -1348,7 +1462,7 @@ export function ChatThread({ messages, typing, context, wizardStep, onWizardStep
               <div className="mt-2 ml-1">
                 <SourcesLine />
               </div>
-              {/* Proactive suggestions — only under the newest reply, once it has streamed in */}
+              {/* Proactive suggestions - only under the newest reply, once it has streamed in */}
               {m.id === lastId && !typing && m.suggestions && (
                 <SuggestionBlock suggestions={m.suggestions} onSend={onSend} />
               )}

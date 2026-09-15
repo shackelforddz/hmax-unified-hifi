@@ -18,7 +18,7 @@ export const ALTERNATIVE_ROLES: Role[] = [
     id: "sales",
     label: "Sales",
     description:
-      "Customer pipelines, opportunity tracking, revenue forecasts, and account management dashboards.",
+      "Customer pipelines, lead tracking, revenue forecasts, and account management dashboards.",
     icon: "Banknote",
   },
   {
@@ -64,14 +64,14 @@ export function roleFromSlug(slug: string): Role | undefined {
   return label ? ALL_ROLES.find((r) => r.label === label) : undefined;
 }
 
-// Roles with a dedicated dashboard view — the ones worth demoing.
+// Roles with a dedicated dashboard view - the ones worth demoing.
 export const DEMO_ROLES: Role[] = ALL_ROLES.filter((r) =>
   ["project-manager", "sales", "operations", "reliability-engineer", "diagnostics"].includes(r.id)
 );
 
 /* ── Role-confirm intro content ──────────────────────────────────── */
 export const PRODUCT_INTRO =
-  "HMAX Unified brings your assets, contracts and teams into one place — with a conversational assistant that helps you deep dive and get your work done.";
+  "HMAX Unified brings your assets, contracts and teams into one place - with a conversational assistant that helps you deep dive and get your work done.";
 
 export interface HowToStep {
   icon: string;   // lucide icon name
@@ -85,7 +85,7 @@ export const HOW_TO_USE: HowToStep[] = [
     icon: "LayoutDashboard",
     title: "Start from your dashboard",
     detail:
-      "Your workspace opens on the widgets tuned to your role — the KPIs, alerts and lists that matter to you first.",
+      "Your workspace opens on the widgets tuned to your role - the KPIs, alerts and lists that matter to you first.",
   },
   {
     icon: "MessageSquareText",
@@ -97,13 +97,13 @@ export const HOW_TO_USE: HowToStep[] = [
     icon: "CircleCheck",
     title: "Get your tasks done",
     detail:
-      "Hand off the work — reschedule delivery, draft a review, chase an invoice. The assistant carries the full context and drives it to a next step.",
+      "Hand off the work - reschedule delivery, draft a review, chase an invoice. The assistant carries the full context and drives it to a next step.",
   },
   {
     icon: "PanelRightOpen",
     title: "Drill into the detail when you need it",
     detail:
-      "Open any asset, contract, customer or opportunity for the full record — summary, documents and history — right alongside the conversation.",
+      "Open any asset, contract, customer or lead for the full record - summary, documents and history - right alongside the conversation.",
   },
 ];
 
@@ -120,14 +120,14 @@ export const ROLE_INTRO: Record<string, RoleIntro> = {
       "Customers and contracts needing your attention",
       "Delivery trend, revenue-at-risk and upcoming milestones",
       "Vendor concentration and program-level risk",
-      "Your team's allocation and assigned work orders",
+      "Your team's allocation and assigned contracts",
     ],
   },
   Sales: {
     detection:
       "Matched from your commercial access groups, account ownership in the pipeline tools, and recent CRM activity.",
     highlights: [
-      "Opportunity pipeline, weighted forecast and stage breakdown",
+      "Lead pipeline, weighted forecast and stage breakdown",
       "SLA renewals and service-agreement health",
       "Fleet map and asset alerts by account",
       "Repeat-repair assets and account summaries",
@@ -137,10 +137,10 @@ export const ROLE_INTRO: Record<string, RoleIntro> = {
     detection:
       "Matched from your service-delivery access groups and recent activity across scheduling and work-order systems.",
     highlights: [
-      "Portfolio health — margin, revenue and outstanding payments",
+      "Portfolio health - margin, revenue and outstanding payments",
       "Contracts needing attention with change-order, HSE and quality alerts",
       "Financial performance and resource capacity",
-      "Your team's allocation and work orders",
+      "Your team's allocation and contracts",
     ],
   },
   "Reliability Engineer": {
@@ -148,7 +148,7 @@ export const ROLE_INTRO: Record<string, RoleIntro> = {
       "Matched from your engineering access groups, asset-management activity, and reliability tooling.",
     highlights: [
       "Fleet health and asset alerts by review type",
-      "Contracts to review — scope feasibility handed over from sales",
+      "Contracts to review - scope feasibility handed over from sales",
       "Handover-vs-site constraints and engineering bulletins",
       "Nameplate, design drawings and service history per asset",
     ],
@@ -158,7 +158,7 @@ export const ROLE_INTRO: Record<string, RoleIntro> = {
       "Matched from your diagnostics access groups and recent field-report interpretation activity.",
     highlights: [
       "Reports awaiting interpretation and field-report turnaround",
-      "Asset reports to review — DGA, electrical and physical",
+      "Asset reports to review - DGA, electrical and physical",
       "Assets showing a fault signature",
       "Your field engineers and their assignments",
     ],

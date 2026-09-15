@@ -4,8 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import { X, ChevronDown, CalendarClock, ClipboardList, Package, UserPlus, ExternalLink, FileText, ScrollText, PencilRuler, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
-import { ASSET_DETAILS, ASSET_CONDITION, type AssetDetail, type AssetReading, type AssetCondition } from "@/lib/sales-data";
-import { WORK_ORDERS, WORK_ORDER_DETAILS } from "@/lib/work-orders-data";
+import { ASSET_DETAILS, ASSET_CONDITION, sensorFaultsFor, type AssetDetail, type AssetReading, type AssetCondition } from "@/lib/sales-data";
+import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS } from "@/lib/operations-data";
 import { REPORTS_AWAITING } from "@/lib/field-reports-data";
 import { ASSET_SERVICE_HISTORY } from "@/lib/asset-history-data";
 import { ASSET_NAMEPLATE, type Nameplate } from "@/lib/asset-nameplate-data";
@@ -40,7 +40,7 @@ function RiskBadge({ level }: { level: "Critical" | "High" | "Medium" }) {
 
 const ACTIONS = [
   { label: "Schedule inspection", icon: CalendarClock },
-  { label: "Create work order", icon: ClipboardList },
+  { label: "Create contract", icon: ClipboardList },
   { label: "Order parts", icon: Package },
   { label: "Assign technician", icon: UserPlus },
   { label: "Open in SAP", icon: ExternalLink },
@@ -82,7 +82,8 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
   );
 }
 
-export function DrawerBody({ d, cond, nameplate, onAction }: { d: AssetDetail; cond: AssetCondition | null; nameplate?: Nameplate; onAction: (prompt: string) => void }) {
+export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: AssetDetail; cond: AssetCondition | null; nameplate?: Nameplate; assetId?: string; onAction: (prompt: string) => void }) {
+  const faults = assetId ? sensorFaultsFor(assetId) : [];
   return (
     <div className="flex flex-col gap-4">
       {/* Context summary */}
@@ -103,7 +104,7 @@ export function DrawerBody({ d, cond, nameplate, onAction }: { d: AssetDetail; c
         )}
       </Card>
 
-      {/* Nameplate — factory specifications */}
+      {/* Nameplate - factory specifications */}
       {nameplate && (
         <Card>
           <SectionTitle>Nameplate</SectionTitle>
@@ -137,6 +138,44 @@ export function DrawerBody({ d, cond, nameplate, onAction }: { d: AssetDetail; c
           <Card><ConditionTrend data={cond.conditionTrend} totals={cond.conditionTotals} /></Card>
           <Card><ScoreCalculation factors={cond.scoreFactors} total={cond.scoreTotal} /></Card>
         </>
+      )}
+
+      {/* Live sensor faults - what the instrumentation reports right now */}
+      {faults.length > 0 && (
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base text-gray-900 flex items-center gap-2">
+              <span className="relative flex w-2 h-2">
+                <span className="absolute inline-flex w-full h-full rounded-full bg-gray-400 opacity-75 animate-ping" />
+                <span className="relative inline-flex w-2 h-2 rounded-full bg-gray-900" />
+              </span>
+              Live sensor faults
+            </h3>
+            <span className="text-xs text-gray-400">{faults.length} active</span>
+          </div>
+          <div className="flex flex-col">
+            {faults.map((f) => (
+              <div key={f.id} className="flex items-start gap-3 py-2.5 border-b border-gray-100 last:border-0">
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 mt-0.5 ${
+                    f.severity === "critical" ? "bg-black text-white" : "border border-gray-400 text-gray-700"
+                  }`}
+                >
+                  {f.severity === "critical" ? "Critical" : "Warning"}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-800 leading-snug">{f.fault}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {f.sensor} · {f.value} against {f.limit}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    detected {f.detected} · active {f.active}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
       )}
 
       {/* Condition & readings */}
@@ -252,14 +291,32 @@ export function DrawerBody({ d, cond, nameplate, onAction }: { d: AssetDetail; c
 }
 
 /* ── Documents tab ───────────────────────────────────────────────── */
-function DocRow({ icon: Icon, title, meta, onOpen }: { icon: React.ElementType; title: string; meta: string; onOpen: () => void }) {
+function DocRow({
+  icon: Icon,
+  title,
+  meta,
+  onOpen,
+  photo,
+}: {
+  icon: React.ElementType;
+  title: string;
+  meta: string;
+  onOpen: () => void;
+  /** Show the asset photo instead of the file icon, for reports with images. */
+  photo?: boolean;
+}) {
   return (
     <button
       onClick={onOpen}
       className="w-full text-left flex items-center gap-3 py-2.5 border-b border-gray-100 last:border-0 hover:bg-white transition-colors cursor-pointer group"
     >
-      <div className="w-8 h-8 rounded-md bg-white border border-gray-100 flex items-center justify-center shrink-0">
-        <Icon size={15} strokeWidth={1.5} className="text-gray-400" />
+      <div className="w-8 h-8 rounded-md bg-white border border-gray-100 flex items-center justify-center shrink-0 overflow-hidden">
+        {photo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src="/transformer.png" alt="" aria-hidden className="w-full h-full object-cover grayscale" />
+        ) : (
+          <Icon size={15} strokeWidth={1.5} className="text-gray-400" />
+        )}
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm text-gray-800 truncate group-hover:underline underline-offset-2 decoration-gray-300">{title}</p>
@@ -284,7 +341,8 @@ function DocGroup({ title, count, children }: { title: string; count: number; ch
 
 export function DocumentsTab({ d, id, onOpen }: { d: AssetDetail; id: string; onOpen: (doc: ViewDoc) => void }) {
   const reports = REPORTS_AWAITING.filter((r) => r.assetId === id);
-  const workOrders = WORK_ORDERS.filter((w) => w.asset === d.code);
+  // Contracts that cover this asset, from each contract's covered-asset list.
+  const contracts = OPS_CONTRACTS.filter((c) => OPS_CONTRACT_DETAILS[c.id]?.assets.some((a) => a.code === d.code));
   const drawings = ASSET_DRAWINGS[id] ?? [];
 
   return (
@@ -328,46 +386,60 @@ export function DocumentsTab({ d, id, onOpen }: { d: AssetDetail; id: string; on
               { label: "Priority", value: cap(r.priority) },
               { label: "Fault signature", value: r.faultSignature ? "Detected" : "None" },
             ],
+            images: r.photos.map((caption) => ({ caption })),
             sections: [
               { heading: "Finding", text: r.finding },
               {
+                heading: "Site photos",
+                text: `${r.photos.length} photo${r.photos.length === 1 ? "" : "s"} attached by ${r.engineer}: ${r.photos.join("; ")}.`,
+              },
+              {
                 heading: "Recommendation",
                 text: r.faultSignature
-                  ? "Fault signature present — recommend engineering interpretation and that a corrective work order be raised against the asset."
-                  : "Readings within limits — continue trend monitoring; no immediate corrective action required.",
+                  ? "Fault signature present - recommend engineering interpretation and that a corrective contract be raised against the asset."
+                  : "Readings within limits - continue trend monitoring; no immediate corrective action required.",
               },
             ],
           };
-          return <DocRow key={r.id} icon={FileText} title={`${r.code} · ${r.type}`} meta={`${r.engineer} · submitted ${r.submitted}`} onOpen={() => onOpen(doc)} />;
+          return (
+            <DocRow
+              key={r.id}
+              icon={FileText}
+              photo={r.photos.length > 0}
+              title={`${r.code} · ${r.type}`}
+              meta={`${r.engineer} · submitted ${r.submitted}${r.photos.length ? ` · ${r.photos.length} photos` : ""}`}
+              onOpen={() => onOpen(doc)}
+            />
+          );
         })}
       </DocGroup>
 
-      <DocGroup title="Work orders" count={workOrders.length}>
-        {workOrders.map((w) => {
-          const det = WORK_ORDER_DETAILS[w.id];
+      <DocGroup title="Contracts" count={contracts.length}>
+        {contracts.map((c) => {
+          const det = OPS_CONTRACT_DETAILS[c.id];
+          const covered = det?.assets.find((a) => a.code === d.code);
           const doc: ViewDoc = {
-            kind: "work-order",
-            docType: "Work order",
-            title: `${w.code} · ${w.title}`,
-            ref: w.code,
+            kind: "contract",
+            docType: "Contract",
+            title: c.name,
+            ref: c.id,
             preview: "text",
             fields: [
-              { label: "Asset", value: w.asset },
-              { label: "Type", value: w.type },
-              { label: "Priority", value: cap(w.priority) },
-              { label: "Status", value: cap(w.status.replace("-", " ")) },
-              { label: "Assignee", value: w.assignee },
-              { label: "Due", value: w.due },
-              { label: "Progress", value: `${w.progress}%` },
-              { label: "Contract", value: w.contract },
+              { label: "Customer", value: c.customer },
+              { label: "Covered asset", value: covered ? `${d.code} · ${covered.type}` : d.code },
+              { label: "Value", value: c.value },
+              { label: "Status", value: c.status === "critical" ? "Critical" : "At risk" },
+              { label: "Owner", value: c.owner },
+              { label: "Term", value: `${c.start} \u2192 ${c.end}` },
+              { label: "Progress", value: `${c.progress}% of term` },
             ],
             sections: det ? [{ heading: "Scope", text: det.summary }] : [],
           };
-          return <DocRow key={w.id} icon={ClipboardList} title={`${w.code} · ${w.title}`} meta={`${w.type} · ${w.status.replace("-", " ")} · due ${w.due}`} onOpen={() => onOpen(doc)} />;
+          return <DocRow key={c.id} icon={ClipboardList} title={c.name} meta={`${c.customer} \u00b7 ${c.value} \u00b7 ${c.progress}% of term`} onOpen={() => onOpen(doc)} />;
         })}
       </DocGroup>
 
-      <DocGroup title="Contracts" count={1}>
+      <DocGroup title="Service agreement" count={1}>
         <DocRow
           icon={ScrollText}
           title={d.related.contract}
@@ -443,12 +515,15 @@ export const DRAWER_TABS = [
 ] as const;
 export type DrawerTab = (typeof DRAWER_TABS)[number]["value"];
 
+import { type DrawerBack, BackLink } from "@/components/dashboard/operations/contract-drawer";
+
 interface Props {
   assetId: string | null;
   onClose: () => void;
+  back?: DrawerBack;
 }
 
-export default function AssetDrawer({ assetId, onClose }: Props) {
+export default function AssetDrawer({ assetId, onClose, back }: Props) {
   const detail = assetId ? ASSET_DETAILS[assetId] : null;
   const cond = assetId ? ASSET_CONDITION[assetId] ?? null : null;
   const open = !!detail;
@@ -503,6 +578,7 @@ export default function AssetDrawer({ assetId, onClose }: Props) {
                     <img src="/transformer.png" alt={detail.code} className="w-full h-full object-contain grayscale" />
                   </div>
                   <div>
+                    <BackLink back={back} />
                     <h2 className="text-2xl text-gray-900">{detail.code}</h2>
                     <p className="text-sm text-gray-400 mt-0.5">{detail.type} · {detail.location}</p>
                   </div>
@@ -557,7 +633,7 @@ export default function AssetDrawer({ assetId, onClose }: Props) {
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-5 bg-white">
-              {tab === "summary" && <DrawerBody d={detail} cond={cond} nameplate={assetId ? ASSET_NAMEPLATE[assetId] : undefined} onAction={runAction} />}
+              {tab === "summary" && <DrawerBody d={detail} cond={cond} nameplate={assetId ? ASSET_NAMEPLATE[assetId] : undefined} assetId={assetId ?? undefined} onAction={runAction} />}
               {tab === "documents" && assetId && <DocumentsTab d={detail} id={assetId} onOpen={setViewDoc} />}
               {tab === "history" && assetId && <ServiceHistoryTab id={assetId} />}
             </div>
@@ -577,7 +653,7 @@ export default function AssetDrawer({ assetId, onClose }: Props) {
         )}
       </div>
 
-      {/* Document viewer — opens above the drawer */}
+      {/* Document viewer - opens above the drawer */}
       <DocumentViewer
         doc={viewDoc}
         onClose={() => setViewDoc(null)}

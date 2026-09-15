@@ -45,7 +45,7 @@ export default function ReportTurnaround() {
           </div>
         </div>
 
-        {/* Stage breakdown — where the time goes */}
+        {/* Stage breakdown - where the time goes */}
         <div className="flex-1 min-w-0 border-l border-gray-100 pl-6">
           <p className="text-[11px] text-gray-400 tracking-wider mb-2">Where the time goes</p>
           <div className="flex flex-col gap-1.5">

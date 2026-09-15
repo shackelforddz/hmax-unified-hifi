@@ -27,15 +27,17 @@ export default function FinancialPerformance() {
         ))}
       </div>
 
-      {/* Margin trend */}
-      <div>
+      {/* Margin trend - grows to fill a taller tile */}
+      <div className="flex flex-col flex-1 min-h-[120px]">
         <div className="flex items-center justify-between mb-1">
           <p className="text-sm font-medium text-gray-700">Margin trend</p>
           <span className="flex items-center gap-0.5 text-xs text-gray-400">
             <ArrowDown size={11} strokeWidth={2} /> {F.marginVsPlan} vs plan
           </span>
         </div>
-        <ResponsiveContainer width="100%" height={120}>
+        <div className="relative flex-1 min-h-[120px]">
+          <div className="absolute inset-0">
+            <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={F.trend} margin={{ top: 10, right: 14, bottom: 0, left: 14 }}>
             <defs>
               <linearGradient id="finArea" x1="0" y1="0" x2="0" y2="1">
@@ -52,8 +54,10 @@ export default function FinancialPerformance() {
               label={{ value: `Plan ${F.planMargin}%`, position: "insideTopRight", fontSize: 9, fill: "#A3A3A3" }}
             />
             <Area type="monotone" dataKey="value" stroke="#171717" strokeWidth={2} fill="url(#finArea)" dot={{ r: 2, fill: "#fff", stroke: "#171717", strokeWidth: 1.5 }} />
-          </AreaChart>
-        </ResponsiveContainer>
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
 
       {/* Variance causes */}

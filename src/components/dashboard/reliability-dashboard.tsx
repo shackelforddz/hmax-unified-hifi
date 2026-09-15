@@ -1,25 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import KpiCard from "@/components/dashboard/kpi-card";
 import FleetMap from "@/components/dashboard/sales/fleet-map";
 import FleetHealth from "@/components/dashboard/sales/fleet-health";
 import AssetAlerts from "@/components/dashboard/sales/asset-alerts";
 import ScopeReviews from "@/components/dashboard/reliability/scope-reviews";
-import SiteConstraints from "@/components/dashboard/reliability/site-constraints";
-import EngBulletins from "@/components/dashboard/reliability/eng-bulletins";
 import { ASSET_REVIEW_ALERTS, REVIEW_CATEGORY_OPTIONS } from "@/lib/reliability-data";
-import CustomWidget from "@/components/dashboard/sales/custom-widget";
 import CustomWidgetView from "@/components/dashboard/sales/custom-widget-view";
 import CustomWidgetBuilder from "@/components/dashboard/sales/custom-widget-builder";
 import { type CustomWidgetConfig } from "@/lib/custom-widget";
 import DashboardTabs from "@/components/dashboard/dashboard-tabs";
 import ContractsTable from "@/components/dashboard/tables/contracts-table";
 import AssetsTable from "@/components/dashboard/tables/assets-table";
+import DashboardGrid, { type GridItem } from "@/components/dashboard/dashboard-grid";
+import CustomersTable from "@/components/dashboard/tables/customers-table";
 
-const TABS = ["Overview", "Assets", "Contracts"];
+const TABS = ["Overview", "Customers", "Assets", "Contracts"];
 
-// Asset-health KPIs lead this view — counted from the "Assets to review" list below.
+// Asset-health KPIs lead this view - counted from the "Assets to review" list below.
 const relCritical = ASSET_REVIEW_ALERTS.filter((a) => a.status === "critical").length;
 const relAtRisk = ASSET_REVIEW_ALERTS.filter((a) => a.status === "at-risk").length;
 const HEALTH_KPIS = [
@@ -33,10 +32,39 @@ export default function ReliabilityDashboard() {
   const [building, setBuilding] = useState(false);
   const [tab, setTab] = useState("Overview");
 
+  // Draggable widgets, in their default order. Spans are out of 12.
+  const gridItems: GridItem[] = useMemo(
+    () => [
+      {
+        // The health KPI strip moves as one block.
+        id: "kpis",
+        span: 12,
+        node: (
+          <div className="grid grid-cols-3 gap-4 h-full">
+            {HEALTH_KPIS.map((k) => (
+              <KpiCard key={k.id} {...k} />
+            ))}
+          </div>
+        ),
+      },
+      { id: "fleet-map", span: 8, tile: true, node: <FleetMap /> },
+      { id: "fleet-health", span: 4, tile: true, node: <FleetHealth /> },
+      {
+        id: "assets-to-review",
+        span: 12,
+        node: <AssetAlerts alerts={ASSET_REVIEW_ALERTS} categoryOptions={REVIEW_CATEGORY_OPTIONS} title="Assets to review" />,
+      },
+      { id: "scope-reviews", span: 12, node: <ScopeReviews /> },
+      ...widgets.map((w): GridItem => ({ id: w.id, span: 4, tile: true, node: <CustomWidgetView config={w} /> })),
+    ],
+    [widgets]
+  );
+
   if (tab !== "Overview") {
     return (
       <div className="flex flex-col gap-4">
         <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
+        {tab === "Customers" && <CustomersTable />}
         {tab === "Assets" && <AssetsTable />}
         {tab === "Contracts" && <ContractsTable />}
       </div>
@@ -47,51 +75,7 @@ export default function ReliabilityDashboard() {
     <div className="flex flex-col gap-4">
       <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
 
-      {/* Bento box — asset health first, then contracts */}
-      <div className="grid grid-cols-6 gap-4 items-stretch [&>*]:min-w-0 [&>.tile>*]:h-full">
-        {/* ── Asset health — top ── */}
-        {HEALTH_KPIS.map((k) => (
-          <div key={k.id} className="tile col-span-2">
-            <KpiCard {...k} />
-          </div>
-        ))}
-
-        <div className="tile col-span-4">
-          <FleetMap />
-        </div>
-        <div className="tile col-span-2">
-          <FleetHealth />
-        </div>
-
-        {/* ── Engineering review ── */}
-        <div className="col-span-6">
-          <AssetAlerts
-            alerts={ASSET_REVIEW_ALERTS}
-            categoryOptions={REVIEW_CATEGORY_OPTIONS}
-            title="Assets to review"
-            unit="to review"
-          />
-        </div>
-        <div className="col-span-6">
-          <ScopeReviews />
-        </div>
-        <div className="col-span-3">
-          <SiteConstraints />
-        </div>
-        <div className="col-span-3">
-          <EngBulletins />
-        </div>
-
-        {/* Custom widgets */}
-        {widgets.map((w) => (
-          <div key={w.id} className="tile col-span-2">
-            <CustomWidgetView config={w} />
-          </div>
-        ))}
-        <div className="tile col-span-2">
-          <CustomWidget onClick={() => setBuilding(true)} />
-        </div>
-      </div>
+      <DashboardGrid storageKey="reliability" items={gridItems} onAddWidget={() => setBuilding(true)} />
 
       {building && (
         <CustomWidgetBuilder

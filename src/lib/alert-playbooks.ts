@@ -1,6 +1,6 @@
 /* ── Alert playbooks ─────────────────────────────────────────────────
    When a user clicks the primary CTA on an alert (contracts / assets /
-   accounts / opportunities), the conversation opens with a grounded,
+   accounts / leads), the conversation opens with a grounded,
    useful response instead of a canned answer:
      · the situation (the alert's own data),
      · a specific recommendation to act on,
@@ -18,7 +18,7 @@ import type { ViewDoc } from "@/components/dashboard/sales/document-viewer";
 
 export interface PlaybookStep {
   label: string;
-  prompt: string; // sent as a new message — many trigger a guided wizard
+  prompt: string; // sent as a new message - many trigger a guided wizard
 }
 
 /* A pickable option (crew member, vendor, schedule option). */
@@ -30,7 +30,7 @@ export interface PanelOption {
   meta: { label: string; value: string }[];
   tags?: string[];
   chooseLabel: string;
-  choosePrompt: string; // sent when picked — usually starts a wizard
+  choosePrompt: string; // sent when picked - usually starts a wizard
   recommended?: boolean;
 }
 
@@ -93,7 +93,7 @@ const RECIPES: Record<string, Recipe> = {
   },
   "review change order": {
     recommendation:
-      "Review the technical impact and price, then raise it for signature — progress invoicing stays blocked and margin sits under baseline until it's booked.",
+      "Review the technical impact and price, then raise it for signature - progress invoicing stays blocked and margin sits under baseline until it's booked.",
     steps: [
       { label: "Raise the change order", prompt: "Raise a change order for this contract" },
       { label: "Estimate the margin impact", prompt: "Create an impact report on the change order" },
@@ -101,14 +101,14 @@ const RECIPES: Record<string, Recipe> = {
   },
   "document scope": {
     recommendation:
-      "Get the verbal agreement on paper before any more work is done — an undocumented extension is unbilled scope creep. I've drafted the scope from the site notes; review it and log it as a change order.",
+      "Get the verbal agreement on paper before any more work is done - an undocumented extension is unbilled scope creep. I've drafted the scope from the site notes; review it and log it as a change order.",
     steps: [],
   },
   "review ncr": {
     recommendation:
-      "Disposition the non-conformance before work continues — accept-with-justification, rework, or reject. Raise a corrective work order so the fix is tracked to closure.",
+      "Disposition the non-conformance before work continues - accept-with-justification, rework, or reject. Raise a corrective contract so the fix is tracked to closure.",
     steps: [
-      { label: "Raise a corrective work order", prompt: "Raise a corrective work order for the non-conformance" },
+      { label: "Raise a corrective contract", prompt: "Raise a corrective contract for the non-conformance" },
       { label: "Notify QA", prompt: "Draft a message to QA on the NCR disposition" },
     ],
   },
@@ -138,7 +138,7 @@ const RECIPES: Record<string, Recipe> = {
   },
   "request written access": {
     recommendation:
-      "A verbal arrangement won't hold — get written site access before mobilising, and issue it as a change order so it's contractually tracked.",
+      "A verbal arrangement won't hold - get written site access before mobilising, and issue it as a change order so it's contractually tracked.",
     steps: [
       { label: "Raise the access change order", prompt: "Raise a change order for the written site-access agreement" },
       { label: "Draft the access request", prompt: "Draft a message requesting written site access from the customer" },
@@ -148,24 +148,24 @@ const RECIPES: Record<string, Recipe> = {
   /* ── Assets: sales alerts ── */
   "schedule inspection": {
     recommendation:
-      "Health is degrading — get eyes on it before load rises into the peak. Schedule an inspection in the next window and assign a certified engineer.",
+      "Health is degrading - get eyes on it before load rises into the peak. Schedule an inspection in the next window and assign a certified engineer.",
     steps: [
       { label: "Create an inspection plan", prompt: "Create an inspection plan for this asset" },
       { label: "Dispatch an engineer", prompt: "Schedule a field engineer for the inspection" },
     ],
   },
-  "create work order": {
+  "create contract": {
     recommendation:
-      "Convert the finding into tracked work: raise a corrective work order, assign it to a competent engineer, and reserve the parts it needs.",
+      "Convert the finding into tracked work: raise a corrective contract, assign it to a competent engineer, and reserve the parts it needs.",
     steps: [
-      { label: "Raise a work order", prompt: "Raise a new work order for this asset" },
+      { label: "Raise a contract", prompt: "Raise a new contract for this asset" },
       { label: "Dispatch an engineer", prompt: "Schedule a field engineer for this asset" },
     ],
   },
   "order parts": {
     recommendation:
-      "Reserve the parts the repair needs and check lead times before you commit to a work date — a long-lead item can push the whole job.",
-    steps: [{ label: "Raise a work order", prompt: "Raise a new work order for this asset" }],
+      "Reserve the parts the repair needs and check lead times before you commit to a work date - a long-lead item can push the whole job.",
+    steps: [{ label: "Raise a contract", prompt: "Raise a new contract for this asset" }],
   },
   "assign technician": {
     recommendation:
@@ -186,13 +186,13 @@ const RECIPES: Record<string, Recipe> = {
     recommendation:
       "Confirm the latest drawing revision matches the as-built before any work is planned. Flag any discrepancy to engineering so it's corrected at source.",
     steps: [
-      { label: "Raise a verification work order", prompt: "Raise a work order to verify the drawing against as-built" },
+      { label: "Raise a verification contract", prompt: "Raise a contract to verify the drawing against as-built" },
       { label: "Note it to engineering", prompt: "Draft a message to engineering about the drawing discrepancy" },
     ],
   },
   "review site constraints": {
     recommendation:
-      "Compare the handover assumptions with actual site conditions. Where they conflict the scope can't proceed as written — record it and route it back before mobilisation.",
+      "Compare the handover assumptions with actual site conditions. Where they conflict the scope can't proceed as written - record it and route it back before mobilisation.",
     steps: [
       { label: "Submit a feasibility review", prompt: "Submit a feasibility review flagging the site constraint" },
       { label: "Flag the conflict", prompt: "Draft a message flagging the site-constraint conflict to the owner" },
@@ -204,7 +204,7 @@ const RECIPES: Record<string, Recipe> = {
     steps: [{ label: "Submit a feasibility review", prompt: "Submit a feasibility review against the updated standard" }],
   },
   "confirm scope": {
-    recommendation: "The scope looks feasible — confirm it and record your sign-off so sales can proceed with the offer.",
+    recommendation: "The scope looks feasible - confirm it and record your sign-off so sales can proceed with the offer.",
     steps: [{ label: "Submit the feasibility review", prompt: "Submit a feasibility review confirming the scope" }],
   },
   "return to sales": {
@@ -222,7 +222,7 @@ const RECIPES: Record<string, Recipe> = {
       "Read the gas ratios against the trend, not a single sample. If the pattern points to a fault, capture the interpretation and raise corrective work; if it's stable, keep it on monitoring.",
     steps: [
       { label: "Create a diagnostics summary", prompt: "Create a diagnostics summary for this asset" },
-      { label: "Raise a corrective work order", prompt: "Raise a corrective work order for the fault" },
+      { label: "Raise a corrective contract", prompt: "Raise a corrective contract for the fault" },
     ],
   },
   "review electrical tests": {
@@ -230,19 +230,19 @@ const RECIPES: Record<string, Recipe> = {
       "Compare the electrical results against nameplate limits and the prior tests. Confirm the fault signature before you record an interpretation.",
     steps: [
       { label: "Create a diagnostics summary", prompt: "Create a diagnostics summary for this asset" },
-      { label: "Raise a corrective work order", prompt: "Raise a corrective work order for this asset" },
+      { label: "Raise a corrective contract", prompt: "Raise a corrective contract for this asset" },
     ],
   },
   "review inspection report": {
     recommendation:
-      "Check the field inspection against the sensor data — where the technician's view and the data disagree, verify before you act. Then log the interpretation.",
+      "Check the field inspection against the sensor data - where the technician's view and the data disagree, verify before you act. Then log the interpretation.",
     steps: [
       { label: "Create a diagnostics summary", prompt: "Create a diagnostics summary for this asset" },
       { label: "Schedule a follow-up visit", prompt: "Schedule a field engineer for a follow-up inspection" },
     ],
   },
 
-  /* ── Accounts & opportunities ── */
+  /* ── Accounts & leads ── */
   "complete scope of work": {
     recommendation:
       "The Scope of Work is the blocker to reaching Offer, and it's owned by Engineering. Chase it with a clear deadline and the asset list so they can turn it around.",
@@ -258,12 +258,12 @@ const RECIPES: Record<string, Recipe> = {
   },
   "request install base profile": {
     recommendation:
-      "Without the Install Base profile the opportunity can't reach Offer. Request it from Reliability with the asset list so they can turn it around quickly.",
+      "Without the Install Base profile the lead can't reach Offer. Request it from Reliability with the asset list so they can turn it around quickly.",
     steps: [{ label: "Request from Reliability", prompt: "Draft a message to Reliability requesting the Install Base profile" }],
   },
   "capture install base profile": {
     recommendation:
-      "Capture the Install Base profile to move this forward — pull it from the asset records where you can, or request the gaps from Reliability.",
+      "Capture the Install Base profile to move this forward - pull it from the asset records where you can, or request the gaps from Reliability.",
     steps: [{ label: "Request the gaps", prompt: "Draft a message to Reliability for the Install Base profile" }],
   },
   "finalize legal t&cs": {
@@ -273,28 +273,28 @@ const RECIPES: Record<string, Recipe> = {
   },
   "send offer": {
     recommendation:
-      "Every input is in place — the offer is ready. Draft the cover note and route it for approval before it goes to the customer.",
+      "Every input is in place - the offer is ready. Draft the cover note and route it for approval before it goes to the customer.",
     steps: [{ label: "Draft the cover note", prompt: "Draft a message sending the offer to the customer" }],
   },
   "qualify budget & scope": {
     recommendation:
-      "Early stage — qualify the customer's budget and confirm the scope is real before investing effort. Capture what you learn against the opportunity.",
+      "Early stage - qualify the customer's budget and confirm the scope is real before investing effort. Capture what you learn against the lead.",
     steps: [{ label: "Draft qualification questions", prompt: "Draft a message to the customer to qualify budget and scope" }],
   },
 };
 
 const DEFAULT: Recipe = {
   recommendation:
-    "Here's what the data shows. Decide whether to act now or keep it on watch — I can turn any of this into a tracked task or a message in a couple of clicks.",
+    "Here's what the data shows. Decide whether to act now or keep it on watch - I can turn any of this into a tracked task or a message in a couple of clicks.",
   steps: [
-    { label: "Raise a work order", prompt: "Raise a new work order" },
+    { label: "Raise a contract", prompt: "Raise a new contract" },
     { label: "Draft a message", prompt: "Draft a message about this" },
   ],
 };
 
 /* ── Interactive panels for the richer CTAs ──────────────────────── */
 
-// Rebalance crew — eligible people, most spare capacity first.
+// Rebalance crew - eligible people, most spare capacity first.
 function crewPanel(): PlaybookPanel {
   const eligible = [...PEOPLE].sort((a, b) => a.allocation - b.allocation).slice(0, 4);
   return {
@@ -318,7 +318,7 @@ function crewPanel(): PlaybookPanel {
   };
 }
 
-// Reassign vendor — approved alternatives to the concentrated supplier.
+// Reassign vendor - approved alternatives to the concentrated supplier.
 function vendorPanel(): PlaybookPanel {
   return {
     kind: "options",
@@ -341,7 +341,7 @@ function vendorPanel(): PlaybookPanel {
   };
 }
 
-// Adjust schedule — recovery options with their impact.
+// Adjust schedule - recovery options with their impact.
 function schedulePanel(): PlaybookPanel {
   return {
     kind: "options",
@@ -372,7 +372,7 @@ function splitGBP(value: string, fraction: number): string {
   return `£${rounded}${unit}`;
 }
 
-// Review change order — recap the CO and link the document.
+// Review change order - recap the CO and link the document.
 function changeOrderPanel(coCode?: string): PlaybookPanel | undefined {
   const co = coCode ? CHANGE_ORDERS[coCode] : undefined;
   if (!co) return undefined;
@@ -410,7 +410,7 @@ function changeOrderPanel(coCode?: string): PlaybookPanel | undefined {
   };
   return {
     kind: "recap",
-    heading: `${co.code} — ${co.status}`,
+    heading: `${co.code} - ${co.status}`,
     rows: [
       { label: "Scope", value: co.scope },
       { label: "Value", value: co.value },
@@ -423,11 +423,11 @@ function changeOrderPanel(coCode?: string): PlaybookPanel | undefined {
   };
 }
 
-// Complete scope of work — what's missing, who owns it, fill it in.
+// Complete scope of work - what's missing, who owns it, fill it in.
 function scopeFormPanel(missing?: { label: string; owner: string }[]): PlaybookPanel {
   const items = missing && missing.length > 0
     ? missing
-    : [{ label: "Scope of Work & tech requirements", owner: "Engineering — J. Park" }];
+    : [{ label: "Scope of Work & tech requirements", owner: "Engineering - J. Park" }];
   return {
     kind: "form",
     heading: "Missing offer inputs",
@@ -438,7 +438,7 @@ function scopeFormPanel(missing?: { label: string; owner: string }[]): PlaybookP
   };
 }
 
-// Review asset health — summarise the asset's relevant condition data.
+// Review asset health - summarise the asset's relevant condition data.
 function healthPanel(assetId?: string): PlaybookPanel {
   const d = ASSET_DETAILS[assetId ?? "ast-001"] ?? ASSET_DETAILS["ast-001"];
   const readingRows = d.readings.slice(0, 4).map((r) => ({
@@ -451,7 +451,7 @@ function healthPanel(assetId?: string): PlaybookPanel {
   const doc: ViewDoc = {
     kind: "report",
     docType: "Asset health report",
-    title: `${d.code} — condition & health`,
+    title: `${d.code} - condition & health`,
     ref: d.code,
     preview: "text",
     fields: [
@@ -474,7 +474,7 @@ function healthPanel(assetId?: string): PlaybookPanel {
   };
   return {
     kind: "recap",
-    heading: `${d.code} — ${d.stats.status} · health ${d.stats.healthPct}%`,
+    heading: `${d.code} - ${d.stats.status} · health ${d.stats.healthPct}%`,
     rows: [
       { label: "Type", value: d.type },
       { label: "Commissioned", value: d.stats.commissioned },
@@ -486,7 +486,7 @@ function healthPanel(assetId?: string): PlaybookPanel {
   };
 }
 
-// Generic "Review …" — summarise + link the reviewed document.
+// Generic "Review …" - summarise + link the reviewed document.
 const REVIEW_DOCTYPE: Record<string, string> = {
   "review ncr": "Non-conformance report",
   "review hse report": "HSE report",
@@ -499,9 +499,9 @@ const REVIEW_DOCTYPE: Record<string, string> = {
   "review standard": "Engineering bulletin",
 };
 
-// The actual document content — with data tables, trend charts and photos.
+// The actual document content - with data tables, trend charts and photos.
 function reviewDoc(key: string, docType: string, ref: string, title: string, situation: string, assetId?: string): ViewDoc {
-  const asset = assetId ? assetId.toUpperCase() : "—";
+  const asset = assetId ? assetId.toUpperCase() : "-";
   const base = { kind: "report" as const, docType, title, ref, preview: "text" as const };
 
   if (key === "review dga trend") {
@@ -585,7 +585,7 @@ function reviewDoc(key: string, docType: string, ref: string, title: string, sit
         },
         { heading: "Notes", text: situation },
       ],
-      images: [{ caption: "Cooling manifold — corrosion" }, { caption: "Y-phase bushing flange" }, { caption: "Thermal — hotspot" }],
+      images: [{ caption: "Cooling manifold - corrosion" }, { caption: "Y-phase bushing flange" }, { caption: "Thermal - hotspot" }],
     };
   }
 
@@ -641,7 +641,7 @@ function reviewDoc(key: string, docType: string, ref: string, title: string, sit
     };
   }
 
-  // feasibility / drawings / site constraints / standard — text summary.
+  // feasibility / drawings / site constraints / standard - text summary.
   return {
     ...base,
     kind: key === "review drawings" ? "drawing" : "report",
@@ -654,7 +654,7 @@ function reviewDoc(key: string, docType: string, ref: string, title: string, sit
   };
 }
 
-/* ── Review feasibility — summarise the scope + a sign-off call ──── */
+/* ── Review feasibility - summarise the scope + a sign-off call ──── */
 const VERDICT_LABEL: Record<NonNullable<PlaybookContext["verdict"]>, string> = {
   feasible: "Feasible",
   "at-risk": "At risk",
@@ -664,17 +664,17 @@ const VERDICT_LABEL: Record<NonNullable<PlaybookContext["verdict"]>, string> = {
 
 function feasibilityAssessment(v: NonNullable<PlaybookContext["verdict"]>): string {
   switch (v) {
-    case "feasible": return "Checked against the asset's nameplate ratings and site constraints — the scope is deliverable as written with no exceptions.";
+    case "feasible": return "Checked against the asset's nameplate ratings and site constraints - the scope is deliverable as written with no exceptions.";
     case "at-risk": return "Deliverable, but only if the flagged condition holds. The margin against the asset's ratings is thin, so there's execution risk if anything moves.";
     case "not-feasible": return "As written, the scope exceeds the asset's ratings or conflicts with the site constraints. It can't be delivered without a change to the scope.";
-    case "pending": return "Not yet assessed against the asset record and site survey — key technical points are still open.";
+    case "pending": return "Not yet assessed against the asset record and site survey - key technical points are still open.";
   }
 }
 
 export function feasibilityRecommendation(v: NonNullable<PlaybookContext["verdict"]>): string {
   switch (v) {
     case "feasible": return "Looks good to sign off. Approve it and record your sign-off so sales can proceed to offer.";
-    case "at-risk": return "Sign off only conditionally — record the risk and the mitigation (e.g. the cooling upgrade) so it isn't a silent assumption. If the mitigation can't be committed, hand it back.";
+    case "at-risk": return "Sign off only conditionally - record the risk and the mitigation (e.g. the cooling upgrade) so it isn't a silent assumption. If the mitigation can't be committed, hand it back.";
     case "not-feasible": return "Don't sign off as written. Return it to sales with the specific blocker and what would make it feasible.";
     case "pending": return "Not enough here to sign off yet. Verify the open points against the nameplate and site survey, then record a verdict.";
   }
@@ -684,9 +684,9 @@ function feasibilityPanel(ctx: PlaybookContext, situation: string): PlaybookPane
   const v = ctx.verdict!;
   const label = VERDICT_LABEL[v];
   const rows = [
-    { label: "Scope", value: ctx.scope ?? "—" },
-    { label: "Value", value: ctx.value ?? "—" },
-    { label: "Handover from", value: ctx.from ?? "—" },
+    { label: "Scope", value: ctx.scope ?? "-" },
+    { label: "Value", value: ctx.value ?? "-" },
+    { label: "Handover from", value: ctx.from ?? "-" },
     { label: "Verdict", value: label },
   ];
   const doc: ViewDoc = {
@@ -702,7 +702,7 @@ function feasibilityPanel(ctx: PlaybookContext, situation: string): PlaybookPane
       { heading: "Sign-off recommendation", text: feasibilityRecommendation(v) },
     ],
   };
-  return { kind: "recap", heading: `Scope feasibility — ${label}`, rows, doc };
+  return { kind: "recap", heading: `Scope feasibility - ${label}`, rows, doc };
 }
 
 function reviewRecapPanel(action: string, situation: string, ctx?: PlaybookContext): PlaybookPanel {
@@ -713,11 +713,11 @@ function reviewRecapPanel(action: string, situation: string, ctx?: PlaybookConte
     ctx?.ref ||
     ctx?.title?.match(codeRe)?.[0] ||
     situation.match(codeRe)?.[0] ||
-    (ctx?.assetId ? ctx.assetId.toUpperCase() : "—");
+    (ctx?.assetId ? ctx.assetId.toUpperCase() : "-");
   const doc = reviewDoc(key, docType, ref, ctx?.title ?? docType, situation, ctx?.assetId);
   return {
     kind: "recap",
-    heading: `${docType}${ref !== "—" ? ` · ${ref}` : ""}`,
+    heading: `${docType}${ref !== "-" ? ` · ${ref}` : ""}`,
     rows: [
       { label: "Document", value: docType },
       { label: "Reference", value: ref },
@@ -727,17 +727,17 @@ function reviewRecapPanel(action: string, situation: string, ctx?: PlaybookConte
   };
 }
 
-// Finalize legal T&Cs — summarise the document and link to it.
+// Finalize legal T&Cs - summarise the document and link to it.
 function legalPanel(): PlaybookPanel {
   const doc: ViewDoc = {
     kind: "contract",
     docType: "Legal terms & conditions",
-    title: "Service agreement — terms & conditions",
+    title: "Service agreement - terms & conditions",
     ref: "T&C-v4.2",
     preview: "text",
     fields: [
-      { label: "Owner", value: "Legal — R. Bianchi" },
-      { label: "Status", value: "Outstanding — final review" },
+      { label: "Owner", value: "Legal - R. Bianchi" },
+      { label: "Status", value: "Outstanding - final review" },
       { label: "Version", value: "v4.2 (redline)" },
       { label: "Blocking", value: "Offer release" },
     ],
@@ -750,9 +750,9 @@ function legalPanel(): PlaybookPanel {
   };
   return {
     kind: "recap",
-    heading: "Terms & conditions — v4.2 · Outstanding",
+    heading: "Terms & conditions - v4.2 · Outstanding",
     rows: [
-      { label: "Owner", value: "Legal — R. Bianchi" },
+      { label: "Owner", value: "Legal - R. Bianchi" },
       { label: "Open point", value: "Liability-cap carve-outs" },
       { label: "Liability cap", value: "100% of annual value" },
       { label: "Payment terms", value: "Net 30 from acceptance" },
@@ -763,7 +763,7 @@ function legalPanel(): PlaybookPanel {
   };
 }
 
-// Document scope — recommend a scope, editable before it's logged.
+// Document scope - recommend a scope, editable before it's logged.
 function scopeDraftPanel(): PlaybookPanel {
   return {
     kind: "draft",
@@ -776,12 +776,12 @@ function scopeDraftPanel(): PlaybookPanel {
   };
 }
 
-// Schedule cert renewal — options to keep the visit on track.
+// Schedule cert renewal - options to keep the visit on track.
 function certRenewalPanel(): PlaybookPanel {
   return {
     kind: "options",
     heading: "How to keep the visit on track",
-    note: "Two offshore certificates lapse before the next window — each option below keeps remobilisation unblocked.",
+    note: "Two offshore certificates lapse before the next window - each option below keeps remobilisation unblocked.",
     options: [
       {
         id: "fast-track",
@@ -814,7 +814,7 @@ function certRenewalPanel(): PlaybookPanel {
 
 function panelFor(action: string, situation: string, ctx?: PlaybookContext): PlaybookPanel | undefined {
   // Scope reviews (review feasibility / confirm scope / return to sales) carry
-  // a verdict — summarise the scope and give a sign-off call.
+  // a verdict - summarise the scope and give a sign-off call.
   if (ctx?.verdict) return feasibilityPanel(ctx, situation);
   switch (action.trim().toLowerCase()) {
     case "rebalance crew":

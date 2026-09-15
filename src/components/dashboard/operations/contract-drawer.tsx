@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { X, ChevronDown, CheckCircle2, Circle, CalendarClock, ClipboardList, RefreshCw, UserPlus, ExternalLink } from "lucide-react";
+import { X, ChevronDown, CheckCircle2, Circle, CalendarClock, ClipboardList, RefreshCw, UserPlus, ExternalLink, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract, type OpsContractDetail, type RiskProfile } from "@/lib/operations-data";
@@ -182,12 +182,34 @@ function DrawerBody({ c, d, onAction }: { c: OpsContract; d: OpsContractDetail; 
   );
 }
 
+
+/** An optional "back" trail shown above the title, for a drawer that was
+ *  opened by drilling out of another one. */
+export interface DrawerBack {
+  label: string;
+  onClick: () => void;
+}
+
+export function BackLink({ back }: { back?: DrawerBack }) {
+  if (!back) return null;
+  return (
+    <button
+      onClick={back.onClick}
+      className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer mb-1.5"
+    >
+      <ChevronLeft size={13} strokeWidth={1.5} />
+      {back.label}
+    </button>
+  );
+}
+
 interface Props {
   contractId: string | null;
   onClose: () => void;
+  back?: DrawerBack;
 }
 
-export default function ContractDrawer({ contractId, onClose }: Props) {
+export default function ContractDrawer({ contractId, onClose, back }: Props) {
   const c = contractId ? OPS_CONTRACTS.find((x) => x.id === contractId) ?? null : null;
   const d = contractId ? OPS_CONTRACT_DETAILS[contractId] ?? null : null;
   const open = !!(c && d);
@@ -214,6 +236,7 @@ export default function ContractDrawer({ contractId, onClose }: Props) {
             <div className="shrink-0 px-6 pt-6 pb-4 border-b border-gray-100">
               <div className="flex items-start justify-between">
                 <div>
+                  <BackLink back={back} />
                   <h2 className="text-2xl text-gray-900">{c.name}</h2>
                   <p className="text-sm text-gray-400 mt-0.5">{c.customer} · {c.value}</p>
                 </div>

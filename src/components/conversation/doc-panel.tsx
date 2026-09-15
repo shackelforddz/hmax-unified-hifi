@@ -10,12 +10,12 @@ interface Props {
 const ALERTS = [
   {
     id: 1,
-    text: "Gasket set: Out of stock. Purchase order must be raised today — not yet done.",
+    text: "Gasket set: Out of stock. Purchase order must be raised today - not yet done.",
     action: "Raise PO",
   },
   {
     id: 2,
-    text: "Site visit date not confirmed with customer — negotiate scheduling.",
+    text: "Site visit date not confirmed with customer - negotiate scheduling.",
     action: "Mark as read",
   },
 ];
@@ -26,7 +26,7 @@ const CASE_FIELDS = [
   { label: "Contract value", value: "$4.2M" },
   { label: "COTD", value: "9 Nov 2023" },
   { label: "Due date", value: "17 Nov 2023" },
-  { label: "Stage", value: "Inspection — Diagnostic Testing" },
+  { label: "Stage", value: "Inspection - Diagnostic Testing" },
 ];
 
 const STAFF = [

@@ -117,7 +117,7 @@ function DrawerBody({ d, onAction }: { d: SlaContractDetail; onAction: (p: strin
         </div>
       </Card>
 
-      {/* Shared contract detail — same as the ops contract drawers */}
+      {/* Shared contract detail - same as the ops contract drawers */}
       <ContractSections d={d} />
 
       {/* Related */}

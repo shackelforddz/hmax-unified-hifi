@@ -83,7 +83,7 @@ function RiskProfileView({ risk }: { risk: RiskProfile }) {
 }
 const LEVEL_CLS: Record<string, string> = { Critical: "bg-gray-900 text-white", High: "bg-gray-700 text-white", Medium: "bg-gray-200 text-gray-700" };
 
-/* ── Asset — mirrors the asset detail drawer (Summary / Documents / History) ── */
+/* ── Asset - mirrors the asset detail drawer (Summary / Documents / History) ── */
 function AssetContext({ id, onAction }: { id: string; onAction?: (prompt: string) => void }) {
   const d = ASSET_DETAILS[id];
   const cond = ASSET_CONDITION[id] ?? null;
@@ -102,7 +102,7 @@ function AssetContext({ id, onAction }: { id: string; onAction?: (prompt: string
 
   const belowHeader = (
     <>
-      {/* Stats — persist across tabs, matching the drawer header */}
+      {/* Stats - persist across tabs, matching the drawer header */}
       <div className="px-7 py-4 border-b border-gray-100">
         <div className="flex flex-wrap gap-x-7 gap-y-3">
           {[
@@ -146,7 +146,7 @@ function AssetContext({ id, onAction }: { id: string; onAction?: (prompt: string
 
   return (
     <Shell title={d.code} subtitle={`${d.type} · ${d.location}`} kind="Asset" belowHeader={belowHeader}>
-      {tab === "summary" && <DrawerBody d={d} cond={cond} nameplate={ASSET_NAMEPLATE[id]} onAction={run} />}
+      {tab === "summary" && <DrawerBody d={d} cond={cond} nameplate={ASSET_NAMEPLATE[id]} assetId={id} onAction={run} />}
       {tab === "documents" && <DocumentsTab d={d} id={id} onOpen={setViewDoc} />}
       {tab === "history" && <ServiceHistoryTab id={id} />}
 
@@ -235,7 +235,7 @@ function ContractContext({ id }: { id: string }) {
   );
 }
 
-/* ── Opportunity ─────────────────────────────────────────────────── */
+/* ── Lead ────────────────────────────────────────────────────────── */
 function OpportunityContext({ id }: { id: string }) {
   const opp = OPPORTUNITIES.find((x) => x.id === id);
   const d = OPPORTUNITY_DETAILS[id];
@@ -243,7 +243,7 @@ function OpportunityContext({ id }: { id: string }) {
   const idx = OPP_STAGES.indexOf(opp.stage);
   const readyCount = opp.requirements.filter((r) => r.done).length;
   return (
-    <Shell title={opp.account} subtitle={opp.title} kind="Opportunity">
+    <Shell title={opp.account} subtitle={opp.title} kind="Lead">
       <Card>
         <Stats
           items={[

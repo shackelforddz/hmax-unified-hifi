@@ -29,15 +29,19 @@ export default function FleetHealth() {
         </div>
       </div>
 
-      {/* Chart — grows to fill the container height */}
-      <div className="flex-1 min-h-[120px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={F.points} margin={{ top: 8, right: 4, bottom: 4, left: 4 }}>
-            <YAxis domain={[55, 92]} hide />
-            <Line type="monotone" dataKey="avg" stroke="#171717" strokeWidth={2} dot={false} />
-            <Line type="monotone" dataKey="std" stroke="#A3A3A3" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
+      {/* Chart - grows to fill the container height. The inner absolute box
+          gives ResponsiveContainer a definite height to measure: a percentage
+          height against a flex item sized only by min-height resolves to 0. */}
+      <div className="relative flex-1 min-h-[120px]">
+        <div className="absolute inset-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={F.points} margin={{ top: 8, right: 4, bottom: 4, left: 4 }}>
+              <YAxis domain={[55, 92]} hide />
+              <Line type="monotone" dataKey="avg" stroke="#171717" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="std" stroke="#A3A3A3" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Legend */}

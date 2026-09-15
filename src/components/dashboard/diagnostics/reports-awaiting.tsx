@@ -9,7 +9,7 @@ function SignatureCell({ report }: { report: FieldReport }) {
   if (report.faultSignature) {
     return <span className="bg-gray-900 text-white text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">Fault signature</span>;
   }
-  return <span className="text-gray-300">—</span>;
+  return <span className="text-gray-300">-</span>;
 }
 
 function WaitingCell({ days }: { days: number }) {

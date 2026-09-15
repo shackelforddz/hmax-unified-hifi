@@ -1,4 +1,4 @@
-/* ── Work orders (PM / Operations) ───────────────────────────────── */
+/* ── Contracts (PM / Operations) ───────────────────────────────── */
 
 export type WoStatus = "open" | "scheduled" | "in-progress" | "blocked" | "complete";
 export type WoPriority = "critical" | "high" | "medium" | "low";
@@ -20,14 +20,14 @@ export interface WorkOrder {
 }
 
 export const WORK_ORDERS: WorkOrder[] = [
-  { id: "wo-2041", code: "WO-2041", title: "Cooling-system diagnostic — hotspot", asset: "AST-001", customer: "ComEd", contract: "ComEd — 5-year Service Agreement", type: "Corrective", priority: "critical", status: "in-progress", assignee: "Daniel Brooks", due: "2026-09-02", progress: 45 },
-  { id: "wo-2038", code: "WO-2038", title: "Bearing replacement — recurring fault", asset: "AST-002", customer: "ComEd", contract: "ComEd — 5-year Service Agreement", type: "Corrective", priority: "high", status: "scheduled", assignee: "Sarah Mitchell", due: "2026-09-10", progress: 0 },
-  { id: "wo-2035", code: "WO-2035", title: "DGA oil sampling", asset: "AST-003", customer: "NV Energy", contract: "NV Energy — Service Agreement", type: "Preventive", priority: "medium", status: "open", assignee: "Lena Fischer", due: "2026-09-14", progress: 0 },
-  { id: "wo-2031", code: "WO-2031", title: "Tap-changer vibration inspection", asset: "AST-004", customer: "AEP Ohio", contract: "AEP Ohio — Service Agreement", type: "Inspection", priority: "medium", status: "in-progress", assignee: "Marcus Lee", due: "2026-09-05", progress: 60 },
-  { id: "wo-2027", code: "WO-2027", title: "HSE certificate renewal — offshore crew", asset: "AST-014", customer: "Baltic Wind NL", contract: "Baltic array transformer maintenance", type: "Mobilisation", priority: "high", status: "blocked", assignee: "Sarah Mitchell", due: "2026-08-30", progress: 20 },
+  { id: "wo-2041", code: "WO-2041", title: "Cooling-system diagnostic - hotspot", asset: "AST-001", customer: "ComEd", contract: "ComEd - 5-year Service Agreement", type: "Corrective", priority: "critical", status: "in-progress", assignee: "Daniel Brooks", due: "2026-09-02", progress: 45 },
+  { id: "wo-2038", code: "WO-2038", title: "Bearing replacement - recurring fault", asset: "AST-002", customer: "ComEd", contract: "ComEd - 5-year Service Agreement", type: "Corrective", priority: "high", status: "scheduled", assignee: "Sarah Mitchell", due: "2026-09-10", progress: 0 },
+  { id: "wo-2035", code: "WO-2035", title: "DGA oil sampling", asset: "AST-003", customer: "NV Energy", contract: "NV Energy - Service Agreement", type: "Preventive", priority: "medium", status: "open", assignee: "Lena Fischer", due: "2026-09-14", progress: 0 },
+  { id: "wo-2031", code: "WO-2031", title: "Tap-changer vibration inspection", asset: "AST-004", customer: "AEP Ohio", contract: "AEP Ohio - Service Agreement", type: "Inspection", priority: "medium", status: "in-progress", assignee: "Marcus Lee", due: "2026-09-05", progress: 60 },
+  { id: "wo-2027", code: "WO-2027", title: "HSE certificate renewal - offshore crew", asset: "AST-014", customer: "Baltic Wind NL", contract: "Baltic array transformer maintenance", type: "Mobilisation", priority: "high", status: "blocked", assignee: "Sarah Mitchell", due: "2026-08-30", progress: 20 },
   { id: "wo-2024", code: "WO-2024", title: "Protection relay firmware upgrade", asset: "AST-021", customer: "Pacific Gas", contract: "Protection relay upgrade", type: "Preventive", priority: "low", status: "scheduled", assignee: "Lena Fischer", due: "2026-09-21", progress: 0 },
-  { id: "wo-2019", code: "WO-2019", title: "Bushing replacement — Unit S-12", asset: "AST-001", customer: "Xcel Energy", contract: "Sherco HVDC winding replacement", type: "Corrective", priority: "critical", status: "in-progress", assignee: "Daniel Brooks", due: "2026-09-01", progress: 30 },
-  { id: "wo-2012", code: "WO-2012", title: "Annual thermal scan", asset: "AST-033", customer: "Duke Energy", contract: "Duke Energy — Service Agreement", type: "Inspection", priority: "low", status: "complete", assignee: "Marcus Lee", due: "2026-08-18", progress: 100 },
+  { id: "wo-2019", code: "WO-2019", title: "Bushing replacement - Unit S-12", asset: "AST-001", customer: "Xcel Energy", contract: "Sherco HVDC winding replacement", type: "Corrective", priority: "critical", status: "in-progress", assignee: "Daniel Brooks", due: "2026-09-01", progress: 30 },
+  { id: "wo-2012", code: "WO-2012", title: "Annual thermal scan", asset: "AST-033", customer: "Duke Energy", contract: "Duke Energy - Service Agreement", type: "Inspection", priority: "low", status: "complete", assignee: "Marcus Lee", due: "2026-08-18", progress: 100 },
 ];
 
 export interface WorkOrderDetail {
@@ -42,7 +42,7 @@ export interface WorkOrderDetail {
 export const WORK_ORDER_DETAILS: Record<string, WorkOrderDetail> = {
   "wo-2041": {
     summary:
-      "Corrective work order raised from AST-001's thermal alert. Top-oil temperature is 14°C over rated and DGA hydrogen is elevated — the cooling circuit needs a full diagnostic before the autumn load peak. Crew is on site with the diagnostic partway complete.",
+      "Corrective contract raised from AST-001's thermal alert. Top-oil temperature is 14°C over rated and DGA hydrogen is elevated - the cooling circuit needs a full diagnostic before the autumn load peak. Crew is on site with the diagnostic partway complete.",
     recommendedActions: ["Escalate to reliability", "Order cooling parts", "Update ETA"],
     checklist: [
       { label: "Isolate and de-energise unit", done: true },
@@ -57,9 +57,9 @@ export const WORK_ORDER_DETAILS: Record<string, WorkOrderDetail> = {
     ],
     timeline: [
       { label: "Crew mobilised to site", date: "2026-08-26" },
-      { label: "Work order raised from alert", date: "2026-08-24" },
+      { label: "Contract raised from alert", date: "2026-08-24" },
     ],
-    related: { asset: "AST-001", customer: "ComEd", contract: "ComEd — 5-year Service Agreement" },
+    related: { asset: "AST-001", customer: "ComEd", contract: "ComEd - 5-year Service Agreement" },
   },
   "wo-2038": {
     summary:
@@ -76,14 +76,14 @@ export const WORK_ORDER_DETAILS: Record<string, WorkOrderDetail> = {
       { label: "Shaft seal", qty: 2, status: "in-stock" },
     ],
     timeline: [
-      { label: "Work order scheduled", date: "2026-08-22" },
+      { label: "Contract scheduled", date: "2026-08-22" },
       { label: "Vibration alarm logged", date: "2026-08-14" },
     ],
-    related: { asset: "AST-002", customer: "ComEd", contract: "ComEd — 5-year Service Agreement" },
+    related: { asset: "AST-002", customer: "ComEd", contract: "ComEd - 5-year Service Agreement" },
   },
   "wo-2027": {
     summary:
-      "Offshore remobilisation for the Baltic array is blocked: two HSE certificates lapse before the next visit. Renewals must clear before the crew can sail — the window is at risk until they do.",
+      "Offshore remobilisation for the Baltic array is blocked: two HSE certificates lapse before the next visit. Renewals must clear before the crew can sail - the window is at risk until they do.",
     recommendedActions: ["Schedule cert renewal", "Escalate to HSE", "Rebook vessel"],
     checklist: [
       { label: "Identify lapsing certificates", done: true },

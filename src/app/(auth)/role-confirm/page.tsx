@@ -102,9 +102,9 @@ export default function RoleConfirmPage() {
             </div>
           </div>
 
-          {/* Getting started — a quick primer on using the product */}
+          {/* Getting started - a quick primer on using the product */}
           <div className="bg-white rounded-2xl ring-1 ring-gray-200 p-6 mb-6">
-            <p className="text-[11px] tracking-wider text-gray-400 mb-4">Getting started — four things to try first</p>
+            <p className="text-[11px] tracking-wider text-gray-400 mb-4">Getting started - four things to try first</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-5">
               {HOW_TO_USE.map((step, i) => (
                 <div key={step.title} className="flex items-start gap-3">

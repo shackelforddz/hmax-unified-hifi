@@ -88,7 +88,7 @@ function StaticFleetMap() {
   const marker = MAP_MARKERS.find((m) => m.id === selected);
   const tipX = marker ? clamp((marker.x / 100) * size.w * view.zoom + view.panX, 116, size.w - 116) : 0;
   const rawY = marker ? (marker.y / 100) * size.h * view.zoom + view.panY : 0;
-  const tipBelow = rawY < 150; // not enough room above — flip below the marker
+  const tipBelow = rawY < 150; // not enough room above - flip below the marker
 
   return (
     <>

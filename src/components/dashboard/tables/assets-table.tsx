@@ -21,7 +21,7 @@ function HealthCell({ health }: { health: number }) {
   );
 }
 
-const contractOf = (a: AssetAlert) => ASSET_DETAILS[a.id]?.related.contract ?? "—";
+const contractOf = (a: AssetAlert) => ASSET_DETAILS[a.id]?.related.contract ?? "-";
 
 const COLUMNS: Column<AssetAlert>[] = [
   { header: "Asset", cell: (a) => <span className="text-gray-900">{a.code}</span> },

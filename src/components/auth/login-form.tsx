@@ -60,7 +60,7 @@ export default function LoginForm({ role }: { role?: Role }) {
 
           <hr className="my-6 border-gray-100" />
 
-          {/* Demo persona quick links — only on the base login */}
+          {/* Demo persona quick links - only on the base login */}
           {!role && (
             <div className="mb-6">
               <p className="text-xs text-gray-400 text-center mb-2">Jump into a demo persona</p>

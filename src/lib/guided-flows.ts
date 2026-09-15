@@ -1,6 +1,6 @@
 /* ── Data-driven guided flows ────────────────────────────────────────
    Every task in the conversation overlay runs a guided, multi-step wizard.
-   Mobilization and opportunity have bespoke wizards; every other task is
+   Mobilization and lead have bespoke wizards; every other task is
    described here as data and rendered by the generic FlowWizardCard.
 
    A flow's input steps are shown as tabs, followed by an auto-generated
@@ -41,20 +41,20 @@ export interface GuidedFlow {
 export const GUIDED_FLOWS: GuidedFlow[] = [
   {
     id: "work-order",
-    match: /\b(raise|create|open|new|log)\b.*\bwork order\b/,
-    intro: "Let's raise a work order — I'll pre-fill what I can from the asset record.",
-    cta: "Raise work order",
-    done: "✓ Work order WO-2045 raised and assigned to Daniel Brooks.\n\nIt's scheduled against AST-001 and now appears in the Work Orders tab. I'll notify the assignee and reserve the parts.",
-    doneSuggestions: ["Show the work order", "Assign a different engineer", "Order the parts now"],
+    match: /\b(raise|create|open|new|log)\s+(a\s+|an\s+)?(new\s+|corrective\s+|verification\s+)?contract\b/,
+    intro: "Let's raise a contract - I'll pre-fill what I can from the asset record.",
+    cta: "Raise contract",
+    done: "✓ Contract raised and assigned to Daniel Brooks.\n\nIt's scheduled against AST-001 and now appears in the Contracts tab. I'll notify the assignee and reserve the parts.",
+    doneSuggestions: ["Show the contract", "Assign a different engineer", "Order the parts now"],
     entity: { kind: "asset", id: "ast-001" },
     steps: [
       {
         label: "Details",
-        title: "Work order details",
+        title: "Contract details",
         sub: "What needs doing and how urgent it is.",
         fields: [
           { type: "text", label: "Asset", value: "AST-001", star: true },
-          { type: "text", label: "Title", value: "Cooling-system diagnostic — hotspot", star: true },
+          { type: "text", label: "Title", value: "Cooling-system diagnostic - hotspot", star: true },
           { type: "chips", label: "Type", options: ["Corrective", "Preventive", "Inspection"], value: "Corrective" },
           { type: "chips", label: "Priority", options: ["Low", "Medium", "High", "Critical"], value: "Critical" },
           { type: "textarea", label: "Description", value: "Investigate Y-phase bushing hotspot flagged on the latest thermal scan; confirm cause and remediate.", full: true },
@@ -75,7 +75,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
   {
     id: "change-order",
     match: /\b(raise|create|new|open|log)\b.*\bchange order\b/,
-    intro: "Let's raise a change order for review — I'll draft it against the contract.",
+    intro: "Let's raise a change order for review - I'll draft it against the contract.",
     cta: "Raise change order",
     done: "✓ Change order CO-242 raised and routed for approval.\n\nIt's linked to the Sherco HVDC contract and blocks progress invoicing until signed. I've flagged the schedule and margin impact for the approver.",
     doneSuggestions: ["Show the change order", "Notify the approver", "Estimate the margin impact"],
@@ -107,7 +107,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
   {
     id: "hse-report",
     match: /\b(log|raise|create|file|report)\b.*\b(hse|health and safety)\b/,
-    intro: "Let's log an HSE report — I'll capture the details and route it correctly.",
+    intro: "Let's log an HSE report - I'll capture the details and route it correctly.",
     cta: "Log HSE report",
     done: "✓ HSE report HSE-0092 logged and acknowledged.\n\nThe site supervisor has been notified and corrective actions are tracked to closure. I've checked whether it's RIDDOR-reportable and flagged accordingly.",
     doneSuggestions: ["Show the HSE report", "Assign corrective actions", "Notify the safety lead"],
@@ -138,7 +138,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
   {
     id: "invoice",
     match: /\b(create|draft|raise|generate|issue)\b.*\binvoice\b/,
-    intro: "Let's draft an invoice — I'll pull the milestone and contract details.",
+    intro: "Let's draft an invoice - I'll pull the milestone and contract details.",
     cta: "Create invoice",
     done: "✓ Invoice INV-3310 drafted for £1.2m.\n\nIt's tied to the milestone on the Sherco HVDC contract and ready for review before sending to Xcel Energy.",
     doneSuggestions: ["Preview the invoice", "Send to the customer", "Change the payment terms"],
@@ -170,7 +170,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
   {
     id: "impact-report",
     match: /\b(create|generate|draft|build)\b.*\bimpact report\b/,
-    intro: "Let's build an impact report — tell me the focus and audience and I'll assemble it.",
+    intro: "Let's build an impact report - tell me the focus and audience and I'll assemble it.",
     cta: "Generate impact report",
     done: "✓ Impact report generated.\n\nIt covers reliability and financial impact for the period, with the charts and headline metrics ready to export or share.",
     doneSuggestions: ["Preview the report", "Export to PDF", "Share with the customer"],
@@ -200,7 +200,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
   {
     id: "renewal-quote",
     match: /\b(draft|create|prepare|build|generate)\b.*\brenewal\b/,
-    intro: "Let's draft a renewal quote — I'll base it on the current agreement.",
+    intro: "Let's draft a renewal quote - I'll base it on the current agreement.",
     cta: "Draft renewal quote",
     done: "✓ Renewal quote drafted.\n\nIt carries a 3% uplift over a 5-year term and is ready to review before it goes to the customer.",
     doneSuggestions: ["Preview the quote", "Adjust the uplift", "Send for approval"],
@@ -231,7 +231,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
   {
     id: "inspection-plan",
     match: /\b(create|draft|build|schedule)\b.*\binspection plan\b/,
-    intro: "Let's create an inspection plan — I'll suggest an interval from the asset's condition.",
+    intro: "Let's create an inspection plan - I'll suggest an interval from the asset's condition.",
     cta: "Create inspection plan",
     done: "✓ Inspection plan created.\n\nQuarterly thermal and DGA checks are scheduled against AST-001 with an engineer assigned to the first window.",
     doneSuggestions: ["Show the plan", "Assign a different engineer", "Add to the maintenance calendar"],
@@ -262,7 +262,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
   {
     id: "feasibility-review",
     match: /\b(draft|create|do|run|submit|start)\b.*\bfeasibility\b/,
-    intro: "Let's work through a feasibility review — I'll pull the scope handed over from sales.",
+    intro: "Let's work through a feasibility review - I'll pull the scope handed over from sales.",
     cta: "Submit feasibility review",
     done: "✓ Feasibility review submitted.\n\nThe verdict and rationale are recorded against the Sherco HVDC scope and shared back with the sales owner.",
     doneSuggestions: ["Show the review", "Flag the design constraint", "Notify the sales owner"],
@@ -293,7 +293,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
   {
     id: "dispatch-engineer",
     match: /\b(schedule|dispatch|assign|send|book)\b.*\b(field engineer|engineer)\b/,
-    intro: "Let's dispatch a field engineer — I'll check who's available for the window.",
+    intro: "Let's dispatch a field engineer - I'll check who's available for the window.",
     cta: "Dispatch engineer",
     done: "✓ Field engineer dispatched.\n\nMarcus Lee is assigned to AST-001 for the requested window and has been sent the task brief and access details.",
     doneSuggestions: ["Show the assignment", "Pick a different engineer", "Send the site brief"],
@@ -324,10 +324,10 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
   {
     id: "diagnostics-summary",
     match: /\b(create|draft|build|generate)\b.*\bdiagnostic/,
-    intro: "Let's create a diagnostics summary — I'll gather the reports for the asset.",
+    intro: "Let's create a diagnostics summary - I'll gather the reports for the asset.",
     cta: "Create summary",
     done: "✓ Diagnostics summary created.\n\nIt consolidates the DGA and thermal findings for AST-001 with a recommended next step, ready to attach to the asset record.",
-    doneSuggestions: ["Preview the summary", "Raise a corrective work order", "Attach to the asset"],
+    doneSuggestions: ["Preview the summary", "Raise a corrective contract", "Attach to the asset"],
     entity: { kind: "asset", id: "ast-001" },
     steps: [
       {
@@ -355,9 +355,9 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
   {
     id: "draft-message",
     match: /\b(draft|write|send|chase|escalate|notify)\b.*\b(message|email|note|chase|customer|legal|engineering|reliability|qa|supplier|approver|safety|owner|team)\b/,
-    intro: "Let's draft that message — I've pulled the context so you can review and edit before it goes.",
+    intro: "Let's draft that message - I've pulled the context so you can review and edit before it goes.",
     cta: "Send message",
-    done: "✓ Message drafted and ready to send.\n\nI've attached the relevant record so the recipient has the full context. Review it, then send — or schedule a reminder to follow up if you don't hear back.",
+    done: "✓ Message drafted and ready to send.\n\nI've attached the relevant record so the recipient has the full context. Review it, then send - or schedule a reminder to follow up if you don't hear back.",
     doneSuggestions: ["Edit the message", "Schedule a follow-up reminder", "Send a copy to my manager"],
     steps: [
       {
@@ -373,10 +373,10 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
       {
         label: "Message",
         title: "What do you want to say?",
-        sub: "I've drafted a starting point from the context — edit as needed.",
+        sub: "I've drafted a starting point from the context - edit as needed.",
         fields: [
           { type: "text", label: "Subject", value: "Action needed", star: true },
-          { type: "textarea", label: "Message", value: "Hi — flagging this needs your attention. Could you confirm status and expected turnaround? The relevant details are attached. Thanks.", full: true },
+          { type: "textarea", label: "Message", value: "Hi - flagging this needs your attention. Could you confirm status and expected turnaround? The relevant details are attached. Thanks.", full: true },
         ],
       },
     ],

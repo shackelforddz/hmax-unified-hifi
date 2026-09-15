@@ -1,17 +1,28 @@
 /* Small avatar + name for the person/function that owns an offer input.
-   Owners are formatted "Team — I. Lastname"; each maps to a photo, with an
+   Owners are formatted "Team - I. Lastname"; each maps to a photo, with an
    initials badge as a fallback. */
 
 const OWNER_AVATARS: Record<string, string> = {
-  "Sales ops — T. Wu": "/avatars/33.jpg",
-  "Reliability — F. Dubois": "/avatars/13.jpg",
-  "Engineering — J. Park": "/avatars/68.jpg",
-  "Commercial — A. Rossi": "/avatars/11.jpg",
-  "Legal — R. Bianchi": "/avatars/9.jpg",
+  "Sales ops - T. Wu": "/avatars/33.jpg",
+  "Reliability - F. Dubois": "/avatars/13.jpg",
+  "Engineering - J. Park": "/avatars/68.jpg",
+  "Commercial - A. Rossi": "/avatars/11.jpg",
+  "Legal - R. Bianchi": "/avatars/9.jpg",
 };
 
+/** The photo for an owner, when one is on file. */
+export function ownerAvatar(owner: string): string | undefined {
+  return OWNER_AVATARS[owner];
+}
+
+/** Owners read "Team - I. Lastname"; split them for compact display. */
+export function splitOwner(owner: string): { team: string; person: string } {
+  const [team, person] = owner.split(" - ");
+  return person ? { team, person } : { team: "", person: owner };
+}
+
 export function ownerInitials(owner: string): string {
-  const person = owner.includes("—") ? owner.split("—")[1].trim() : owner;
+  const person = owner.includes("-") ? owner.split("-")[1].trim() : owner;
   return person
     .split(/\s+/)
     .map((t) => t[0])

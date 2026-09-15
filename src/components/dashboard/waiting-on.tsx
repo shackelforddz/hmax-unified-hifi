@@ -16,7 +16,7 @@ const PARTY_CLS: Record<WaitingParty, string> = {
 
 export default function WaitingOn() {
   const launch = useConversationLauncher();
-  // Longest-waiting first — that's what you chase first.
+  // Longest-waiting first - that's what you chase first.
   const items = [...WAITING_ON].sort((a, b) => b.waitingDays - a.waitingDays);
 
   return (
@@ -58,7 +58,7 @@ export default function WaitingOn() {
               }
               className="rounded-full h-auto px-4 py-1.5 text-xs text-gray-700 cursor-pointer shrink-0"
             >
-              Chase
+              Follow up
             </Button>
           </div>
         ))}

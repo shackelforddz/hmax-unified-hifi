@@ -8,15 +8,13 @@ import { OPPORTUNITIES, type OppStage } from "@/lib/sales-data";
 const parseVal = (v: string) => parseFloat(v.replace(/[^0-9.]/g, "")) || 0; // "$8.2M" → 8.2
 const fmt = (n: number) => `$${n.toFixed(1)}M`;
 
-// Win probability by stage — drives the weighted forecast.
+// Win probability by stage - drives the weighted forecast.
 const STAGE_PROB: Record<OppStage, number> = {
-  Discovery: 0.1,
-  Qualified: 0.25,
-  Scoping: 0.5,
-  Offer: 0.75,
+  Prospects: 0.2,
+  Bidding: 0.6,
   Negotiation: 0.9,
 };
-const OFFER_PLUS: OppStage[] = ["Offer", "Negotiation"];
+const OFFER_PLUS: OppStage[] = ["Bidding", "Negotiation"];
 
 // Illustrative pipeline-value trend (ends at the current total).
 const SPARK = [22.1, 23.4, 24.0, 25.2, 24.6, 26.5, 27.3].map((v) => ({ v }));
@@ -34,7 +32,7 @@ export default function OpportunityStats() {
 
   return (
     <div className="grid grid-cols-4 gap-4">
-      {/* Pipeline value — wide tile with a trend sparkline */}
+      {/* Pipeline value - wide tile with a trend sparkline */}
       <div className="col-span-2 bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
         <div className="flex items-start justify-between mb-1">
           <p className="text-base text-gray-900">Pipeline value</p>
@@ -45,7 +43,7 @@ export default function OpportunityStats() {
             <p className="text-4xl text-gray-900 leading-none">{fmt(total)}</p>
             <p className="flex items-center gap-1 text-xs text-gray-500 mt-2">
               <ArrowUp size={12} strokeWidth={2} /> {fmt(delta)} vs last month
-              <span className="text-gray-400">· {OPPORTUNITIES.length} opportunities</span>
+              <span className="text-gray-400">· {OPPORTUNITIES.length} leads</span>
             </p>
           </div>
           <div className="w-40 h-14 shrink-0">
@@ -87,7 +85,7 @@ export default function OpportunityStats() {
         </div>
         <div className="flex-1 flex flex-col justify-end">
           <p className="text-4xl text-gray-900 leading-none">{offerPlus.length}</p>
-          <p className="text-xs text-gray-500 mt-2 mb-2">of {OPPORTUNITIES.length} opportunities · {fmt(offerPlusValue)}</p>
+          <p className="text-xs text-gray-500 mt-2 mb-2">of {OPPORTUNITIES.length} leads · {fmt(offerPlusValue)}</p>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
             <div className="h-full bg-gray-900 rounded-full" style={{ width: `${offerPct}%` }} />
           </div>

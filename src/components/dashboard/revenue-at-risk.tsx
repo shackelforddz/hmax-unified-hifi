@@ -6,6 +6,25 @@ import WidgetChat from "./widget-chat";
 
 const max = Math.max(...R.bars.map((b) => b.amount));
 
+/* `display` would land on the SVG element as a presentation attribute, so the
+   label rides along under a name that cannot collide. */
+const DATA = R.bars.map((b) => ({ trigger: b.label, amount: b.amount, amountLabel: b.display }));
+
+// Trigger names are long, so each column's label wraps onto two lines.
+function TriggerTick({ x, y, payload }: { x?: number; y?: number; payload?: { value?: string } }) {
+  const words = String(payload?.value ?? "").split(" ");
+  const lines = words.length > 1 ? [words[0], words.slice(1).join(" ")] : words;
+  return (
+    <text x={x} y={y} textAnchor="middle" fontFamily="inherit" fontSize="11" fill="#525252">
+      {lines.map((line, i) => (
+        <tspan key={line} x={x} dy={i === 0 ? 12 : 12}>
+          {line}
+        </tspan>
+      ))}
+    </text>
+  );
+}
+
 export default function RevenueAtRisk() {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
@@ -24,28 +43,20 @@ export default function RevenueAtRisk() {
         <span className="text-xs text-gray-400 mb-0.5">{R.caption}</span>
       </div>
 
-      {/* Chart */}
-      <ResponsiveContainer width="100%" height={150}>
-        <BarChart
-          layout="vertical"
-          data={R.bars}
-          margin={{ top: 6, right: 44, bottom: 0, left: 8 }}
-          barCategoryGap={10}
-        >
-          <XAxis type="number" domain={[0, max]} hide />
-          <YAxis
-            type="category"
-            dataKey="label"
-            width={130}
-            tick={{ fontSize: 12, fill: "#525252" }}
-            tickLine={false}
-            axisLine={false}
-          />
-          <Bar dataKey="amount" fill="#171717" radius={[4, 4, 4, 4]} barSize={12}>
-            <LabelList dataKey="display" position="right" fontSize={12} fill="#171717" />
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      {/* Chart - grows to fill the tile */}
+      <div className="relative flex-1 min-h-[150px]">
+        <div className="absolute inset-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={DATA} margin={{ top: 22, right: 4, bottom: 4, left: 4 }} barCategoryGap="24%">
+              <XAxis dataKey="trigger" interval={0} height={36} tick={<TriggerTick />} tickLine={false} axisLine={false} />
+              <YAxis type="number" domain={[0, max]} hide />
+              <Bar dataKey="amount" fill="#171717" radius={[4, 4, 0, 0]} maxBarSize={44}>
+                <LabelList dataKey="amountLabel" position="top" fontSize={11} fill="#171717" />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 }

@@ -17,7 +17,7 @@ const VISUALS: { type: WidgetType; label: string; icon: typeof LineChart }[] = [
 // Example prompts tuned to what each role actually tracks.
 const EXAMPLES_BY_ROLE: Record<string, string[]> = {
   "Project Manager": ["On-time delivery trend", "Revenue at risk by trigger", "Milestones due by week", "Vendor concentration"],
-  Sales: ["Pipeline value trend", "Weighted forecast by stage", "SLA renewals by month", "Opportunities by stage"],
+  Sales: ["Pipeline value trend", "Weighted forecast by stage", "SLA renewals by month", "Leads by stage"],
   Operations: ["Portfolio margin trend", "Contract status breakdown", "Resource utilisation by team", "Change orders by value"],
   "Reliability Engineer": ["Fleet health over time", "Assets by review type", "Scope feasibility outcomes", "Site constraints by type"],
   Diagnostics: ["Reports awaiting interpretation", "Fault signatures by asset", "Field-report turnaround", "DGA trends by unit"],

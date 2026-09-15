@@ -146,7 +146,7 @@ function DrawingCanvas({ doc }: { doc: ViewDoc }) {
   );
 }
 
-/* The document itself — reused in the modal viewer and inline in the chat. */
+/* The document itself - reused in the modal viewer and inline in the chat. */
 export function DocContent({ doc }: { doc: ViewDoc }) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-5 flex flex-col gap-5">
@@ -175,7 +175,7 @@ export function DocContent({ doc }: { doc: ViewDoc }) {
         ))}
       </div>
 
-      {/* Narrative sections — text, tables and charts */}
+      {/* Narrative sections - text, tables and charts */}
       {doc.sections.map((s) => (
         <div key={s.heading} className="flex flex-col gap-2.5">
           <p className="text-[11px] text-gray-400 tracking-wider">{s.heading}</p>
@@ -255,7 +255,7 @@ export default function DocumentViewer({ doc, onClose, onAsk }: Props) {
           </div>
         </div>
 
-        {/* Body — the document itself */}
+        {/* Body - the document itself */}
         <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-6 bg-gray-50">
           <DocContent doc={doc} />
         </div>

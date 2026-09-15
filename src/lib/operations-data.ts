@@ -34,6 +34,8 @@ export interface ContractAlert {
   title: string;
   detail: string;
   action: string;
+  /** The business consequence of this alert, shown in the card meta row. */
+  impact?: string;
 }
 export interface OpsContract {
   id: string;
@@ -44,7 +46,7 @@ export interface OpsContract {
   status: OpsStatus;
   start: string; // contract term start (ISO)
   end: string;   // contract term end (ISO)
-  progress: number; // % of contract term elapsed — derived from start/end
+  progress: number; // % of contract term elapsed - derived from start/end
   risk: RiskProfile;
   alerts: ContractAlert[];
 }
@@ -72,11 +74,11 @@ const RAW_CONTRACTS: Omit<OpsContract, "progress">[] = [
     end: "2026-12-15",
     risk: { schedule: "high", cost: "med", quality: "low", safety: "med" },
     alerts: [
-      { category: "delivery", title: "18 days behind baseline — outage window at risk", detail: "Field mobilization slipped and the work is now tracking 18 days behind. Missing the 14 September outage window pushes delivery into February and defers a £1.2m milestone invoice.", action: "Adjust Schedule" },
-      { category: "delivery", title: "Delta Coils is the critical path on winding sets", detail: "A single vendor gates the remaining scope; a further slip cascades across six projects.", action: "Reassign Vendor" },
-      { category: "change-order", title: "Change order CO-204 · Additional winding sets — £320k", detail: "Scope adds two winding sets beyond the original contract. Review the technical impact and price before it's booked to release progress invoicing.", action: "Review change order" },
-      { category: "quality", title: "NCR-071 · Weld porosity on winding set 2", detail: "QA radiography flagged porosity above the acceptance criteria on the second winding set. Disposition the non-conformance before assembly continues.", action: "Review NCR" },
-      { category: "hse", title: "HSE complaint · Dropped-load near-miss during lift", detail: "A dropped-load near-miss was reported during the winding lift. HSE has opened a RIDDOR review — confirm the lifting-plan corrective actions.", action: "Review HSE report" },
+      { category: "delivery", title: "18 days behind baseline - outage window at risk", detail: "Field mobilization slipped and the work is now tracking 18 days behind. Missing the 14 September outage window pushes delivery into February and defers a £1.2m milestone invoice.", action: "Adjust Schedule", impact: "£1.2m invoice deferred" },
+      { category: "delivery", title: "Delta Coils is the critical path on winding sets", detail: "A single vendor gates the remaining scope; a further slip cascades across six projects.", action: "Reassign Vendor", impact: "6 projects exposed" },
+      { category: "change-order", title: "Change order CO-204 · Additional winding sets - £320k", detail: "Scope adds two winding sets beyond the original contract. Review the technical impact and price before it's booked to release progress invoicing.", action: "Review change order", impact: "£320k unbooked" },
+      { category: "quality", title: "NCR-071 · Weld porosity on winding set 2", detail: "QA radiography flagged porosity above the acceptance criteria on the second winding set. Disposition the non-conformance before assembly continues.", action: "Review NCR", impact: "Assembly on hold" },
+      { category: "hse", title: "HSE complaint · Dropped-load near-miss during lift", detail: "A dropped-load near-miss was reported during the winding lift. HSE has opened a RIDDOR review - confirm the lifting-plan corrective actions.", action: "Review HSE report", impact: "RIDDOR review open" },
     ],
   },
   {
@@ -90,10 +92,10 @@ const RAW_CONTRACTS: Omit<OpsContract, "progress">[] = [
     end: "2027-02-01",
     risk: { schedule: "high", cost: "high", quality: "med", safety: "low" },
     alerts: [
-      { category: "delivery", title: "Crew over-allocated across the platform cluster", detail: "Field Service is at 96% utilisation with no slack for the additional protection-relay scope.", action: "Rebalance Crew" },
-      { category: "change-order", title: "Change order CO-118 · Protection-relay scope extension — £680k", detail: "Progress invoicing is blocked and reported margin sits 14pts under baseline until this change order is booked. Review and raise it for signature.", action: "Review change order" },
-      { category: "change-order", title: "Change order CO-131 · Weather standby days — £120k", detail: "Additional weather standby days claimed by the vessel operator. Verify the logs and approve before booking.", action: "Review change order" },
-      { category: "hse", title: "HSE complaint · Working-at-height PPE non-use", detail: "A subcontractor was reported working at height without fall arrest. An HSE complaint is open — verify the toolbox-talk and re-induction records.", action: "Review HSE report" },
+      { category: "delivery", title: "Crew over-allocated across the platform cluster", detail: "Field Service is at 96% utilisation with no slack for the additional protection-relay scope.", action: "Rebalance Crew", impact: "No slack for relay scope" },
+      { category: "change-order", title: "Change order CO-118 · Protection-relay scope extension - £680k", detail: "Progress invoicing is blocked and reported margin sits 14pts under baseline until this change order is booked. Review and raise it for signature.", action: "Review change order", impact: "£680k invoice held" },
+      { category: "change-order", title: "Change order CO-131 · Weather standby days - £120k", detail: "Additional weather standby days claimed by the vessel operator. Verify the logs and approve before booking.", action: "Review change order", impact: "£120k unverified" },
+      { category: "hse", title: "HSE complaint · Working-at-height PPE non-use", detail: "A subcontractor was reported working at height without fall arrest. An HSE complaint is open - verify the toolbox-talk and re-induction records.", action: "Review HSE report", impact: "HSE complaint open" },
     ],
   },
   {
@@ -107,9 +109,9 @@ const RAW_CONTRACTS: Omit<OpsContract, "progress">[] = [
     end: "2026-10-15",
     risk: { schedule: "low", cost: "low", quality: "med", safety: "high" },
     alerts: [
-      { category: "delivery", title: "Two HSE certificates expire before the next visit", detail: "Offshore crew certifications lapse ahead of the planned window; remobilisation is blocked until they renew.", action: "Schedule Cert Renewal" },
-      { category: "hse", title: "HSE complaint · Slip hazard on access gangway", detail: "Crew logged a slip hazard on the wet access gangway. Confirm the anti-slip remediation is closed out before the next mobilisation.", action: "Review HSE report" },
-      { category: "quality", title: "NCR-058 · Bushing torque values out of spec", detail: "A torque check on the transformer bushings fell outside specification. Disposition the non-conformance and re-torque to procedure.", action: "Review NCR" },
+      { category: "delivery", title: "Two HSE certificates expire before the next visit", detail: "Offshore crew certifications lapse ahead of the planned window; remobilisation is blocked until they renew.", action: "Schedule Cert Renewal", impact: "Remobilisation blocked" },
+      { category: "hse", title: "HSE complaint · Slip hazard on access gangway", detail: "Crew logged a slip hazard on the wet access gangway. Confirm the anti-slip remediation is closed out before the next mobilisation.", action: "Review HSE report", impact: "Mobilisation gated" },
+      { category: "quality", title: "NCR-058 · Bushing torque values out of spec", detail: "A torque check on the transformer bushings fell outside specification. Disposition the non-conformance and re-torque to procedure.", action: "Review NCR", impact: "Re-torque required" },
     ],
   },
   {
@@ -123,8 +125,8 @@ const RAW_CONTRACTS: Omit<OpsContract, "progress">[] = [
     end: "2027-03-01",
     risk: { schedule: "med", cost: "low", quality: "low", safety: "med" },
     alerts: [
-      { category: "delivery", title: "Site access unresolved — verbal only", detail: "Only a verbal arrangement is in place; a written access agreement is required before the crew can mobilise.", action: "Request Written Access" },
-      { category: "change-order", title: "Change order CO-241 · Written site-access agreement — £15k", detail: "Only a verbal access arrangement is in place. Review and issue the written change order before the crew can mobilise.", action: "Review change order" },
+      { category: "delivery", title: "Site access unresolved - verbal only", detail: "Only a verbal arrangement is in place; a written access agreement is required before the crew can mobilise.", action: "Request Written Access", impact: "Crew cannot mobilise" },
+      { category: "change-order", title: "Change order CO-241 · Written site-access agreement - £15k", detail: "Only a verbal access arrangement is in place. Review and issue the written change order before the crew can mobilise.", action: "Review change order", impact: "£15k unissued" },
     ],
   },
 ];
@@ -143,8 +145,8 @@ export interface OpsContractDetail {
   milestones: { label: string; done: boolean; planned: string; actual?: string }[];
   risks: { title: string; detail: string; level: "Critical" | "High" | "Medium" }[];
   team: { role: string; name: string }[];
-  /** Assets covered by this contract. */
-  assets: { code: string; type: string; status: string }[];
+  /** Assets covered by this contract, with their condition score. */
+  assets: { code: string; type: string; status: string; health: number }[];
   /** Parts & materials the contract work depends on. */
   parts: { label: string; qty: number; status: PartStatus }[];
   /** Scheduled maintenance on the covered assets. */
@@ -153,7 +155,7 @@ export interface OpsContractDetail {
   fieldService: { visit: string; engineer: string; date: string; status: string }[];
   /** Customer-side contacts. */
   contacts: { name: string; role: string; email: string; phone: string }[];
-  /** Commercial position — revenue and net margin. */
+  /** Commercial position - revenue and net margin. */
   finance: { revenue: string; netMargin: string; asSoldMargin: string; invoiced: string; outstanding: string };
   /** Invoicing against milestones. */
   invoices: { code: string; milestone: string; amount: string; status: InvoiceStatus; due: string }[];
@@ -183,9 +185,9 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { role: "Field Supervisor", name: "Liam O." },
     ],
     assets: [
-      { code: "AST-001", type: "HVDC converter transformer · Unit S-12", status: "Critical" },
-      { code: "AST-014", type: "HVDC converter transformer · Unit S-14", status: "At risk" },
-      { code: "AST-019", type: "HVDC converter transformer · Unit S-19", status: "In service" },
+      { code: "AST-001", type: "HVDC converter transformer · Unit S-12", status: "Critical" , health: 24 },
+      { code: "AST-014", type: "HVDC converter transformer · Unit S-14", status: "At risk" , health: 47 },
+      { code: "AST-019", type: "HVDC converter transformer · Unit S-19", status: "In service" , health: 82 },
     ],
     parts: [
       { label: "Converter winding set", qty: 2, status: "ordered" },
@@ -199,7 +201,7 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { task: "Cooling system service", due: "2026-10-05", interval: "Annual", status: "Scheduled" },
     ],
     fieldService: [
-      { visit: "Winding replacement — Unit S-12", engineer: "Daniel Brooks", date: "2026-09-02", status: "In progress" },
+      { visit: "Winding replacement - Unit S-12", engineer: "Daniel Brooks", date: "2026-09-02", status: "In progress" },
       { visit: "Site commissioning", engineer: "Liam O.", date: "2026-09-28", status: "Scheduled" },
     ],
     contacts: [
@@ -215,7 +217,7 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
     payments: [
       { date: "2026-07-02", event: "INV-3301 paid", amount: "+£0.8m" },
       { date: "2026-08-15", event: "INV-3302 overdue", amount: "£1.6m" },
-      { date: "2026-09-30", event: "INV-3310 milestone invoice — at risk", amount: "£1.2m" },
+      { date: "2026-09-30", event: "INV-3310 milestone invoice - at risk", amount: "£1.2m" },
     ],
     related: { customer: "Xcel Energy", value: "£4.2m", region: "North America" },
   },
@@ -239,8 +241,8 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { role: "Field Supervisor", name: "Sara B." },
     ],
     assets: [
-      { code: "AST-021", type: "Protection relay bank · Platform A", status: "At risk" },
-      { code: "AST-022", type: "MV switchgear panel · Platform B", status: "In service" },
+      { code: "AST-021", type: "Protection relay bank · Platform A", status: "At risk" , health: 54 },
+      { code: "AST-022", type: "MV switchgear panel · Platform B", status: "In service" , health: 88 },
     ],
     parts: [
       { label: "Protection relay module", qty: 8, status: "ordered" },
@@ -252,7 +254,7 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { task: "Switchgear inspection", due: "2026-08-28", interval: "6-monthly", status: "Overdue" },
     ],
     fieldService: [
-      { visit: "Protection-relay extension works", engineer: "Sara B.", date: "2026-09-08", status: "Blocked — CO unsigned" },
+      { visit: "Protection-relay extension works", engineer: "Sara B.", date: "2026-09-08", status: "Blocked - CO unsigned" },
       { visit: "Platform B switchgear service", engineer: "Tom H.", date: "2026-09-18", status: "Scheduled" },
     ],
     contacts: [
@@ -289,8 +291,8 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { role: "Field Engineer", name: "Dev K." },
     ],
     assets: [
-      { code: "AST-031", type: "Array transformer · WTG cluster 3", status: "At risk" },
-      { code: "AST-032", type: "Array transformer · WTG cluster 4", status: "In service" },
+      { code: "AST-031", type: "Array transformer · WTG cluster 3", status: "At risk" , health: 51 },
+      { code: "AST-032", type: "Array transformer · WTG cluster 4", status: "In service" , health: 79 },
     ],
     parts: [
       { label: "Transformer oil (barrels)", qty: 6, status: "in-stock" },
@@ -301,7 +303,7 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { task: "Oil quality check", due: "2026-07-30", interval: "Quarterly", status: "Complete" },
     ],
     fieldService: [
-      { visit: "Array transformer maintenance", engineer: "Dev K.", date: "2026-09-08", status: "Blocked — cert lapse" },
+      { visit: "Array transformer maintenance", engineer: "Dev K.", date: "2026-09-08", status: "Blocked - cert lapse" },
     ],
     contacts: [
       { name: "Femke Bakker", role: "O&M Manager · Baltic Wind NL", email: "f.bakker@balticwind.nl", phone: "+31 10 555 2210" },
@@ -319,7 +321,7 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
   },
   "ct-pacific": {
     summary:
-      "Protection relay upgrade for Pacific Gas. On schedule but early, with site access unresolved — only a verbal change order is in place. A written agreement is needed before the crew can mobilise.",
+      "Protection relay upgrade for Pacific Gas. On schedule but early, with site access unresolved - only a verbal change order is in place. A written agreement is needed before the crew can mobilise.",
     recommendedActions: ["Request written access", "Review access terms"],
     milestones: [
       { label: "Engineering approval", done: true, planned: "2026-06-01", actual: "2026-06-01" },
@@ -333,7 +335,7 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { role: "Lead Engineer", name: "Priya K." },
     ],
     assets: [
-      { code: "AST-041", type: "Protection relay bank · Substation West", status: "In service" },
+      { code: "AST-041", type: "Protection relay bank · Substation West", status: "In service" , health: 91 },
     ],
     parts: [
       { label: "Relay hardware set", qty: 5, status: "in-stock" },
@@ -343,7 +345,7 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { task: "Relay firmware upgrade", due: "2026-09-21", interval: "One-off", status: "Scheduled" },
     ],
     fieldService: [
-      { visit: "Relay upgrade — Substation West", engineer: "Priya K.", date: "2026-09-01", status: "Blocked — site access" },
+      { visit: "Relay upgrade - Substation West", engineer: "Priya K.", date: "2026-09-01", status: "Blocked - site access" },
     ],
     contacts: [
       { name: "Diego Ramos", role: "Substation Manager · Pacific Gas", email: "d.ramos@pge.com", phone: "+1 415 555 0190" },
@@ -380,6 +382,73 @@ export const FINANCIALS = {
     { label: "Siemens change order unbooked", impact: "−0.5pp" },
     { label: "Delta Coils vendor delay", impact: "−0.2pp" },
     { label: "Scope creep (unbilled)", impact: "−0.1pp" },
+  ],
+};
+
+/* ── Response time ───────────────────────────────────────────────────
+   Time from a customer raising a case to a first qualified response,
+   against the 6-hour SLA commitment. */
+export const RESPONSE_TIME = {
+  current: "4.2h",
+  delta: "-0.8h vs last month",
+  target: 6,
+  min: 0,
+  max: 9,
+  points: [
+    { label: "Mar", value: 7.4 },
+    { label: "Apr", value: 6.8 },
+    { label: "May", value: 6.1 },
+    { label: "Jun", value: 5.4 },
+    { label: "Jul", value: 5.0 },
+    { label: "Aug", value: 4.2 },
+  ],
+  byPriority: [
+    { label: "Critical", value: "1.6h", within: 96 },
+    { label: "High", value: "3.4h", within: 91 },
+    { label: "Medium", value: "7.8h", within: 78 },
+  ],
+};
+
+/* ── Revenue & revenue timing ────────────────────────────────────────
+   What has been invoiced against what has actually landed, plus how
+   long the unpaid balance has been sitting. */
+export const REVENUE_TIMING = {
+  invoiced: "£16.1m",
+  collected: "£13.8m",
+  outstanding: "£2.3m",
+  points: [
+    { label: "Mar", invoiced: 2.4, collected: 2.3 },
+    { label: "Apr", invoiced: 2.8, collected: 2.6 },
+    { label: "May", invoiced: 2.6, collected: 2.5 },
+    { label: "Jun", invoiced: 2.9, collected: 2.4 },
+    { label: "Jul", invoiced: 2.7, collected: 2.1 },
+    { label: "Aug", invoiced: 2.7, collected: 1.9 },
+  ],
+  aging: [
+    { label: "0-30d", value: 0.9 },
+    { label: "31-60d", value: 0.7 },
+    { label: "61-90d", value: 0.4 },
+    { label: "90d+", value: 0.3 },
+  ],
+};
+
+/* ── Assets monitored ────────────────────────────────────────────────
+   Installed base under active condition monitoring across the portfolio. */
+export const ASSETS_MONITORED = {
+  total: 248,
+  delta: "+12 vs last month",
+  breakdown: [
+    { label: "Healthy", value: 224 },
+    { label: "At risk", value: 18 },
+    { label: "Critical", value: 6 },
+  ],
+  points: [
+    { label: "Mar", value: 208 },
+    { label: "Apr", value: 214 },
+    { label: "May", value: 221 },
+    { label: "Jun", value: 229 },
+    { label: "Jul", value: 236 },
+    { label: "Aug", value: 248 },
   ],
 };
 

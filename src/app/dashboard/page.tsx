@@ -15,7 +15,7 @@ import { useAppSelector } from "@/store/hooks";
 
 export default function DashboardPage() {
   const [conv, setConv] = useState<{ visible: boolean; context?: string; prompt?: string; entity?: LaunchArgs["entity"]; playbook?: LaunchArgs["playbook"]; restore?: StoredConversation | null }>({ visible: false });
-  // First-time login — the conversation history starts empty.
+  // First-time login - the conversation history starts empty.
   const [conversations, setConversations] = useState<StoredConversation[]>([]);
   const selectedRole = useAppSelector((s) => s.auth.selectedRole);
   const isSales = selectedRole === "Sales";
@@ -45,7 +45,7 @@ export default function DashboardPage() {
     <ConversationLauncherContext.Provider value={openConversation}>
     <div className="h-screen bg-[#F5F5F5] font-patrick-hand relative overflow-hidden">
 
-      {/* Right conversations panel — anchored below nav, never scrolls under it */}
+      {/* Right conversations panel - anchored below nav, never scrolls under it */}
       <div className="absolute top-[80px] right-4 bottom-4 w-[400px]">
         <ConversationsPanel
           conversations={conversations}
@@ -55,7 +55,7 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Left content — starts at top-0 so it can scroll under the nav */}
+      {/* Left content - starts at top-0 so it can scroll under the nav */}
       {/* right = 16px page pad + 400px panel + 16px gap = 432px */}
       <div className="no-scrollbar absolute top-0 left-0 bottom-0 overflow-y-auto" style={{ right: 432 }}>
         <div className="pl-4 pb-4 pt-[80px] flex flex-col gap-4">
@@ -63,7 +63,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Progressive blur — covers exactly the nav zone (0–64px) */}
+      {/* Progressive blur - covers exactly the nav zone (0–64px) */}
       <div className="absolute top-0 left-0 right-0 z-20 h-[64px] pointer-events-none overflow-hidden">
         <div style={{
           position: "absolute", inset: 0,
@@ -89,14 +89,14 @@ export default function DashboardPage() {
         }} />
       </div>
 
-      {/* Nav content — above blur layers */}
+      {/* Nav content - above blur layers */}
       <div className="absolute top-0 left-0 right-0 z-30 px-4 pt-4 pointer-events-none">
         <div className="pointer-events-auto">
           <TopNav />
         </div>
       </div>
 
-      {/* Unified conversation overlay — welcome → chat on one screen */}
+      {/* Unified conversation overlay - welcome → chat on one screen */}
       <ConversationOverlay
         visible={conv.visible}
         context={conv.context}
