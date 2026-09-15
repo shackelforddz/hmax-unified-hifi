@@ -16,7 +16,7 @@ import AssetsTable from "@/components/dashboard/tables/assets-table";
 import DashboardGrid, { type GridItem } from "@/components/dashboard/dashboard-grid";
 import CustomersTable from "@/components/dashboard/tables/customers-table";
 
-const TABS = ["Overview", "Customers", "Assets", "Contracts"];
+const TABS = ["Overview", "Customers", "Contracts", "Assets"];
 
 // Asset-health KPIs lead this view - counted from the "Assets to review" list below.
 const relCritical = ASSET_REVIEW_ALERTS.filter((a) => a.status === "critical").length;
