@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, MapPin, TriangleAlert } from "lucide-react";
+import { ChevronRight, MapPin } from "lucide-react";
 import WidgetChat from "@/components/dashboard/widget-chat";
 import { ALL, Select, TabGroup } from "@/components/dashboard/filter-controls";
 import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
@@ -34,150 +34,125 @@ function riskReasons(person: Person): string[] {
   return [];
 }
 
-function LeadBadge({ status }: { status: Opportunity["status"] }) {
-  const cls =
-    status === "stalled" ? "bg-status-critical text-white font-bold"
-    : status === "at-risk" ? "border border-gray-400 text-gray-700"
-    : "border border-gray-300 text-gray-500";
-  const label = status === "stalled" ? "Stalled" : status === "at-risk" ? "At risk" : "On track";
-  return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${cls}`}>{label}</span>;
-}
-
-function StatusBadge({ status }: { status: OpsContract["status"] }) {
-  const cls = status === "critical" ? "bg-status-critical text-white font-bold" : "border border-gray-400 text-gray-700";
-  return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${cls}`}>{status === "critical" ? "Critical" : "At risk"}</span>;
-}
-
-function RiskChip({ reason }: { reason: string }) {
-  const cls = reason === "High allocation" ? "bg-gray-200 text-gray-700 font-bold" : "bg-status-critical text-white font-bold";
+/* A contract or lead the person is on - its own tappable row so the list
+   reads as distinct items rather than running text. */
+function WorkRow({
+  title,
+  meta,
+  onOpen,
+}: {
+  title: string;
+  meta: string;
+  onOpen: () => void;
+}) {
   return (
-    <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}`}>
-      <TriangleAlert size={10} strokeWidth={2} />
-      {reason}
-    </span>
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onOpen}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+      className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-3 py-2.5 cursor-pointer group hover:border-gray-400 transition-colors"
+    >
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-gray-900 leading-snug line-clamp-2">{title}</p>
+        <p className="text-xs text-gray-400 truncate mt-0.5">{meta}</p>
+      </div>
+      <ChevronRight size={14} strokeWidth={1.5} className="text-gray-300 group-hover:text-gray-600 transition-colors shrink-0" />
+    </div>
   );
 }
 
-function PersonRow({
+function SectionLabel({ label, count }: { label: string; count: number }) {
+  return (
+    <div className="flex items-center justify-between mb-2">
+      <p className="text-xs text-gray-500">{label}</p>
+      <span className="text-xs text-gray-400">{count}</span>
+    </div>
+  );
+}
+
+function PersonCard({
   person,
-  defaultExpanded,
   onOpenContract,
   onOpenLead,
 }: {
   person: Person;
-  defaultExpanded: boolean;
   onOpenContract: (id: string) => void;
   onOpenLead: (opp: Opportunity) => void;
 }) {
-  const [expanded, setExpanded] = useState(defaultExpanded);
   const contracts = contractsFor(person);
   const leads = leadsFor(person);
-  const reasons = riskReasons(person);
+  const skills = [...person.competencies, ...person.certifications.map((c) => c.name)];
 
   return (
-    <div className="border border-gray-200 rounded-2xl overflow-hidden">
-      <button onClick={() => setExpanded((e) => !e)} className="w-full text-left px-5 py-4 hover:bg-gray-50 transition-colors cursor-pointer">
-        <div className="flex items-center gap-4">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={person.avatar} alt={person.name} className="w-11 h-11 rounded-full object-cover bg-gray-200 shrink-0" />
-
-          <div className="min-w-0 flex-1">
-            <h4 className="text-base text-gray-900 leading-tight">{person.name}</h4>
-            <p className="text-sm text-gray-400 flex items-center gap-1.5 mt-0.5">
-              <span>{person.role}</span>
-              <span className="text-gray-300">·</span>
-              <span className="flex items-center gap-1"><MapPin size={12} strokeWidth={1.5} className="text-gray-400" />{person.location}</span>
-            </p>
-          </div>
-
-          {/* Alerts sit where the allocation bar and counts used to */}
-          <div className="flex items-center justify-end gap-1.5 flex-wrap shrink-0">
-            {reasons.map((r) => (
-              <RiskChip key={r} reason={r} />
-            ))}
-          </div>
-
-          {expanded ? <ChevronUp size={16} strokeWidth={1.5} className="text-gray-400 shrink-0" /> : <ChevronDown size={16} strokeWidth={1.5} className="text-gray-400 shrink-0" />}
+    <div className="border border-gray-200 rounded-2xl flex flex-col min-w-0 overflow-hidden">
+      {/* Who */}
+      <div className="flex items-start gap-3 p-4">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={person.avatar} alt={person.name} className="w-11 h-11 rounded-full object-cover bg-gray-200 shrink-0" />
+        <div className="min-w-0 flex-1">
+          <h4 className="text-base text-gray-900 leading-tight truncate">{person.name}</h4>
+          <p className="text-sm text-gray-500 truncate mt-0.5">{person.role}</p>
+          <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
+            <MapPin size={12} strokeWidth={1.5} className="shrink-0" />
+            <span className="truncate">{person.location}</span>
+          </p>
         </div>
-      </button>
+      </div>
 
-      {expanded && (
-        <>
-          <hr className="border-gray-200" />
-          <div className="px-5 py-3">
-            {/* Competencies */}
-            {person.competencies.length > 0 && (
-              <>
-                <p className="text-[11px] text-gray-400 tracking-wider mb-1.5">Competencies</p>
-                <div className="flex flex-wrap gap-1.5 mb-3.5">
-                  {person.competencies.map((c) => (
-                    <span key={c} className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{c}</span>
-                  ))}
-                </div>
-              </>
-            )}
+      {/* The work they're on - the reason to look at this card */}
+      <div className="border-y border-gray-200 p-4 flex flex-col gap-4 flex-1">
+        <div>
+          <SectionLabel label="Assigned contracts" count={contracts.length} />
+          {contracts.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              {contracts.map((c) => (
+                <WorkRow
+                  key={c.id}
+                  title={c.name}
+                  meta={`${c.customer} · ${c.value}`}
+                  onOpen={() => onOpenContract(c.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400">No contracts assigned.</p>
+          )}
+        </div>
 
-            {/* Certifications - a delivery concern; sales roles carry none.
-                Listed plainly: expiry is tracked elsewhere, not alerted here. */}
-            {person.certifications.length > 0 && (
-              <>
-                <p className="text-[11px] text-gray-400 tracking-wider mb-1.5">Certifications</p>
-                <div className="flex flex-wrap gap-1.5 mb-3.5">
-                  {person.certifications.map((cert) => (
-                    <span
-                      key={cert.name}
-                      className="text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1 border border-gray-200 text-gray-600"
-                    >
-                      {cert.name}
-                      <span className="text-gray-400">· exp {cert.expires}</span>
-                    </span>
-                  ))}
-                </div>
-              </>
-            )}
+        {leads.length > 0 && (
+          <div>
+            <SectionLabel label="Assigned leads" count={leads.length} />
+            <div className="flex flex-col gap-2">
+              {leads.map((l) => (
+                <WorkRow
+                  key={l.id}
+                  title={l.title}
+                  meta={`${l.account} · ${l.value} · ${l.stage}`}
+                  onOpen={() => onOpenLead(l)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
-            {leads.length > 0 && (
-              <>
-                <p className="text-[11px] text-gray-400 tracking-wider mb-1">Assigned leads</p>
-                {leads.map((l) => (
-                  <div
-                    key={l.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => onOpenLead(l)}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenLead(l); } }}
-                    className="flex items-center gap-3 py-2.5 border-b border-gray-100 last:border-0 cursor-pointer group"
-                  >
-                    <span className="text-sm text-gray-700 flex-1 min-w-0 truncate group-hover:text-gray-900 transition-colors underline underline-offset-2 decoration-gray-200 group-hover:decoration-gray-500">{l.title}</span>
-                    <span className="text-xs text-gray-400 shrink-0 hidden sm:block">{l.account}</span>
-                    <span className="text-xs text-gray-400 shrink-0 hidden sm:block">{l.value}</span>
-                    <span className="text-xs text-gray-400 shrink-0 hidden sm:block">{l.stage}</span>
-                    <LeadBadge status={l.status} />
-                  </div>
-                ))}
-                <p className="text-[11px] text-gray-400 tracking-wider mb-1 mt-3.5">Assigned contracts</p>
-              </>
-            )}
-            {leads.length === 0 && (
-              <p className="text-[11px] text-gray-400 tracking-wider mb-1">Assigned contracts</p>
-            )}
-            {contracts.map((c) => (
-              <div
-                key={c.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => onOpenContract(c.id)}
-                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpenContract(c.id); } }}
-                className="flex items-center gap-3 py-2.5 border-b border-gray-100 last:border-0 cursor-pointer group"
-              >
-                <span className="text-sm text-gray-700 flex-1 min-w-0 truncate group-hover:text-gray-900 transition-colors underline underline-offset-2 decoration-gray-200 group-hover:decoration-gray-500">{c.name}</span>
-                <span className="text-xs text-gray-400 shrink-0 hidden sm:block">{c.customer}</span>
-                <span className="text-xs text-gray-400 shrink-0 hidden sm:block">{c.value}</span>
-                <StatusBadge status={c.status} />
-              </div>
+      {/* Supporting detail - competencies and certifications as one list,
+          kept quiet. Sales roles carry neither. */}
+      {skills.length > 0 && (
+        <div className="p-4">
+          <p className="text-[11px] text-gray-400 tracking-wider mb-1.5">Competencies &amp; certifications</p>
+          <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+            {skills.map((name) => (
+              <span key={name} className="shrink-0 whitespace-nowrap text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{name}</span>
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
@@ -213,7 +188,6 @@ export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" 
     if (ra !== rb) return rb - ra;
     return b.allocation - a.allocation;
   });
-  const firstAtRisk = sorted.find(isAtRisk)?.id;
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -265,15 +239,15 @@ export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" 
         </div>
       </div>
 
-      <div className="p-4 flex flex-col gap-3">
-        {sorted.length > 0 ? (
-          sorted.map((p) => (
-            <PersonRow key={p.id} person={p} defaultExpanded={p.id === firstAtRisk} onOpenContract={setDrawerId} onOpenLead={setLeadDrawer} />
-          ))
-        ) : (
-          <p className="text-sm text-gray-400 text-center py-6">No one on your team matches the selected filters.</p>
-        )}
-      </div>
+      {sorted.length > 0 ? (
+        <div className="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          {sorted.map((p) => (
+            <PersonCard key={p.id} person={p} onOpenContract={setDrawerId} onOpenLead={setLeadDrawer} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-gray-400 text-center px-4 py-6">No one on your team matches the selected filters.</p>
+      )}
     </div>
   );
 }
