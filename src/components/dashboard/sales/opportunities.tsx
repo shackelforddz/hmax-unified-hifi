@@ -224,7 +224,7 @@ export default function Opportunities({ category, title, withContext = false, wi
         withProposals ? (
           <button
             onClick={() => launch({ context: "New lead", prompt: "Build a new lead" })}
-            className="flex items-center justify-center gap-2 border border-dashed border-gray-200 rounded-lg py-4 text-sm text-gray-500 hover:border-gray-400 hover:bg-gray-50 transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-2 border border-dashed border-gray-200 rounded-full py-4 text-sm font-bold text-gray-500 hover:border-gray-400 hover:bg-gray-50 transition-colors cursor-pointer"
           >
             <Plus size={16} strokeWidth={1.5} />
             Build a new lead

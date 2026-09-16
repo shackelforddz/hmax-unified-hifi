@@ -362,14 +362,14 @@ function schedulePanel(): PlaybookPanel {
   };
 }
 
-// Split a "£320k" / "£1.2m" value into a proportional line item.
+// Split a "€320k" / "€1.2m" value into a proportional line item.
 function splitGBP(value: string, fraction: number): string {
   const m = value.match(/([\d.]+)\s*([km])?/i);
   if (!m) return value;
   const num = parseFloat(m[1]) * fraction;
   const unit = (m[2] ?? "").toLowerCase();
   const rounded = unit === "m" ? Math.round(num * 100) / 100 : Math.round(num);
-  return `£${rounded}${unit}`;
+  return `€${rounded}${unit}`;
 }
 
 // Review change order - recap the CO and link the document.
@@ -770,7 +770,7 @@ function scopeDraftPanel(): PlaybookPanel {
     heading: "Recommended scope",
     note: "Drafted from the on-site agreement and prior change orders. Edit before you log it as a change order.",
     value:
-      "Additional protection-relay works agreed verbally on site: supply and install 3× protection-relay modules on the North Sea platform cluster, including commissioning and updated protection settings. Estimated value £680k. To be raised as a change order for signature before invoicing.",
+      "Additional protection-relay works agreed verbally on site: supply and install 3× protection-relay modules on the North Sea platform cluster, including commissioning and updated protection settings. Estimated value €680k. To be raised as a change order for signature before invoicing.",
     submitLabel: "Log as a change order",
     submitPrompt: "Raise a change order documenting the additional protection-relay scope",
   };

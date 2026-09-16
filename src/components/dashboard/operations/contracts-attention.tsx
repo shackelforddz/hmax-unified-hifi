@@ -18,9 +18,6 @@ const CATEGORY_LABEL: Record<AlertCategory, string> = {
 };
 const TYPE_OPTIONS = Object.values(CATEGORY_LABEL);
 
-/** The widget shows the five most pressing alerts, not the whole backlog. */
-const MAX_ALERTS = 5;
-
 /** Flatten contracts down to their individual alerts - one card each. */
 function toAlerts(): AlertItem[] {
   return OPS_CONTRACTS.flatMap((contract) =>
@@ -50,36 +47,8 @@ function toAlerts(): AlertItem[] {
   );
 }
 
-const URGENCY_RANK: Record<string, number> = { critical: 0, "at-risk": 1, watch: 2, proposed: 3 };
-
-/** The cap takes the top alert from each contract before taking a second from
- *  any one of them, so a single noisy contract can't fill the whole widget. */
-function topAlerts(all: AlertItem[], limit: number): AlertItem[] {
-  const byContract = new Map<string, AlertItem[]>();
-  for (const a of all) {
-    const list = byContract.get(a.detailId) ?? [];
-    list.push(a);
-    byContract.set(a.detailId, list);
-  }
-  // Most severe contract first, so the round-robin starts where it matters.
-  const queues = [...byContract.values()].sort(
-    (a, b) => URGENCY_RANK[a[0].urgency] - URGENCY_RANK[b[0].urgency]
-  );
-
-  const out: AlertItem[] = [];
-  for (let round = 0; out.length < limit; round++) {
-    const before = out.length;
-    for (const q of queues) {
-      if (out.length >= limit) break;
-      if (q[round]) out.push(q[round]);
-    }
-    if (out.length === before) break; // every queue exhausted
-  }
-  return out;
-}
-
 /** Built once - the source records are static module data. */
-const ALERTS = topAlerts(toAlerts(), MAX_ALERTS);
+const ALERTS = toAlerts();
 
 export default function ContractsAttention() {
   const [drawerId, setDrawerId] = useState<string | null>(null);

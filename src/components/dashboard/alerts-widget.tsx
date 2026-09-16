@@ -1,26 +1,26 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { ChevronDown, Eye, MessageCircle, EllipsisVertical, EyeOff, Trash2 } from "lucide-react";
+import { ChevronDown, Eye, MessageCircle, EllipsisVertical, EyeOff, Trash2, CircleAlert, Circle } from "lucide-react";
 import WidgetChat from "./widget-chat";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "./conversation-launcher";
+import { ALL, Select, TabGroup } from "./filter-controls";
 import {
   URGENCY,
   categoriesOf,
   customersOf,
   groupByUrgency,
+  topAlerts,
   typesOf,
   type AlertItem,
   type AlertUrgency,
 } from "@/lib/alerts";
 
-const ALL = "__all__";
-
 /* ── Badges ──────────────────────────────────────────────────────── */
 function CustomerBadge({ children }: { children: ReactNode }) {
   return (
-    <span className="bg-secondary text-secondary-foreground text-xs px-2 py-0.5 rounded-full border border-transparent whitespace-nowrap">
+    <span className="bg-secondary text-secondary-foreground text-xs font-bold px-2 py-0.5 rounded-full border border-transparent whitespace-nowrap">
       {children}
     </span>
   );
@@ -28,7 +28,7 @@ function CustomerBadge({ children }: { children: ReactNode }) {
 
 function TypeBadge({ children }: { children: ReactNode }) {
   return (
-    <span className="bg-background text-foreground text-xs px-2 py-0.5 rounded-full border border-border whitespace-nowrap">
+    <span className="bg-background text-foreground text-xs font-bold px-2 py-0.5 rounded-full border border-border whitespace-nowrap">
       {children}
     </span>
   );
@@ -119,7 +119,7 @@ function AlertCard({
         </div>
 
         <div className="min-w-0">
-          <p className="text-sm text-gray-900 leading-5">{alert.title}</p>
+          <p className="text-sm font-bold text-gray-900 leading-5">{alert.title}</p>
           <p className="text-xs text-gray-500 leading-4">{alert.detail}</p>
         </div>
 
@@ -189,15 +189,19 @@ function UrgencyBand({
   onToggle: () => void;
 }) {
   const { label, dot, band } = URGENCY[urgency];
+  const Glyph = urgency === "critical" || urgency === "at-risk" ? CircleAlert : Circle;
   return (
     <button
       onClick={onToggle}
       aria-expanded={open}
-      className={`w-full flex items-center px-4 py-2 rounded-md cursor-pointer ${band}`}
+      className={`w-full flex items-center pl-2 pr-4 py-2 rounded-full cursor-pointer ${band}`}
     >
-      <div className="flex-1 min-w-0 flex gap-2 items-center">
-        <span className="size-2 rounded-full shrink-0" style={{ backgroundColor: dot }} />
-        <span className="text-sm text-gray-900 leading-5 whitespace-nowrap">{label}</span>
+      <div className="flex-1 min-w-0 flex gap-2.5 items-center">
+        {/* Filled status disc, per the hi-fi design */}
+        <span className="size-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: dot }}>
+          <Glyph size={16} strokeWidth={2} className="text-white" />
+        </span>
+        <span className="text-sm font-bold text-gray-900 leading-5 whitespace-nowrap">{label}</span>
         <span className="text-xs text-gray-500 leading-4 whitespace-nowrap">{count}</span>
       </div>
       <ChevronDown
@@ -206,84 +210,6 @@ function UrgencyBand({
         className={`text-gray-500 shrink-0 transition-transform ${open ? "" : "-rotate-90"}`}
       />
     </button>
-  );
-}
-
-/* ── Filter tabs ─────────────────────────────────────────────────── */
-function TabGroup({
-  value,
-  onChange,
-  options,
-  countFor,
-  label,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  options: string[];
-  countFor: (v: string) => number;
-  label: string;
-}) {
-  const tab = (active: boolean) =>
-    `h-full flex gap-1.5 items-center justify-center px-2 py-1 rounded-full text-sm whitespace-nowrap transition-colors cursor-pointer ${
-      active ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
-    }`;
-
-  return (
-    <div
-      role="tablist"
-      aria-label={label}
-      className="bg-gray-100 h-8 flex items-center p-[3px] rounded-full overflow-x-auto no-scrollbar shrink-0"
-    >
-      <button role="tab" aria-selected={value === "all"} onClick={() => onChange("all")} className={tab(value === "all")}>
-        All
-      </button>
-      {options.map((o) => (
-        <button key={o} role="tab" aria-selected={value === o} onClick={() => onChange(o)} className={tab(value === o)}>
-          {o}
-          <span className="h-5 min-w-5 px-1 flex items-center justify-center rounded-full bg-gray-500/30 text-xs text-gray-900">
-            {countFor(o)}
-          </span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-/* ── Filter select ───────────────────────────────────────────────── */
-function Select({
-  value,
-  onChange,
-  allLabel,
-  options,
-  label,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  allLabel: string;
-  options: string[];
-  label: string;
-}) {
-  return (
-    <div className="relative shrink-0 w-[157px]">
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        aria-label={label}
-        className="appearance-none w-full h-8 pl-2.5 pr-8 py-1 text-sm text-gray-500 bg-white border border-gray-200 rounded-lg outline-none focus:border-gray-400 cursor-pointer truncate"
-      >
-        <option value={ALL}>{allLabel}</option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
-      <ChevronDown
-        size={12}
-        strokeWidth={1.5}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
-      />
-    </div>
   );
 }
 
@@ -306,8 +232,13 @@ interface AlertsWidgetProps {
   /** Notified when a card is ignored or deleted, so the caller can drop it
    *  from its own source list as well as from this widget. */
   onDismiss?: (alert: AlertItem, how: "ignored" | "deleted") => void;
+  /** Cards shown at most, most pressing first. */
+  maxAlerts?: number;
   emptyLabel?: string;
 }
+
+/** No widget shows more than this - it's a shortlist, not the backlog. */
+const MAX_ALERTS = 6;
 
 export default function AlertsWidget({
   title,
@@ -319,6 +250,7 @@ export default function AlertsWidget({
   footer,
   extraActions,
   onDismiss,
+  maxAlerts = MAX_ALERTS,
   emptyLabel = "No alerts match the selected filters.",
 }: AlertsWidgetProps) {
   const [type, setType] = useState<string>("all");
@@ -329,10 +261,11 @@ export default function AlertsWidget({
   // differently later; both drop the card from the list today.
   const [dismissed, setDismissed] = useState<Record<string, "ignored" | "deleted">>({});
 
-  const live = useMemo(() => alerts.filter((a) => !dismissed[a.id]), [alerts, dismissed]);
+  const capped = useMemo(() => topAlerts(alerts, maxAlerts), [alerts, maxAlerts]);
+  const live = useMemo(() => capped.filter((a) => !dismissed[a.id]), [capped, dismissed]);
   const types = useMemo(() => typeOptions ?? typesOf(live), [typeOptions, live]);
-  const customers = useMemo(() => customersOf(alerts), [alerts]);
-  const categories = useMemo(() => categoriesOf(alerts), [alerts]);
+  const customers = useMemo(() => customersOf(capped), [capped]);
+  const categories = useMemo(() => categoriesOf(capped), [capped]);
 
   const byCustomer = useMemo(() => live.filter((a) => customer === ALL || a.customer === customer), [live, customer]);
   const filtered = useMemo(

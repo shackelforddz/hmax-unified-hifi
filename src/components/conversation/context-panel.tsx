@@ -55,7 +55,7 @@ const LOCATIONS = [
 ];
 
 const CASE_SUMMARY = [
-  "Xcel Energy plans to sign a 5-year HVDC SLA for 9 converter stations in North America, valued at $4.2M. This is Hitachi Energy's largest SLA in the West. Procurement lead Dan Hoffmann requested an offer by 30 September 2026.",
+  "Xcel Energy plans to sign a 5-year HVDC SLA for 9 converter stations in North America, valued at €4.2M. This is Hitachi Energy's largest SLA in the West. Procurement lead Dan Hoffmann requested an offer by 30 September 2026.",
   "The lead arose from a July 2026 service visit where recurring partial discharge on Unit S-12 was noted, similar to issues in November 2025 and March 2026. This, along with DGA trends on Unit S-11 and aging units, sparked discussions. The strong relationship with Xcel and evidence of asset issues indicate high confidence, with operational risks being the main concern.",
 ];
 
@@ -123,7 +123,7 @@ export default function ContextPanel({ customer }: { customer?: string }) {
                 </div>
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gray-900 rounded-full"
+                    className="h-full bg-chart-line rounded-full"
                     style={{ width: `${(count / max) * 100}%` }}
                   />
                 </div>

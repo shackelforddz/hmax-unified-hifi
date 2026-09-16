@@ -24,14 +24,14 @@ export default function LoginForm({ role }: { role?: Role }) {
   }, [role, dispatch]);
 
   return (
-    <div className="min-h-screen bg-[#EBEBEB] flex flex-col font-patrick-hand">
+    <div className="min-h-screen bg-[#EBEBEB] flex flex-col">
       <header className="flex justify-center pt-8">
         <AuthHeader />
       </header>
 
       <main className="flex-1 flex items-center justify-center px-4">
         <div className="bg-white rounded-2xl p-10 w-full max-w-[420px]">
-          <h1 className="font-patrick-hand text-[1.65rem] text-center leading-snug mb-1">
+          <h1 className=" text-[1.65rem] text-center leading-snug mb-1">
             Sign in to your workspace
           </h1>
           <p className="text-sm text-gray-400 text-center mb-6">

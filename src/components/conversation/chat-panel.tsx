@@ -90,7 +90,7 @@ function StepCase() {
     <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
       <div>
         <p className="text-xs text-gray-400 tracking-widest mb-1">Step 1 of 5</p>
-        <h3 className="text-2xl text-gray-900 mb-1 font-patrick-hand">Case details</h3>
+        <h3 className="text-2xl text-gray-900 mb-1">Case details</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
           Confirm or update the case basics. The system has pre-filled from the linked lead OPP-441.
         </p>
@@ -105,7 +105,7 @@ function StepCase() {
           <input
             type="text"
             defaultValue="Xcel Energy"
-            className="w-full h-9 px-3 text-sm border border-gray-200 rounded-lg outline-none focus:border-gray-400 bg-white"
+            className="w-full h-9 px-3 text-sm border border-gray-200 rounded-full outline-none focus:border-gray-400 bg-white"
           />
         </div>
         <div>
@@ -113,7 +113,7 @@ function StepCase() {
           <input
             type="text"
             defaultValue="HVDC Units S-12, S-14, S-19"
-            className="w-full h-9 px-3 text-sm border border-gray-200 rounded-lg outline-none focus:border-gray-400 bg-white"
+            className="w-full h-9 px-3 text-sm border border-gray-200 rounded-full outline-none focus:border-gray-400 bg-white"
           />
         </div>
       </div>
@@ -137,7 +137,7 @@ function StepCase() {
         <label className="text-xs text-gray-500 mb-1.5 block">What needs to happen?</label>
         <textarea
           placeholder="Brief description of the fault or scope..."
-          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
+          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
         />
       </div>
     </div>
@@ -160,7 +160,7 @@ function StepScope() {
     <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
       <div>
         <p className="text-xs text-gray-400 tracking-widest mb-1">Step 2 of 5</p>
-        <h3 className="text-2xl text-gray-900 mb-1 font-patrick-hand">Scope & access</h3>
+        <h3 className="text-2xl text-gray-900 mb-1">Scope & access</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
           What work is needed and what site constraints apply? The system has suggested scope based on the open field signals on this account.
         </p>
@@ -236,7 +236,7 @@ function StepScope() {
         <p className="text-xs text-gray-400 mb-2">When can the customer grant access? Any restricted periods?</p>
         <textarea
           placeholder="e.g. Weekdays 06:00–14:00 · 4-week customer notice required"
-          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
+          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
         />
       </div>
     </div>
@@ -294,7 +294,7 @@ function StaffCard({
       <img
         src={member.img}
         alt={member.name}
-        className="w-9 h-9 rounded-full object-cover bg-gray-200 shrink-0 grayscale"
+        className="w-9 h-9 rounded-full object-cover bg-gray-200 shrink-0"
       />
       <div className="flex-1 min-w-0">
         <p className="text-sm text-gray-800">
@@ -369,7 +369,7 @@ function StepStaffing() {
     <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
       <div>
         <p className="text-xs text-gray-400 tracking-widest mb-1">Step 3 of 5</p>
-        <h3 className="text-2xl text-gray-900 mb-1 font-patrick-hand">Staffing</h3>
+        <h3 className="text-2xl text-gray-900 mb-1">Staffing</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
           The system has checked availability and suggested the best-fit crew for this case type, scope, and site requirements. Confirm, swap, or add.
         </p>
@@ -446,7 +446,7 @@ function StepParts() {
     <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
       <div>
         <p className="text-xs text-gray-400 tracking-widest mb-1">Step 4 of 5</p>
-        <h3 className="text-2xl text-gray-900 mb-1 font-patrick-hand">Parts & materials</h3>
+        <h3 className="text-2xl text-gray-900 mb-1">Parts & materials</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
           The system has checked ERP inventory for parts required based on the asset type and scope. Review stock status, override quantities, or add items.
         </p>
@@ -493,7 +493,7 @@ function StepParts() {
             <input
               value={p.qty}
               onChange={(e) => setQty(i, e.target.value)}
-              className="w-9 h-8 text-center text-sm text-gray-800 border border-gray-200 rounded-lg outline-none focus:border-gray-400"
+              className="w-9 h-8 text-center text-sm text-gray-800 border border-gray-200 rounded-full outline-none focus:border-gray-400"
             />
             <span className="text-xs text-gray-500 truncate">{p.supplier}</span>
             <StockBadge kind={p.stockKind} label={p.stock} />
@@ -521,7 +521,7 @@ function StepParts() {
         <label className="text-xs text-gray-500 mb-2 block">Any parts requiring customer sign-off or import clearance?</label>
         <textarea
           placeholder="Note any special handling, customer PO requirements, or customs declarations..."
-          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
+          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
         />
       </div>
     </div>
@@ -601,7 +601,7 @@ function StepSchedule() {
     <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
       <div>
         <p className="text-xs text-gray-400 tracking-widest mb-1">Step 5 of 5</p>
-        <h3 className="text-2xl text-gray-900 mb-1 font-patrick-hand">Schedule</h3>
+        <h3 className="text-2xl text-gray-900 mb-1">Schedule</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
           Milestones auto-placed from parts lead times and crew availability. Drag any event to change its date. Conflicts flagged in real time.
         </p>
@@ -787,7 +787,7 @@ function OppHeader({ n, title, sub }: { n: number; title: string; sub: string })
   return (
     <div>
       <p className="text-xs text-gray-400 tracking-widest mb-1">Step {n} of 4</p>
-      <h3 className="text-2xl text-gray-900 mb-1 font-patrick-hand">{title}</h3>
+      <h3 className="text-2xl text-gray-900 mb-1">{title}</h3>
       <p className="text-sm text-gray-500 leading-relaxed">{sub}</p>
     </div>
   );
@@ -801,7 +801,7 @@ function OppInput({ label, value, star }: { label: string; value: string; star?:
       <input
         type="text"
         defaultValue={value}
-        className="w-full h-9 px-3 text-sm border border-gray-200 rounded-lg outline-none focus:border-gray-400 bg-white"
+        className="w-full h-9 px-3 text-sm border border-gray-200 rounded-full outline-none focus:border-gray-400 bg-white"
       />
     </div>
   );
@@ -838,7 +838,7 @@ function OppStepAccount() {
         <OppInput label="Region" value="North America" />
       </div>
       <OppInput label="Lead title" value="Fleet reliability program" star />
-      <OppInput label="Estimated value" value="$5.4M" />
+      <OppInput label="Estimated value" value="€5.4M" />
     </OppFieldGroup>
   );
 }
@@ -853,7 +853,7 @@ function OppStepScope() {
         <textarea
           placeholder="Summarise the scope of work and technical requirements..."
           defaultValue="Condition-based maintenance across the converter fleet, prioritising units with declining DGA and PD trends."
-          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
+          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
         />
       </div>
     </OppFieldGroup>
@@ -876,7 +876,7 @@ function OppStepReview() {
   const rows = [
     { label: "Customer", value: "Duke Energy · North America" },
     { label: "Lead", value: "Fleet reliability program" },
-    { label: "Value", value: "$5.4M · Premium · 18% margin" },
+    { label: "Value", value: "€5.4M · Premium · 18% margin" },
     { label: "Scope", value: "Service agreement · fleet-wide (12 stations)" },
     { label: "Entry stage", value: "Discovery" },
   ];
@@ -954,7 +954,7 @@ function FlowFieldControl({ f }: { f: FlowField }) {
         </label>
         <textarea
           defaultValue={f.value}
-          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
+          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
         />
       </div>
     );
@@ -968,7 +968,7 @@ function FlowFieldControl({ f }: { f: FlowField }) {
       <input
         type={f.type === "date" ? "date" : "text"}
         defaultValue={f.value}
-        className="w-full h-9 px-3 text-sm border border-gray-200 rounded-lg outline-none focus:border-gray-400 bg-white"
+        className="w-full h-9 px-3 text-sm border border-gray-200 rounded-full outline-none focus:border-gray-400 bg-white"
       />
     </div>
   );
@@ -978,7 +978,7 @@ function FlowHeader({ n, total, title, sub }: { n: number; total: number; title:
   return (
     <div>
       <p className="text-xs text-gray-400 tracking-widest mb-1">Step {n} of {total}</p>
-      <h3 className="text-2xl text-gray-900 mb-1 font-patrick-hand">{title}</h3>
+      <h3 className="text-2xl text-gray-900 mb-1">{title}</h3>
       <p className="text-sm text-gray-500 leading-relaxed">{sub}</p>
     </div>
   );
@@ -1194,7 +1194,7 @@ function PanelBlock({ panel, onSend, onOpenDoc }: { panel: PlaybookPanel; onSend
             <div key={o.id} className={`rounded-xl border p-3 flex items-center gap-3 ${o.recommended ? "border-gray-900" : "border-gray-200"}`}>
               {o.avatar && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={o.avatar} alt={o.title} className="w-9 h-9 rounded-full object-cover bg-gray-200 grayscale shrink-0" />
+                <img src={o.avatar} alt={o.title} className="w-9 h-9 rounded-full object-cover bg-gray-200 shrink-0" />
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -1259,7 +1259,7 @@ function PanelBlock({ panel, onSend, onOpenDoc }: { panel: PlaybookPanel; onSend
         {panel.note && <p className="text-xs text-gray-400 mb-3 leading-relaxed">{panel.note}</p>}
         <textarea
           defaultValue={panel.value}
-          className="w-full h-32 px-3 py-2.5 text-sm text-gray-700 border border-gray-200 rounded-lg outline-none focus:border-gray-400 resize-none bg-white leading-relaxed"
+          className="w-full h-32 px-3 py-2.5 text-sm text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white leading-relaxed"
         />
         <Button onClick={() => onSend?.(panel.submitPrompt)} className="mt-3 rounded-full h-auto px-5 py-2 text-sm cursor-pointer">
           {panel.submitLabel}
@@ -1283,7 +1283,7 @@ function PanelBlock({ panel, onSend, onOpenDoc }: { panel: PlaybookPanel; onSend
             <input
               type="text"
               placeholder={f.placeholder}
-              className="w-full h-9 px-3 text-sm border border-gray-200 rounded-lg outline-none focus:border-gray-400 bg-white placeholder-gray-300"
+              className="w-full h-9 px-3 text-sm border border-gray-200 rounded-full outline-none focus:border-gray-400 bg-white placeholder-gray-300"
             />
           </div>
         ))}
@@ -1320,7 +1320,7 @@ function TaskCard({ task }: { task: AssignedTask }) {
         <div className="flex items-center gap-4 flex-wrap">
           <span className="flex items-center gap-2 min-w-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={task.avatar} alt="" aria-hidden className="w-6 h-6 rounded-full object-cover bg-gray-200 shrink-0 grayscale" />
+            <img src={task.avatar} alt="" aria-hidden className="w-6 h-6 rounded-full object-cover bg-gray-200 shrink-0" />
             <span className="min-w-0">
               <span className="block text-xs text-gray-700 truncate">{task.assignee}</span>
               <span className="block text-[11px] text-gray-400 truncate">{task.role}</span>
@@ -1377,7 +1377,7 @@ export function ChatThread({ messages, typing, context, wizardStep, onWizardStep
             <img
               src="/avatars/68.jpg"
               alt="Jan V."
-              className="w-8 h-8 rounded-full object-cover bg-gray-200 shrink-0 mt-0.5 grayscale"
+              className="w-8 h-8 rounded-full object-cover bg-gray-200 shrink-0 mt-0.5"
             />
           </div>
         ) : m.kind === "wizard" ? (

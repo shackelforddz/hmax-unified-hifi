@@ -168,7 +168,7 @@ function DrawerBody({ opp, detail, onAction }: { opp: Opportunity; detail: Oppor
               <span className={`text-sm ${r.done ? "text-gray-700" : "text-gray-500"}`}>{r.label}</span>
               <span className="ml-auto flex items-center gap-2 shrink-0">
                 <OwnerBadge owner={r.owner} />
-                {!r.done && <span className="text-[10px] text-gray-500 border border-gray-200 rounded-full px-2 py-0.5">Missing</span>}
+                {!r.done && <span className="text-[10px] border border-status-critical text-status-critical font-bold rounded-full px-2 py-0.5">Missing</span>}
               </span>
             </div>
           ))}
@@ -257,8 +257,8 @@ export default function OpportunityDrawer({ opp, detail, onClose }: Props) {
         }`}
       />
       <div
-        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white shadow-2xl flex flex-col transition-transform duration-500 ease-in-out font-patrick-hand ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${
+          open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
         }`}
       >
         {opp && detail && (

@@ -106,7 +106,7 @@ function StaticFleetMap() {
       >
       {/* Transformed map layer */}
       <div className="absolute inset-0 origin-top-left will-change-transform" style={{ transform: `translate(${view.panX}px, ${view.panY}px) scale(${view.zoom})` }}>
-        <div className="absolute inset-0 bg-cover bg-center grayscale" style={{ backgroundImage: "url(/milan-map.png)" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url(/milan-map.png)" }} />
         {MAP_MARKERS.map((m) => (
           <span key={m.id} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${m.x}%`, top: `${m.y}%` }}>
             <button
@@ -116,8 +116,13 @@ function StaticFleetMap() {
               style={{ transform: `scale(${1 / view.zoom})` }}
               aria-label={m.id.replace("ast-", "AST-")}
             >
-              {m.ping && <span className="absolute inline-flex h-12 w-12 rounded-full bg-gray-900/30 animate-ping [animation-duration:2.5s]" />}
-              <span className={`relative inline-flex w-3.5 h-3.5 rounded-full bg-gray-900 ring-4 transition-all ${selected === m.id ? "ring-gray-900/30 scale-125" : "ring-gray-900/15"}`} />
+              {/* A pinging marker is one raising an alert - it reads red. */}
+              {m.ping && <span className="absolute inline-flex h-12 w-12 rounded-full bg-status-critical/30 animate-ping [animation-duration:2.5s]" />}
+              <span
+                className={`relative inline-flex w-2.5 h-2.5 rounded-full transition-all ${
+                  m.ping ? "bg-status-critical" : "bg-gray-900"
+                } ${selected === m.id ? "scale-125" : ""}`}
+              />
             </button>
           </span>
         ))}
@@ -135,12 +140,12 @@ function StaticFleetMap() {
               <p className="text-sm text-gray-900">{asset.code}</p>
               <p className="text-xs text-gray-400 truncate">{asset.type}</p>
             </div>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${asset.stats.status === "Critical" ? "bg-gray-900 text-white" : "border border-gray-300 text-gray-500"}`}>{asset.stats.status}</span>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${asset.stats.status === "Critical" ? "bg-status-critical text-white font-bold" : "border border-gray-300 text-gray-500"}`}>{asset.stats.status}</span>
           </div>
           <p className="text-xs text-gray-400 mt-1">{asset.location}</p>
           <div className="flex items-center gap-2 mt-2">
             <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-gray-900 rounded-full" style={{ width: `${asset.stats.healthPct}%` }} />
+              <div className="h-full bg-chart-line rounded-full" style={{ width: `${asset.stats.healthPct}%` }} />
             </div>
             <span className="text-xs text-gray-500">{asset.stats.healthPct}%</span>
           </div>

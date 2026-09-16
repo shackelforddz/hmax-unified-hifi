@@ -42,7 +42,7 @@ export const ACCOUNT_ATTENTION: AccountAttention[] = [
     id: "xcel-energy",
     account: "Xcel Energy",
     owner: "Priya N.",
-    meta: "$8.2M pipeline · 5-yr HVDC renewal",
+    meta: "€8.2M pipeline · 5-yr HVDC renewal",
     status: "critical",
     summary: "Renewal slipping in Scoping · scope of work missing · critical asset alert",
     progress: 55,
@@ -50,12 +50,12 @@ export const ACCOUNT_ATTENTION: AccountAttention[] = [
     contractId: "sla-xcel",
     flags: [
       {
-        title: "$8.2M HVDC renewal stuck in Bidding",
+        title: "€8.2M HVDC renewal stuck in Bidding",
         detail:
           "Scope of Work & tech requirements are still missing (owned by Engineering - J. Park). The renewal is at risk of missing its window.",
         action: "Complete scope of work",
         category: "opportunity",
-        impact: "$8.2m renewal at risk",
+        impact: "€8.2m renewal at risk",
       },
       {
         title: "AST-001 critical - thermal fault signature",
@@ -72,7 +72,7 @@ export const ACCOUNT_ATTENTION: AccountAttention[] = [
     id: "aep-ohio",
     account: "AEP Ohio",
     owner: "Priya N.",
-    meta: "$6.2M pipeline",
+    meta: "€6.2M pipeline",
     status: "at-risk",
     summary: "Lead stalled in Prospects · Install Base profile missing · asset health falling",
     progress: 40,
@@ -80,12 +80,12 @@ export const ACCOUNT_ATTENTION: AccountAttention[] = [
     contractId: "sla-aep",
     flags: [
       {
-        title: "$6.2M converter replacement can't reach Offer",
+        title: "€6.2M converter replacement can't reach Offer",
         detail:
           "The Install Base profile is missing (owned by Reliability - F. Dubois), holding the lead in Prospects.",
         action: "Request Install Base profile",
         category: "opportunity",
-        impact: "$6.2m held in Prospects",
+        impact: "€6.2m held in Prospects",
       },
       {
         title: "AST-004 health 58% and falling",
@@ -102,7 +102,7 @@ export const ACCOUNT_ATTENTION: AccountAttention[] = [
     id: "pacific-gas",
     account: "Pacific Gas",
     owner: "Lena Fischer",
-    meta: "$1.9M pipeline",
+    meta: "€1.9M pipeline",
     status: "at-risk",
     summary: "Lead stalled · written site-access agreement outstanding",
     progress: 30,
@@ -123,7 +123,7 @@ export const ACCOUNT_ATTENTION: AccountAttention[] = [
     id: "nv-energy",
     account: "NV Energy",
     owner: "Marcus Lee",
-    meta: "$2.1M pipeline",
+    meta: "€2.1M pipeline",
     status: "watch",
     summary: "In Negotiation · legal T&Cs the only outstanding offer input",
     progress: 85,
@@ -131,12 +131,12 @@ export const ACCOUNT_ATTENTION: AccountAttention[] = [
     contractId: "sla-nv",
     flags: [
       {
-        title: "Legal T&Cs outstanding on $2.1M retrofit",
+        title: "Legal T&Cs outstanding on €2.1M retrofit",
         detail:
           "The offer is otherwise complete; Legal T&Cs (owned by Legal - R. Bianchi) are the last item before it can go out.",
         action: "Finalize legal T&Cs",
         category: "commercial",
-        impact: "$2.1m offer held",
+        impact: "€2.1m offer held",
       },
     ],
   },

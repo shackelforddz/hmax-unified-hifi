@@ -99,7 +99,7 @@ export default function WidgetChat({ title, triggerClassName }: Props) {
           <div
             ref={popRef}
             style={{ position: "fixed", top: pos.top, left: pos.left, width: POPOVER_W }}
-            className="z-[60] bg-white rounded-xl shadow-xl border border-gray-100 p-4 font-patrick-hand animate-message-in"
+            className="z-[60] bg-white rounded-xl shadow-xl border border-gray-100 p-4 animate-message-in"
           >
             <p className="text-sm text-gray-900 mb-0.5">Ask about {title}</p>
             <p className="text-xs text-gray-400 mb-3">
@@ -112,7 +112,7 @@ export default function WidgetChat({ title, triggerClassName }: Props) {
               onKeyDown={onKey}
               autoFocus
               placeholder={`e.g. What's driving ${title.toLowerCase()}?`}
-              className="w-full h-20 px-3 py-2 text-sm text-gray-700 placeholder-gray-300 border border-gray-200 rounded-lg outline-none focus:border-gray-400 resize-none"
+              className="w-full h-20 px-3 py-2 text-sm text-gray-700 placeholder-gray-300 border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none"
             />
 
             {starters.length > 0 && (

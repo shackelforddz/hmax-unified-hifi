@@ -6,7 +6,7 @@ import AssetDrawer from "@/components/dashboard/sales/asset-drawer";
 import { ASSET_ALERTS, ASSET_DETAILS, type AssetAlert } from "@/lib/sales-data";
 
 function StatusBadge({ status }: { status: AssetAlert["status"] }) {
-  if (status === "critical") return <span className="bg-black text-white text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">Critical</span>;
+  if (status === "critical") return <span className="bg-status-critical text-white font-bold text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">Critical</span>;
   return <span className="border border-gray-400 text-gray-700 text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">At risk</span>;
 }
 
@@ -14,7 +14,7 @@ function HealthCell({ health }: { health: number }) {
   return (
     <div className="flex items-center gap-2 min-w-[110px]">
       <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-        <div className="h-full bg-gray-900 rounded-full" style={{ width: `${health}%` }} />
+        <div className="h-full bg-chart-line rounded-full" style={{ width: `${health}%` }} />
       </div>
       <span className="text-xs text-gray-400 shrink-0">{health}%</span>
     </div>

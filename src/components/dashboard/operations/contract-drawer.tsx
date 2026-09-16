@@ -89,7 +89,7 @@ function DrawerBody({ c, d, onAction }: { c: OpsContract; d: OpsContractDetail; 
           <span className="text-xs text-gray-400">{c.progress}% of term elapsed</span>
         </div>
         <div className="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
-          <div className="h-full bg-gray-900 rounded-full" style={{ width: `${c.progress}%` }} />
+          <div className="h-full bg-chart-line rounded-full" style={{ width: `${c.progress}%` }} />
         </div>
         <p className="text-xs text-gray-400 mt-2">Contract term {c.start} → {c.end}</p>
       </Card>
@@ -230,7 +230,7 @@ export default function ContractDrawer({ contractId, onClose, back }: Props) {
   return (
     <>
       <div onClick={onClose} className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
-      <div className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white shadow-2xl flex flex-col transition-transform duration-500 ease-in-out font-patrick-hand ${open ? "translate-x-0" : "translate-x-full"}`}>
+      <div className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"}`}>
         {c && d && (
           <>
             <div className="shrink-0 px-6 pt-6 pb-4 border-b border-gray-100">

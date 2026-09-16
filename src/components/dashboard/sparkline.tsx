@@ -25,7 +25,7 @@ export default function Sparkline({ variant }: SparklineProps) {
     <svg width="64" height="54" viewBox="0 0 64 54" fill="none">
       <path
         d={PATHS[variant]}
-        stroke="#404040"
+        stroke="#3b82f6"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"

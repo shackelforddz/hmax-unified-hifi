@@ -4,15 +4,7 @@ import { Clock } from "lucide-react";
 import WidgetChat from "./widget-chat";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "./conversation-launcher";
-import { WAITING_ON, type WaitingParty } from "@/lib/waiting-on-data";
-
-const PARTY_CLS: Record<WaitingParty, string> = {
-  Customer: "bg-gray-900 text-white",
-  Vendor: "bg-gray-700 text-white",
-  Legal: "bg-gray-200 text-gray-700",
-  Reliability: "bg-gray-200 text-gray-700",
-  Engineering: "bg-gray-200 text-gray-700",
-};
+import { WAITING_ON } from "@/lib/waiting-on-data";
 
 export default function WaitingOn() {
   const launch = useConversationLauncher();
@@ -25,7 +17,6 @@ export default function WaitingOn() {
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-base text-gray-900">Waiting on</h3>
-          <p className="text-sm text-gray-400 mt-0.5">{items.length} items owned by others · you&apos;re chasing</p>
         </div>
         <WidgetChat title="Waiting on" />
       </div>
@@ -40,8 +31,7 @@ export default function WaitingOn() {
             <div className="flex-1 min-w-0">
               <p className="text-sm text-gray-900 truncate">{w.item}</p>
               <p className="text-xs text-gray-400 truncate">
-                <span className={`px-1.5 py-0.5 rounded-full text-[10px] mr-1.5 ${PARTY_CLS[w.party]}`}>{w.waitingOn}</span>
-                {w.context}
+                {w.waitingOn} • {w.context}
               </p>
             </div>
             <span className="flex items-center gap-1 text-xs text-gray-400 shrink-0 whitespace-nowrap">

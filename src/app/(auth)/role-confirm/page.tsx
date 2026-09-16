@@ -59,7 +59,7 @@ export default function RoleConfirmPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#EBEBEB] flex flex-col font-patrick-hand">
+    <div className="min-h-screen bg-[#EBEBEB] flex flex-col">
       <header className="flex justify-center pt-8">
         <AuthHeader />
       </header>
@@ -67,7 +67,7 @@ export default function RoleConfirmPage() {
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-[740px]">
           {/* Welcome heading */}
-          <h1 className="font-patrick-hand text-[2rem] text-center mb-3">
+          <h1 className=" text-[2rem] text-center mb-3">
             Welcome to HMAX Unified, {MOCK_USER.name}
           </h1>
           <p className="text-sm text-gray-500 text-center leading-relaxed max-w-[520px] mx-auto mb-8">
@@ -83,7 +83,7 @@ export default function RoleConfirmPage() {
                   <div className="flex-shrink-0 w-11 h-11 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600">
                     <RoleIcon name={recommended.icon} size={20} />
                   </div>
-                  <h2 className="font-patrick-hand text-xl">{recommended.label}</h2>
+                  <h2 className=" text-xl">{recommended.label}</h2>
                 </div>
               </div>
               {intro && (

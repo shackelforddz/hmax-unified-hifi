@@ -2,10 +2,12 @@
 
 import { ArrowUp } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { CHART } from "@/lib/chart-theme";
 import { ASSETS_MONITORED as A } from "@/lib/operations-data";
 import WidgetChat from "@/components/dashboard/widget-chat";
 
-const SHADES = ["#D4D4D4", "#737373", "#171717"];
+/* Healthy / at risk / critical - condition reads as colour, not shade. */
+const CONDITION = ["#10B981", "#F59E0B", "#FA000F"];
 
 export default function AssetsMonitored() {
   const total = A.breakdown.reduce((s, b) => s + b.value, 0);
@@ -15,13 +17,12 @@ export default function AssetsMonitored() {
       <div className="flex items-start justify-between mb-1">
         <div>
           <h3 className="text-base text-gray-900">Assets monitored</h3>
-          <p className="text-sm text-gray-400 mt-0.5">Installed base under condition monitoring</p>
         </div>
         <WidgetChat title="Assets monitored" />
       </div>
 
       <div className="flex items-end gap-2 mb-3">
-        <span className="text-3xl text-gray-900 leading-none">{A.total}</span>
+        <span className="text-3xl font-bold text-gray-900 leading-none">{A.total}</span>
         <span className="flex items-center gap-0.5 text-xs text-gray-400 mb-0.5">
           <ArrowUp size={11} strokeWidth={2} />
           {A.delta}
@@ -35,8 +36,8 @@ export default function AssetsMonitored() {
             <AreaChart data={A.points} margin={{ top: 8, right: 14, bottom: 0, left: 14 }}>
             <defs>
               <linearGradient id="assetsArea" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#171717" stopOpacity={0.15} />
-                <stop offset="100%" stopColor="#171717" stopOpacity={0} />
+                <stop offset="0%" stopColor={CHART.fill} stopOpacity={0.18} />
+                <stop offset="100%" stopColor={CHART.fill} stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis dataKey="label" interval={0} tick={{ fontSize: 10, fill: "#A3A3A3" }} tickLine={false} axisLine={false} />
@@ -44,10 +45,10 @@ export default function AssetsMonitored() {
             <Area
               type="monotone"
               dataKey="value"
-              stroke="#171717"
+              stroke={CHART.line}
               strokeWidth={2}
               fill="url(#assetsArea)"
-              dot={{ r: 2, fill: "#ffffff", stroke: "#171717", strokeWidth: 1.5 }}
+              dot={{ r: 2, fill: "#ffffff", stroke: CHART.line, strokeWidth: 1.5 }}
             />
             </AreaChart>
           </ResponsiveContainer>
@@ -58,13 +59,13 @@ export default function AssetsMonitored() {
       <p className="text-[11px] text-gray-400 tracking-wider mt-3 mb-2">By condition</p>
       <div className="flex h-2.5 rounded-full overflow-hidden bg-gray-100 mb-2">
         {A.breakdown.map((b, i) => (
-          <div key={b.label} style={{ width: `${(b.value / total) * 100}%`, backgroundColor: SHADES[i] }} />
+          <div key={b.label} style={{ width: `${(b.value / total) * 100}%`, backgroundColor: CONDITION[i] }} />
         ))}
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         {A.breakdown.map((b, i) => (
           <span key={b.label} className="flex items-center gap-1.5 text-xs text-gray-500">
-            <span className="w-2 h-2 rounded-sm inline-block" style={{ backgroundColor: SHADES[i] }} />
+            <span className="w-2 h-2 rounded-sm inline-block" style={{ backgroundColor: CONDITION[i] }} />
             {b.label} {b.value}
           </span>
         ))}

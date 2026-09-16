@@ -23,9 +23,13 @@ import type {
   BulletMetric,
   PhasePoint,
 } from "@/lib/sales-data";
+import { CHART } from "@/lib/chart-theme";
 
-/* Greyscale palette */
+/* Neutrals for axes and scale furniture; every data series is coloured. */
 const INK = "#171717";
+// Primary data series follow the shared chart accent.
+const SERIES = CHART.line;
+const [S1, S2, S3, S4] = CHART.ramp;
 const G600 = "#404040";
 const G500 = "#737373";
 const G400 = "#A3A3A3";
@@ -51,7 +55,7 @@ export function Aging({ d }: { d: AgingData }) {
         />
         {/* Age fill */}
         <div
-          className="absolute top-1.5 bottom-1.5 bg-gray-800 rounded"
+          className="absolute top-1.5 bottom-1.5 bg-chart-line rounded"
           style={{ left: 0, width: pct(d.age) }}
         />
         {/* Manufacturer marker */}
@@ -71,7 +75,7 @@ export function Aging({ d }: { d: AgingData }) {
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-[11px]">
         <span className="flex items-center gap-1.5 text-gray-600">
-          <span className="w-3 h-2 rounded-sm bg-gray-800" /> Age {d.age} yr
+          <span className="w-3 h-2 rounded-sm bg-chart-line" /> Age {d.age} yr
         </span>
         <span className="flex items-center gap-1.5 text-gray-600">
           <span className="w-3 border-t-2 border-dashed border-gray-400" /> Customer {d.customerLife} yr
@@ -100,7 +104,7 @@ export function ScoreCalculation({ factors, total }: { factors: ScoreFactor[]; t
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="text-xs text-gray-400 w-11 shrink-0 text-right">{f.pctOfMax.toFixed(1)}%</span>
               <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-gray-500 rounded-full" style={{ width: `${f.pctOfMax}%` }} />
+                <div className="h-full bg-chart-line rounded-full" style={{ width: `${f.pctOfMax}%` }} />
               </div>
             </div>
             <span className="text-sm text-gray-900 tabular-nums text-right w-10">{f.value.toFixed(1)}</span>
@@ -169,10 +173,10 @@ function Kpi({ icon: Icon, label, value, accent, small }: { icon: React.ElementT
 
 /* ── Condition Trend (stacked area) ──────────────────────────────── */
 const COND_KEYS: { key: keyof Omit<ConditionPoint, "date">; label: string; color: string }[] = [
-  { key: "dielectric", label: "Dielectric", color: G600 },
-  { key: "mechanical", label: "Mechanical", color: G500 },
-  { key: "other", label: "Other", color: G400 },
-  { key: "wear", label: "Wear", color: G300 },
+  { key: "dielectric", label: "Dielectric", color: S1 },
+  { key: "mechanical", label: "Mechanical", color: S2 },
+  { key: "other", label: "Other", color: S3 },
+  { key: "wear", label: "Wear", color: S4 },
 ];
 
 export function ConditionTrend({ data, totals }: { data: ConditionPoint[]; totals: AssetCondition["conditionTotals"] }) {
@@ -185,10 +189,10 @@ export function ConditionTrend({ data, totals }: { data: ConditionPoint[]; total
             <XAxis dataKey="date" interval={2} tick={{ fontSize: 9, fill: G400 }} tickLine={false} axisLine={{ stroke: G200 }} />
             <YAxis tick={{ fontSize: 9, fill: G400 }} tickLine={false} axisLine={false} width={22} />
             {/* Stack order bottom→top: wear, other, mechanical, dielectric */}
-            <Area type="monotone" dataKey="wear" stackId="1" stroke={G300} fill={G300} fillOpacity={0.9} strokeWidth={1} />
-            <Area type="monotone" dataKey="other" stackId="1" stroke={G400} fill={G400} fillOpacity={0.9} strokeWidth={1} />
-            <Area type="monotone" dataKey="mechanical" stackId="1" stroke={G500} fill={G500} fillOpacity={0.9} strokeWidth={1} />
-            <Area type="monotone" dataKey="dielectric" stackId="1" stroke={G600} fill={G600} fillOpacity={0.9} strokeWidth={1} />
+            <Area type="monotone" dataKey="wear" stackId="1" stroke={S4} fill={S4} fillOpacity={0.9} strokeWidth={1} />
+            <Area type="monotone" dataKey="other" stackId="1" stroke={S3} fill={S3} fillOpacity={0.9} strokeWidth={1} />
+            <Area type="monotone" dataKey="mechanical" stackId="1" stroke={S2} fill={S2} fillOpacity={0.9} strokeWidth={1} />
+            <Area type="monotone" dataKey="dielectric" stackId="1" stroke={S1} fill={S1} fillOpacity={0.9} strokeWidth={1} />
           </AreaChart>
         </ResponsiveContainer>
         <div className="flex flex-col gap-1.5">
@@ -215,7 +219,7 @@ export function ParameterTrend({ data, rows }: { data: ParameterPoint[]; rows: P
         <LineChart data={data} margin={{ top: 6, right: 10, bottom: 0, left: 0 }}>
           <XAxis dataKey="date" interval={1} tick={{ fontSize: 9, fill: G400 }} tickLine={false} axisLine={{ stroke: G200 }} />
           <YAxis tick={{ fontSize: 9, fill: G400 }} tickLine={false} axisLine={false} width={22} />
-          <Line type="monotone" dataKey="value" stroke={INK} strokeWidth={2} dot={{ r: 2.5, fill: "#fff", stroke: INK, strokeWidth: 1.5 }} />
+          <Line type="monotone" dataKey="value" stroke={SERIES} strokeWidth={2} dot={{ r: 2.5, fill: "#fff", stroke: SERIES, strokeWidth: 1.5 }} />
         </LineChart>
       </ResponsiveContainer>
 
@@ -263,7 +267,7 @@ function Bullet({ m }: { m: BulletMetric }) {
         <div className="absolute top-0 bottom-0 bg-gray-200" style={{ left: pct(m.warning), width: `calc(${pct(m.alarm)} - ${pct(m.warning)})` }} />
         <div className="absolute top-0 bottom-0 bg-gray-300" style={{ left: pct(m.alarm), right: 0 }} />
         {/* measure bar */}
-        <div className="absolute top-1 bottom-1 left-0 bg-gray-700 rounded-sm" style={{ width: pct(m.value) }} />
+        <div className={`absolute top-1 bottom-1 left-0 rounded-sm ${breach === "alarm" ? "bg-status-critical" : breach === "warn" ? "bg-status-warning" : "bg-chart-line"}`} style={{ width: pct(m.value) }} />
         {/* warning / alarm markers */}
         <div className="absolute top-0 bottom-0 border-l-2 border-dashed border-gray-500" style={{ left: pct(m.warning) }} />
         <div className="absolute top-0 bottom-0 border-l-2 border-dashed border-gray-800" style={{ left: pct(m.alarm) }} />
@@ -303,9 +307,9 @@ function PhaseChart({
           {lines.map((l) => (
             <ReferenceLine key={l.label} y={l.y} stroke={l.color} strokeDasharray="4 3" strokeWidth={1.5} />
           ))}
-          <Line type="monotone" dataKey="a" stroke={INK} strokeWidth={1.75} dot={false} />
-          <Line type="monotone" dataKey="b" stroke={G500} strokeWidth={1.75} dot={false} />
-          <Line type="monotone" dataKey="c" stroke={G400} strokeWidth={1.75} dot={false} />
+          <Line type="monotone" dataKey="a" stroke={S1} strokeWidth={1.75} dot={false} />
+          <Line type="monotone" dataKey="b" stroke={S2} strokeWidth={1.75} dot={false} />
+          <Line type="monotone" dataKey="c" stroke={S4} strokeWidth={1.75} dot={false} />
         </LineChart>
       </ResponsiveContainer>
       <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-[10px] text-gray-500">
@@ -339,8 +343,8 @@ export function Diagnostics({ d }: { d: AssetDiagnostics }) {
         series={d.contactWear.series}
         interval={5}
         lines={[
-          { y: d.contactWear.warning, label: "Warning", color: G500 },
-          { y: d.contactWear.alert, label: "Alert", color: INK },
+          { y: d.contactWear.warning, label: "Warning", color: CHART.warning },
+          { y: d.contactWear.alert, label: "Alert", color: CHART.alert },
         ]}
       />
 
@@ -352,7 +356,7 @@ export function Diagnostics({ d }: { d: AssetDiagnostics }) {
           series={d.sf6Pressure.series}
           lines={[
             { y: d.sf6Pressure.informational, label: "Informational", color: G400 },
-            { y: d.sf6Pressure.warning, label: "Warning", color: G600 },
+            { y: d.sf6Pressure.warning, label: "Warning", color: CHART.warning },
           ]}
         />
       )}
@@ -364,8 +368,8 @@ export function Diagnostics({ d }: { d: AssetDiagnostics }) {
           unit={d.sf6Moisture.unit}
           series={d.sf6Moisture.series}
           lines={[
-            { y: d.sf6Moisture.warning, label: "Warning", color: G500 },
-            { y: d.sf6Moisture.alert, label: "Alert", color: INK },
+            { y: d.sf6Moisture.warning, label: "Warning", color: CHART.warning },
+            { y: d.sf6Moisture.alert, label: "Alert", color: CHART.alert },
           ]}
         />
       )}

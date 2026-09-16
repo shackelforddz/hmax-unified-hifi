@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowDown, X } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer } from "recharts";
+import { CHART } from "@/lib/chart-theme";
 import { DELIVERY_TREND as D, type TrendPoint } from "@/lib/dashboard-data";
 import WidgetChat from "./widget-chat";
 import ContractDrawer from "./operations/contract-drawer";
@@ -110,14 +111,13 @@ export default function DeliveryTrend() {
       <div className="flex items-start justify-between mb-1">
         <div>
           <h3 className="text-base text-gray-900">Delivery performance</h3>
-          <p className="text-sm text-gray-400 mt-0.5">{D.metric} vs 85% target · 6 months</p>
         </div>
         <WidgetChat title="Delivery performance" />
       </div>
 
       {/* Big value */}
       <div className="flex items-end gap-2 mb-1">
-        <span className="text-3xl text-gray-900 leading-none">{D.current}</span>
+        <span className="text-3xl font-bold text-gray-900 leading-none">{D.current}</span>
         <span className="flex items-center gap-0.5 text-xs text-gray-400 mb-0.5">
           <ArrowDown size={11} strokeWidth={2} />
           {D.delta}
@@ -132,8 +132,8 @@ export default function DeliveryTrend() {
           <AreaChart data={D.points} margin={{ top: 12, right: 14, bottom: 0, left: 14 }}>
             <defs>
               <linearGradient id="deliveryArea" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#171717" stopOpacity={0.15} />
-                <stop offset="100%" stopColor="#171717" stopOpacity={0} />
+                <stop offset="0%" stopColor={CHART.fill} stopOpacity={0.18} />
+                <stop offset="100%" stopColor={CHART.fill} stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
@@ -153,7 +153,7 @@ export default function DeliveryTrend() {
             <Area
               type="monotone"
               dataKey="value"
-              stroke="#171717"
+              stroke={CHART.line}
               strokeWidth={2}
               fill="url(#deliveryArea)"
               // Each dot is its own click target - an invisible r=14 hit area
@@ -184,8 +184,8 @@ export default function DeliveryTrend() {
                       cx={cx}
                       cy={cy}
                       r={active ? 4 : 2.5}
-                      fill={active ? "#171717" : "#ffffff"}
-                      stroke="#171717"
+                      fill={active ? CHART.line : "#ffffff"}
+                      stroke={CHART.line}
                       strokeWidth={1.5}
                     />
                   </g>

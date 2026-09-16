@@ -12,7 +12,7 @@ export interface CustomWidgetConfig {
   title: string;
   type: WidgetType;
   series: WidgetPoint[];
-  unit?: string; // "%" | "$M" | undefined
+  unit?: string; // "%" | "€M" | undefined
 }
 
 const MONTHS = ["Mar", "Apr", "May", "Jun", "Jul", "Aug"];
@@ -42,7 +42,7 @@ export function buildSeries(prompt: string): { series: WidgetPoint[]; unit?: str
         { label: "Change order", value: 0.7 },
         { label: "Scope creep", value: 0.4 },
       ],
-      unit: "$M",
+      unit: "€M",
     };
   if (/(vendor|supplier|concentration)/.test(q))
     return {
@@ -52,7 +52,7 @@ export function buildSeries(prompt: string): { series: WidgetPoint[]; unit?: str
         { label: "Nynas AB", value: 0.6 },
         { label: "Air Liquide", value: 0.3 },
       ],
-      unit: "$M",
+      unit: "€M",
     };
   if (/(fleet|health|score)/.test(q))
     return { series: MONTHS.map((m, i) => ({ label: m, value: [83, 86, 80, 68, 72, 71][i] })) };
@@ -95,6 +95,6 @@ export function buildWidget(prompt: string, type: WidgetType): CustomWidgetConfi
 
 export function formatValue(v: number, unit?: string): string {
   if (unit === "%") return `${v}%`;
-  if (unit === "$M") return `$${v}M`;
+  if (unit === "€M") return `€${v}M`;
   return `${v}`;
 }

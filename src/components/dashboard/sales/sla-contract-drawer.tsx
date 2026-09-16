@@ -17,7 +17,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 function Badge({ badge }: { badge: SlaBadge }) {
   if (badge.verified) {
     return (
-      <span className="inline-flex items-center gap-1 bg-gray-900 text-white text-[11px] px-3 py-0.5 rounded-full whitespace-nowrap">
+      <span className="inline-flex items-center gap-1 bg-status-critical text-white font-bold text-[11px] px-3 py-0.5 rounded-full whitespace-nowrap">
         <Check size={10} strokeWidth={2.5} /> {badge.label}
       </span>
     );
@@ -111,7 +111,7 @@ function DrawerBody({ d, onAction }: { d: SlaContractDetail; onAction: (p: strin
             <div key={o.label} className="flex items-center gap-2.5 py-2 border-b border-gray-100 last:border-0">
               {o.met ? <Check size={15} className="text-gray-900 shrink-0" /> : <Circle size={15} className="text-gray-300 shrink-0" />}
               <span className={`text-sm ${o.met ? "text-gray-700" : "text-gray-500"}`}>{o.label}</span>
-              {!o.met && <span className="ml-auto text-[10px] text-gray-500 border border-gray-200 rounded-full px-2 py-0.5">At risk</span>}
+              {!o.met && <span className="ml-auto text-[10px] border border-status-critical text-status-critical font-bold rounded-full px-2 py-0.5">At risk</span>}
             </div>
           ))}
         </div>
@@ -166,7 +166,7 @@ export default function SlaContractDrawer({ contractId, onClose }: Props) {
   return (
     <>
       <div onClick={onClose} className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
-      <div className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white shadow-2xl flex flex-col transition-transform duration-500 ease-in-out font-patrick-hand ${open ? "translate-x-0" : "translate-x-full"}`}>
+      <div className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"}`}>
         {d && (
           <>
             <div className="shrink-0 px-6 pt-6 pb-4 border-b border-gray-100">

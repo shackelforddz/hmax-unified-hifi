@@ -75,25 +75,25 @@ export interface ScopeReview {
 
 export const SCOPE_REVIEWS: ScopeReview[] = [
   {
-    id: "sr-sherco", account: "Xcel Energy", scope: "Continuous-load uplift on Sherco HVDC", value: "£3.1m", from: "Priya N.", submitted: "2026-08-24", contractId: "ct-sherco", verdict: "at-risk",
+    id: "sr-sherco", account: "Xcel Energy", scope: "Continuous-load uplift on Sherco HVDC", value: "€3.1m", from: "Priya N.", submitted: "2026-08-24", contractId: "ct-sherco", verdict: "at-risk",
     detail: "The continuous-load uplift pushes the transformer past its 65 °C temp-rise limit. Feasible only with a cooling upgrade - confirm the thermal headroom against the nameplate before the scope is committed.",
     action: "Review feasibility",
     impact: "Cooling upgrade required",
   },
   {
-    id: "sr-northsea", account: "Siemens", scope: "Protection-relay scope extension - North Sea", value: "£680k", from: "Marcus Lee", submitted: "2026-08-22", contractId: "ct-northsea", verdict: "pending",
+    id: "sr-northsea", account: "Siemens", scope: "Protection-relay scope extension - North Sea", value: "€680k", from: "Marcus Lee", submitted: "2026-08-22", contractId: "ct-northsea", verdict: "pending",
     detail: "As-built protection on the platform cluster differs from the design SLD. Verify the original drawings and FAT report before approving the retrofit scope and procedure.",
     action: "Review feasibility",
     impact: "Retrofit scope unreliable",
   },
   {
-    id: "sr-baltic", account: "Baltic Wind NL", scope: "Transformer maintenance scope extension", value: "£1.2m", from: "Priya N.", submitted: "2026-08-20", contractId: "ct-baltic", verdict: "feasible",
+    id: "sr-baltic", account: "Baltic Wind NL", scope: "Transformer maintenance scope extension", value: "€1.2m", from: "Priya N.", submitted: "2026-08-20", contractId: "ct-baltic", verdict: "feasible",
     detail: "Additional array-transformer maintenance scope. Validated - asset condition, design drawings and site access all check out. Ready to hand to execution.",
     action: "Confirm scope",
     impact: "Ready for execution",
   },
   {
-    id: "sr-pacific", account: "Pacific Gas", scope: "Relay upgrade expansion - Zone B", value: "£440k", from: "Lena Fischer", submitted: "2026-08-15", contractId: "ct-pacific", verdict: "not-feasible",
+    id: "sr-pacific", account: "Pacific Gas", scope: "Relay upgrade expansion - Zone B", value: "€440k", from: "Lena Fischer", submitted: "2026-08-15", contractId: "ct-pacific", verdict: "not-feasible",
     detail: "The Zone B expansion assumes 40 t crane access the site can't provide (height barrier, restricted road). Not feasible as scoped - return to sales for a rescope.",
     action: "Return to sales",
     impact: "Not feasible as scoped",

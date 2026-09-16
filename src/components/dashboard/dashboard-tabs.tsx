@@ -20,7 +20,7 @@ export default function DashboardTabs({
             className="relative pb-2 cursor-pointer"
           >
             <span
-              className={`text-2xl leading-none transition-colors ${
+              className={`text-2xl font-bold leading-none transition-colors ${
                 isActive ? "text-gray-900" : "text-gray-400 hover:text-gray-600"
               }`}
             >

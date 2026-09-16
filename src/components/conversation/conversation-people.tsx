@@ -52,12 +52,14 @@ function AssignTaskDialog({
     onClose();
   };
 
-  const field = "w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-300 border border-gray-200 rounded-lg outline-none focus:border-gray-400";
+  const field = "w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-300 border border-gray-200 rounded-full outline-none focus:border-gray-400";
+  // Multi-line boxes keep a soft corner - a pill shape crops the text.
+  const fieldBox = field.replace("rounded-full", "rounded-xl");
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-[420px] bg-white rounded-2xl shadow-xl border border-gray-100 p-5 font-patrick-hand animate-message-in">
+      <div className="relative w-full max-w-[420px] bg-white rounded-2xl shadow-xl border border-gray-100 p-5 animate-message-in">
         <div className="flex items-start justify-between gap-3 mb-4">
           <div>
             <p className="text-base text-gray-900">Assign a task</p>
@@ -105,7 +107,7 @@ function AssignTaskDialog({
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Anything they need to know before they start"
-          className={`${field} h-16 resize-none mb-4`}
+          className={`${fieldBox} h-16 resize-none mb-4`}
         />
 
         <div className="flex gap-2 justify-end">
@@ -172,7 +174,7 @@ export default function ConversationPeople({ participants, onAdd, onRemove, onAs
               src={p.avatar}
               alt={p.name}
               title={`${p.name} · ${p.role}`}
-              className="w-7 h-7 rounded-full object-cover bg-gray-200 ring-2 ring-white grayscale"
+              className="w-7 h-7 rounded-full object-cover bg-gray-200 ring-2 ring-white"
             />
           ))}
           {participants.length > 3 && (
@@ -194,7 +196,7 @@ export default function ConversationPeople({ participants, onAdd, onRemove, onAs
         </button>
 
         {open && (
-          <div className="absolute right-0 top-11 z-50 w-[320px] bg-white rounded-xl shadow-xl border border-gray-100 font-patrick-hand animate-message-in overflow-hidden">
+          <div className="absolute right-0 top-11 z-50 w-[320px] bg-white rounded-xl shadow-xl border border-gray-100 animate-message-in overflow-hidden">
             {/* Already in the conversation */}
             {participants.length > 0 && (
               <div className="px-4 pt-4 pb-3 border-b border-gray-100">
@@ -203,7 +205,7 @@ export default function ConversationPeople({ participants, onAdd, onRemove, onAs
                   {participants.map((p) => (
                     <div key={p.id} className="flex items-center gap-2.5">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={p.avatar} alt="" aria-hidden className="w-7 h-7 rounded-full object-cover bg-gray-200 shrink-0 grayscale" />
+                      <img src={p.avatar} alt="" aria-hidden className="w-7 h-7 rounded-full object-cover bg-gray-200 shrink-0" />
                       <span className="flex-1 min-w-0">
                         <span className="block text-sm text-gray-800 truncate">{p.name}</span>
                         <span className="block text-xs text-gray-400 truncate">{p.role}</span>
@@ -260,7 +262,7 @@ export default function ConversationPeople({ participants, onAdd, onRemove, onAs
                     className="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer text-left"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={p.avatar} alt="" aria-hidden className="w-7 h-7 rounded-full object-cover bg-gray-200 shrink-0 grayscale" />
+                    <img src={p.avatar} alt="" aria-hidden className="w-7 h-7 rounded-full object-cover bg-gray-200 shrink-0" />
                     <span className="flex-1 min-w-0">
                       <span className="block text-sm text-gray-800 truncate">{p.name}</span>
                       <span className="block text-xs text-gray-400 truncate">

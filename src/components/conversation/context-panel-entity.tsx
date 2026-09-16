@@ -119,7 +119,7 @@ function AssetContext({ id, onAction }: { id: string; onAction?: (prompt: string
             <p className="text-[11px] text-gray-400 tracking-wider">Health</p>
             <div className="flex items-center gap-2 mt-1.5">
               <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-gray-900 rounded-full" style={{ width: `${d.stats.healthPct}%` }} />
+                <div className="h-full bg-chart-line rounded-full" style={{ width: `${d.stats.healthPct}%` }} />
               </div>
               <span className="text-xs text-gray-500">{d.stats.healthPct}%</span>
             </div>
@@ -180,7 +180,7 @@ function ContractContext({ id }: { id: string }) {
         />
         <div className="mt-3">
           <div className="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-gray-900 rounded-full" style={{ width: `${c.progress}%` }} />
+            <div className="h-full bg-chart-line rounded-full" style={{ width: `${c.progress}%` }} />
           </div>
           <p className="text-xs text-gray-400 mt-1.5">{c.progress}% of contract term ({c.start} → {c.end})</p>
         </div>

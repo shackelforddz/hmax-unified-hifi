@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp, MapPin, TriangleAlert } from "lucide-react";
 import WidgetChat from "@/components/dashboard/widget-chat";
+import { ALL, Select, TabGroup } from "@/components/dashboard/filter-controls";
 import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
 import OpportunityDrawer from "@/components/dashboard/sales/opportunity-drawer";
 import { DELIVERY_TEAM, type Person } from "@/lib/people-data";
@@ -25,19 +26,17 @@ function leadsFor(person: Person): Opportunity[] {
     .filter((o): o is Opportunity => !!o);
 }
 
-// Most-severe reason first.
-function riskReasons(person: Person, contracts: OpsContract[], leads: Opportunity[]): string[] {
-  const reasons: string[] = [];
-  if (person.allocation >= OVER_ALLOCATED) reasons.push("Over-allocated");
-  else if (person.allocation >= HIGH_LOAD) reasons.push("High allocation");
-  if (contracts.some((c) => c.status === "critical")) reasons.push("Critical contract");
-  if (leads.some((l) => l.status === "stalled")) reasons.push("Stalled lead");
-  return reasons;
+/** Allocation is the only thing flagged on a person - contract and lead
+ *  trouble is alerted on the contract and lead widgets, not here. */
+function riskReasons(person: Person): string[] {
+  if (person.allocation >= OVER_ALLOCATED) return ["Over-allocated"];
+  if (person.allocation >= HIGH_LOAD) return ["High allocation"];
+  return [];
 }
 
 function LeadBadge({ status }: { status: Opportunity["status"] }) {
   const cls =
-    status === "stalled" ? "bg-black text-white"
+    status === "stalled" ? "bg-status-critical text-white font-bold"
     : status === "at-risk" ? "border border-gray-400 text-gray-700"
     : "border border-gray-300 text-gray-500";
   const label = status === "stalled" ? "Stalled" : status === "at-risk" ? "At risk" : "On track";
@@ -45,12 +44,12 @@ function LeadBadge({ status }: { status: Opportunity["status"] }) {
 }
 
 function StatusBadge({ status }: { status: OpsContract["status"] }) {
-  const cls = status === "critical" ? "bg-black text-white" : "border border-gray-400 text-gray-700";
+  const cls = status === "critical" ? "bg-status-critical text-white font-bold" : "border border-gray-400 text-gray-700";
   return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${cls}`}>{status === "critical" ? "Critical" : "At risk"}</span>;
 }
 
 function RiskChip({ reason }: { reason: string }) {
-  const cls = reason === "High allocation" ? "bg-gray-200 text-gray-700" : "bg-gray-900 text-white";
+  const cls = reason === "High allocation" ? "bg-gray-200 text-gray-700 font-bold" : "bg-status-critical text-white font-bold";
   return (
     <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}`}>
       <TriangleAlert size={10} strokeWidth={2} />
@@ -73,14 +72,14 @@ function PersonRow({
   const [expanded, setExpanded] = useState(defaultExpanded);
   const contracts = contractsFor(person);
   const leads = leadsFor(person);
-  const reasons = riskReasons(person, contracts, leads);
+  const reasons = riskReasons(person);
 
   return (
     <div className="border border-gray-200 rounded-2xl overflow-hidden">
       <button onClick={() => setExpanded((e) => !e)} className="w-full text-left px-5 py-4 hover:bg-gray-50 transition-colors cursor-pointer">
         <div className="flex items-center gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={person.avatar} alt={person.name} className="w-11 h-11 rounded-full object-cover bg-gray-200 grayscale shrink-0" />
+          <img src={person.avatar} alt={person.name} className="w-11 h-11 rounded-full object-cover bg-gray-200 shrink-0" />
 
           <div className="min-w-0 flex-1">
             <h4 className="text-base text-gray-900 leading-tight">{person.name}</h4>
@@ -118,23 +117,21 @@ function PersonRow({
               </>
             )}
 
-            {/* Certifications - a delivery concern; sales roles carry none */}
+            {/* Certifications - a delivery concern; sales roles carry none.
+                Listed plainly: expiry is tracked elsewhere, not alerted here. */}
             {person.certifications.length > 0 && (
               <>
                 <p className="text-[11px] text-gray-400 tracking-wider mb-1.5">Certifications</p>
                 <div className="flex flex-wrap gap-1.5 mb-3.5">
-                  {person.certifications.map((cert) => {
-                    const soon = cert.expires <= "2026-11"; // expiring within ~90 days
-                    return (
-                      <span
-                        key={cert.name}
-                        className={`text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${soon ? "bg-gray-900 text-white" : "border border-gray-200 text-gray-600"}`}
-                      >
-                        {cert.name}
-                        <span className={soon ? "text-gray-300" : "text-gray-400"}>· exp {cert.expires}</span>
-                      </span>
-                    );
-                  })}
+                  {person.certifications.map((cert) => (
+                    <span
+                      key={cert.name}
+                      className="text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1 border border-gray-200 text-gray-600"
+                    >
+                      {cert.name}
+                      <span className="text-gray-400">· exp {cert.expires}</span>
+                    </span>
+                  ))}
                 </div>
               </>
             )}
@@ -186,18 +183,18 @@ function PersonRow({
   );
 }
 
-type Filter = "all" | "at-risk";
+/** The one priority tab beside "All". */
+const AT_RISK = "At risk";
 
 export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" }: { people?: Person[]; title?: string }) {
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [leadDrawer, setLeadDrawer] = useState<Opportunity | null>(null);
-  const [filter, setFilter] = useState<Filter>("all");
-  const [comp, setComp] = useState("all");
-  const [cert, setCert] = useState("all");
+  const [filter, setFilter] = useState("all");
+  const [comp, setComp] = useState(ALL);
+  const [cert, setCert] = useState(ALL);
 
-  const isAtRisk = (p: Person) => riskReasons(p, contractsFor(p), leadsFor(p)).length > 0;
+  const isAtRisk = (p: Person) => riskReasons(p).length > 0;
   const atRiskCount = people.filter(isAtRisk).length;
-  const avgAllocation = Math.round(people.reduce((s, p) => s + p.allocation, 0) / people.length);
 
   // Filter options derived from the current team.
   const competencyOptions = Array.from(new Set(people.flatMap((p) => p.competencies))).sort();
@@ -206,8 +203,8 @@ export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" 
   const visible = people.filter(
     (p) =>
       (filter === "all" || isAtRisk(p)) &&
-      (comp === "all" || p.competencies.includes(comp)) &&
-      (cert === "all" || p.certifications.some((c) => c.name === cert))
+      (comp === ALL || p.competencies.includes(comp)) &&
+      (cert === ALL || p.certifications.some((c) => c.name === cert))
   );
   // Surface at-risk people first, then by allocation (busiest first).
   const sorted = [...visible].sort((a, b) => {
@@ -218,14 +215,6 @@ export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" 
   });
   const firstAtRisk = sorted.find(isAtRisk)?.id;
 
-  const FILTERS: { label: string; value: Filter; count: number }[] = [
-    { label: "All", value: "all", count: people.length },
-    { label: "At risk", value: "at-risk", count: atRiskCount },
-  ];
-
-  const selectCls =
-    "text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-500 bg-white cursor-pointer outline-none hover:border-gray-300 max-w-[180px]";
-
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       <ContractDrawer contractId={drawerId} onClose={() => setDrawerId(null)} />
@@ -234,57 +223,45 @@ export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" 
         detail={leadDrawer ? leadDetail(leadDrawer) : null}
         onClose={() => setLeadDrawer(null)}
       />
-      <div className="px-5 pt-5 pb-4 border-b border-gray-100">
+      <div className="px-5 pt-5 pb-4">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h3 className="text-base text-gray-900">{title}</h3>
-            <p className="text-sm text-gray-400 mt-0.5">
-              {people.length} on your team · {avgAllocation}% avg allocation
-              {atRiskCount > 0 && <span> · {atRiskCount} at risk</span>}
-            </p>
           </div>
           <WidgetChat title={title} />
         </div>
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-xs text-gray-400">Priority</span>
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`text-xs px-3 py-1 rounded-full transition-colors cursor-pointer ${
-                filter === f.value ? "bg-black text-white" : "border border-gray-200 text-gray-500 hover:border-gray-300"
-              }`}
-            >
-              {f.label} {f.count}
-            </button>
-          ))}
+        {/* Filters - priority tabs on the left, selects on the right */}
+        <div className="flex items-start justify-between gap-4 w-full">
+          <div className="flex items-start gap-2 min-w-0 overflow-x-auto no-scrollbar">
+            <TabGroup
+              value={filter}
+              onChange={setFilter}
+              options={[AT_RISK]}
+              countFor={() => atRiskCount}
+              label="Filter by priority"
+            />
+          </div>
 
-          <span className="text-gray-200 text-xs mx-1">|</span>
-
-          {competencyOptions.length > 0 && (
-            <>
-              <span className="text-xs text-gray-400">Competency</span>
-              <select value={comp} onChange={(e) => setComp(e.target.value)} className={selectCls}>
-                <option value="all">All</option>
-                {competencyOptions.map((o) => (
-                  <option key={o} value={o}>{o}</option>
-                ))}
-              </select>
-            </>
-          )}
-
-          {certOptions.length > 0 && (
-            <>
-              <span className="text-xs text-gray-400">Certification</span>
-              <select value={cert} onChange={(e) => setCert(e.target.value)} className={selectCls}>
-                <option value="all">All</option>
-                {certOptions.map((o) => (
-                  <option key={o} value={o}>{o}</option>
-                ))}
-              </select>
-            </>
-          )}
-
+          <div className="flex items-start gap-2 shrink-0">
+            {competencyOptions.length > 0 && (
+              <Select
+                value={comp}
+                onChange={setComp}
+                allLabel="All Competencies"
+                options={competencyOptions}
+                label="Filter by competency"
+              />
+            )}
+            {certOptions.length > 0 && (
+              <Select
+                value={cert}
+                onChange={setCert}
+                allLabel="All Certifications"
+                options={certOptions}
+                label="Filter by certification"
+              />
+            )}
+          </div>
         </div>
       </div>
 

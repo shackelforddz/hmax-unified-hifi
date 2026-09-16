@@ -33,7 +33,7 @@ export default function LoadingProfilePage() {
   }, [dispatch, router]);
 
   return (
-    <div className="min-h-screen bg-[#EBEBEB] flex flex-col font-patrick-hand">
+    <div className="min-h-screen bg-[#EBEBEB] flex flex-col">
       <header className="flex justify-center pt-8">
         <AuthHeader />
       </header>
@@ -46,11 +46,11 @@ export default function LoadingProfilePage() {
             <img
               src={MOCK_USER.avatar}
               alt={MOCK_USER.fullName}
-              className="w-14 h-14 rounded-full object-cover bg-gray-200 grayscale select-none"
+              className="w-14 h-14 rounded-full object-cover bg-gray-200 select-none"
             />
           </div>
 
-          <h1 className="font-patrick-hand text-[1.6rem] text-center mb-1">
+          <h1 className=" text-[1.6rem] text-center mb-1">
             Welcome, {MOCK_USER.name}
           </h1>
           <p className="text-sm text-gray-400 text-center mb-7">

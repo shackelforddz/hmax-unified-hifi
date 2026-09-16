@@ -4,6 +4,7 @@ import { ArrowUp } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer } from "recharts";
 import WidgetChat from "@/components/dashboard/widget-chat";
 import { REPORT_TURNAROUND as T } from "@/lib/field-reports-data";
+import { CHART } from "@/lib/chart-theme";
 
 export default function ReportTurnaround() {
   const overTarget = T.actualDays - T.targetDays;
@@ -22,7 +23,7 @@ export default function ReportTurnaround() {
         {/* Headline: actual vs target + trend */}
         <div className="shrink-0 w-40">
           <div className="flex items-end gap-1">
-            <p className="text-3xl text-gray-900 leading-none">{T.actualDays}</p>
+            <p className="text-3xl font-bold text-gray-900 leading-none">{T.actualDays}</p>
             <p className="text-sm text-gray-400 mb-0.5">days</p>
           </div>
           <p className="flex items-center gap-1 text-xs text-gray-500 mt-1.5">
@@ -35,11 +36,11 @@ export default function ReportTurnaround() {
               <AreaChart data={spark} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
                 <defs>
                   <linearGradient id="turnaroundSpark" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#171717" stopOpacity={0.18} />
-                    <stop offset="100%" stopColor="#171717" stopOpacity={0} />
+                    <stop offset="0%" stopColor={CHART.fill} stopOpacity={0.18} />
+                    <stop offset="100%" stopColor={CHART.fill} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <Area type="monotone" dataKey="v" stroke="#171717" strokeWidth={2} fill="url(#turnaroundSpark)" dot={false} />
+                <Area type="monotone" dataKey="v" stroke={CHART.line} strokeWidth={2} fill="url(#turnaroundSpark)" dot={false} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -54,7 +55,7 @@ export default function ReportTurnaround() {
                 <span className="text-sm text-gray-600 w-44 shrink-0">{s.label}</span>
                 <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className={`h-full rounded-full ${s.label === slowest.label ? "bg-gray-900" : "bg-gray-500"}`}
+                    className={`h-full rounded-full ${s.label === slowest.label ? "bg-status-critical" : "bg-chart-line"}`}
                     style={{ width: `${(s.days / maxStage) * 100}%` }}
                   />
                 </div>

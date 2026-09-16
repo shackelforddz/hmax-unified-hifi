@@ -6,12 +6,8 @@ import AttentionList from "@/components/dashboard/attention-list";
 import DeliveryTrend from "@/components/dashboard/delivery-trend";
 import RevenueAtRisk from "@/components/dashboard/revenue-at-risk";
 import UpcomingServicing from "@/components/dashboard/upcoming-servicing";
-import VendorConcentration from "@/components/dashboard/vendor-concentration";
 import WaitingOn from "@/components/dashboard/waiting-on";
-import CustomWidgetView from "@/components/dashboard/sales/custom-widget-view";
-import CustomWidgetBuilder from "@/components/dashboard/sales/custom-widget-builder";
 import { KPI_DATA } from "@/lib/dashboard-data";
-import { type CustomWidgetConfig } from "@/lib/custom-widget";
 import DashboardTabs from "@/components/dashboard/dashboard-tabs";
 import ContractsTable from "@/components/dashboard/tables/contracts-table";
 import AssetsTable from "@/components/dashboard/tables/assets-table";
@@ -22,8 +18,6 @@ import CustomersTable from "@/components/dashboard/tables/customers-table";
 const TABS = ["Overview", "Customers", "Contracts", "Assets"];
 
 export default function PmDashboard() {
-  const [widgets, setWidgets] = useState<CustomWidgetConfig[]>([]);
-  const [building, setBuilding] = useState(false);
   const [tab, setTab] = useState("Overview");
 
   // Draggable widgets, in their default order. Spans are out of 12.
@@ -41,17 +35,15 @@ export default function PmDashboard() {
           </div>
         ),
       },
-      // ── Bento: delivery leads wide, then three supporting tiles ──
+      // ── Bento, two even rows: how delivery is going, then what to chase ──
       { id: "delivery-trend", span: 8, tile: true, node: <DeliveryTrend /> },
       { id: "revenue-at-risk", span: 4, tile: true, node: <RevenueAtRisk /> },
-      { id: "waiting-on", span: 4, tile: true, node: <WaitingOn /> },
-      { id: "servicing", span: 4, tile: true, node: <UpcomingServicing /> },
-      { id: "vendors", span: 4, tile: true, node: <VendorConcentration /> },
+      { id: "waiting-on", span: 6, tile: true, node: <WaitingOn /> },
+      { id: "servicing", span: 6, tile: true, node: <UpcomingServicing /> },
       { id: "attention", span: 12, node: <AttentionList /> },
       { id: "people", span: 12, node: <PeopleWidget /> },
-      ...widgets.map((w): GridItem => ({ id: w.id, span: 6, tile: true, node: <CustomWidgetView config={w} /> })),
     ],
-    [widgets]
+    []
   );
 
   if (tab !== "Overview") {
@@ -69,17 +61,8 @@ export default function PmDashboard() {
     <div className="flex flex-col gap-4">
       <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
 
-      <DashboardGrid storageKey="pm" items={gridItems} onAddWidget={() => setBuilding(true)} />
+      <DashboardGrid storageKey="pm" items={gridItems} />
 
-      {building && (
-        <CustomWidgetBuilder
-          onAdd={(config) => {
-            setWidgets((ws) => [...ws, config]);
-            setBuilding(false);
-          }}
-          onClose={() => setBuilding(false)}
-        />
-      )}
     </div>
   );
 }

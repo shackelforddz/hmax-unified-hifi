@@ -38,7 +38,7 @@ export default function OwnerBadge({ owner, className = "" }: { owner: string; c
     <span className={`flex items-center gap-1.5 shrink-0 ${className}`}>
       {avatar ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={avatar} alt={owner} className="w-5 h-5 rounded-full object-cover bg-gray-200 shrink-0 grayscale" />
+        <img src={avatar} alt={owner} className="w-5 h-5 rounded-full object-cover bg-gray-200 shrink-0" />
       ) : (
         <span className="w-5 h-5 rounded-full bg-gray-200 text-gray-600 text-[9px] flex items-center justify-center shrink-0">
           {ownerInitials(owner)}

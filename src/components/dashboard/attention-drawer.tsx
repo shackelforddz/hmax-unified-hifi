@@ -27,8 +27,8 @@ function DocStateBadge({ state }: { state: DocState }) {
   const map: Record<DocState, { label: string; cls: string }> = {
     verified: { label: "Verified", cls: "bg-gray-900 text-white" },
     portal: { label: "Portal", cls: "bg-gray-100 text-gray-600" },
-    conflicting: { label: "Conflicting", cls: "bg-gray-200 text-gray-700" },
-    missing: { label: "Missing", cls: "border border-gray-300 text-gray-500" },
+    conflicting: { label: "Conflicting", cls: "bg-status-critical text-white font-bold" },
+    missing: { label: "Missing", cls: "border border-status-critical text-status-critical font-bold" },
   };
   const { label, cls } = map[state];
   return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{label}</span>;
@@ -36,15 +36,15 @@ function DocStateBadge({ state }: { state: DocState }) {
 
 function RiskBadge({ level }: { level: RiskLevel }) {
   const cls =
-    level === "Critical" ? "bg-gray-900 text-white"
-    : level === "High" ? "bg-gray-700 text-white"
+    level === "Critical" ? "bg-status-critical text-white font-bold"
+    : level === "High" ? "border border-status-critical text-status-critical font-bold"
     : "bg-gray-200 text-gray-700";
   return <span className={`text-[11px] px-3 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{level}</span>;
 }
 
 function InfoBadge({ status }: { status: InfoStatus }) {
   const cls =
-    status === "Conflicting" ? "bg-gray-900 text-white"
+    status === "Conflicting" ? "bg-status-critical text-white font-bold"
     : status === "Partial" ? "bg-gray-200 text-gray-700"
     : "border border-gray-300 text-gray-500";
   return <span className={`text-[11px] px-2.5 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{status}</span>;
@@ -117,7 +117,7 @@ function DrawerBody({ d, onAction }: { d: CustomerDetail; onAction: (prompt: str
           <div className="bg-white border border-gray-100 rounded-xl p-4 mt-4 flex flex-col gap-3">
             <div>
               <p className="text-[11px] text-gray-400 tracking-wider mb-1.5">Invoice readiness</p>
-              <span className="text-xs bg-gray-900 text-white px-2 py-0.5 rounded-full">{d.invoice.readiness}</span>
+              <span className="text-xs bg-status-critical text-white font-bold px-2 py-0.5 rounded-full">{d.invoice.readiness}</span>
             </div>
             <div>
               <p className="text-[11px] text-gray-400 tracking-wider mb-1">Blocker</p>
@@ -369,8 +369,8 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white shadow-2xl flex flex-col transition-transform duration-500 ease-in-out font-patrick-hand ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${
+          open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
         }`}
       >
         {detail && (
@@ -407,7 +407,7 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
                   <p className="text-[11px] text-gray-400 tracking-wider">Health</p>
                   <div className="flex items-center gap-2 mt-1.5">
                     <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-gray-900 rounded-full" style={{ width: `${detail.stats.healthPct}%` }} />
+                      <div className="h-full bg-chart-line rounded-full" style={{ width: `${detail.stats.healthPct}%` }} />
                     </div>
                     <span className="text-xs text-gray-500">{detail.stats.healthPct}%</span>
                   </div>

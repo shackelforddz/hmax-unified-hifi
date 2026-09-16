@@ -8,20 +8,12 @@ import AssetDrawer from "./asset-drawer";
 
 const MILAN = { lat: 45.4642, lng: 9.19 };
 
-// Neutral greyscale base style (CSS grayscale filter is the safety net).
-const GREYSCALE_STYLE = [
-  { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+// Google's default colour tiles, with only the clutter turned down - POI pins,
+// business icons and transit lines aren't fleet information.
+const BASE_STYLE = [
   { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#737373" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
-  { featureType: "administrative", elementType: "geometry", stylers: [{ visibility: "off" }] },
   { featureType: "poi", stylers: [{ visibility: "off" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
-  { featureType: "road", elementType: "labels", stylers: [{ visibility: "off" }] },
-  { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#eeeeee" }] },
-  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#e0e0e0" }] },
   { featureType: "transit", stylers: [{ visibility: "off" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#e5e5e5" }] },
 ];
 
 // Load the Google Maps JS API once.
@@ -59,7 +51,7 @@ export default function GoogleFleetMap({ apiKey }: { apiKey: string }) {
         const map = new g.maps.Map(ref.current, {
           center: MILAN,
           zoom: 11,
-          styles: GREYSCALE_STYLE,
+          styles: BASE_STYLE,
           backgroundColor: "#e5e5e5",
           mapTypeControl: false,
           streetViewControl: false,
@@ -77,18 +69,18 @@ export default function GoogleFleetMap({ apiKey }: { apiKey: string }) {
             title: asset.code,
             icon: {
               path: g.maps.SymbolPath.CIRCLE,
-              scale: 7,
-              fillColor: "#171717",
+              // scale is the radius, so 5 draws a 10px dot.
+              scale: 5,
+              // A pinging marker is one raising an alert - it reads red.
+              fillColor: m.ping ? "#fa000f" : "#171717",
               fillOpacity: 1,
-              strokeColor: "#171717",
-              strokeOpacity: 0.2,
-              strokeWeight: 6,
+              strokeWeight: 0,
             },
           });
           marker.addListener("click", () => {
             const statusCls = asset.stats.status === "Critical" ? "bg-gray-900 text-white" : "border border-gray-300 text-gray-500";
             const node = document.createElement("div");
-            node.className = "font-patrick-hand";
+            node.className = "";
             node.style.width = "190px";
             node.innerHTML = `
               <div class="flex items-start justify-between gap-2">
@@ -100,7 +92,7 @@ export default function GoogleFleetMap({ apiKey }: { apiKey: string }) {
               </div>
               <p class="text-xs text-gray-400 mt-1">${asset.location}</p>
               <div class="flex items-center gap-2 mt-2">
-                <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-gray-900 rounded-full" style="width:${asset.stats.healthPct}%"></div></div>
+                <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-chart-line rounded-full" style="width:${asset.stats.healthPct}%"></div></div>
                 <span class="text-xs text-gray-500">${asset.stats.healthPct}%</span>
               </div>
               <button class="fleet-view mt-3 w-full text-xs text-gray-700 border border-gray-200 rounded-full py-1.5 cursor-pointer">View details</button>`;
@@ -123,8 +115,7 @@ export default function GoogleFleetMap({ apiKey }: { apiKey: string }) {
     <div className="relative rounded-xl overflow-hidden border border-gray-200 h-full min-h-[420px] bg-gray-100">
       <AssetDrawer assetId={drawerId} onClose={() => setDrawerId(null)} />
 
-      {/* Map - CSS grayscale keeps it on-brand regardless of tile colours */}
-      <div ref={ref} className="absolute inset-0 grayscale" />
+            <div ref={ref} className="absolute inset-0" />
 
       {!ready && !failed && <div className="absolute inset-0 bg-gray-100 animate-pulse" />}
       {failed && (

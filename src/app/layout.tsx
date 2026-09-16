@@ -1,22 +1,26 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Patrick_Hand } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { Providers } from "@/components/providers";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
-const patrickHand = Patrick_Hand({
-  weight: "400",
-  variable: "--font-patrick-hand",
-  subsets: ["latin"],
+// Hitachi Sans is the product face; served from /public so no network fetch.
+const hitachiSans = localFont({
+  variable: "--font-hitachi",
+  display: "swap",
+  src: [
+    { path: "../../public/hitachi-sans/HitachiSans-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../../public/hitachi-sans/HitachiSans-Italic.woff2", weight: "400", style: "italic" },
+    { path: "../../public/hitachi-sans/HitachiSans-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "../../public/hitachi-sans/HitachiSans-SemiBoldItalic.woff2", weight: "600", style: "italic" },
+    { path: "../../public/hitachi-sans/HitachiSans-Bold.woff2", weight: "700", style: "normal" },
+    { path: "../../public/hitachi-sans/HitachiSans-BoldItalic.woff2", weight: "700", style: "italic" },
+  ],
 });
 
 export const metadata: Metadata = {
@@ -28,7 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${patrickHand.variable} h-full antialiased`}
+      className={`${hitachiSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
           <Providers>{children}</Providers>

@@ -149,3 +149,12 @@ export const DELIVERY_TEAM: Person[] = PEOPLE;
 
 /** Everyone who owns a lead - the sales-facing view of the team. */
 export const SALES_TEAM: Person[] = SALES_PEOPLE;
+
+/** Resolve a short owner credit ("Daniel B.") to the person behind it, so
+ *  widgets that only carry the short form can still show a face. */
+export function personByShortName(short: string): Person | undefined {
+  const [first, initial] = short.replace(/\.$/, "").split(" ");
+  return [...PEOPLE, ...SALES_PEOPLE].find(
+    (p) => p.name.startsWith(`${first} `) && (!initial || p.name.split(" ")[1]?.startsWith(initial))
+  );
+}

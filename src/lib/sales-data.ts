@@ -238,7 +238,7 @@ export const ASSET_DETAILS: Record<string, AssetDetail> = {
     ],
     risks: [
       { title: "Insulation failure risk within the peak window", detail: "At current degradation, thermal margin is exhausted by the autumn load peak.", level: "Critical" },
-      { title: "Unplanned outage exposure - $0.9M", detail: "AST-001 feeds two pump lines with no standby capacity.", level: "High" },
+      { title: "Unplanned outage exposure - €0.9M", detail: "AST-001 feeds two pump lines with no standby capacity.", level: "High" },
     ],
     related: { customer: "ComEd", contract: "ComEd - 5-year Service Agreement", station: "Pump Station 1, Zone A" },
   },
@@ -619,13 +619,13 @@ export interface SlaRow {
   risk: SlaBadge;
 }
 export const SLA_PIPELINE: SlaRow[] = [
-  { contractId: "sla-comed", account: "ComEd", value: "$4.8M", dueIn: "22d", serviceHealth: { label: "Issues open", verified: false }, risk: { label: "High", verified: false } },
-  { contractId: "sla-nv", account: "NV Energy", value: "$2.1M", dueIn: "31d", serviceHealth: { label: "Verified", verified: true }, risk: { label: "Verified", verified: true } },
-  { contractId: "sla-aep", account: "AEP Ohio", value: "$6.2M", dueIn: "38d", serviceHealth: { label: "Asset declining", verified: false }, risk: { label: "High", verified: false } },
-  { contractId: "sla-pacific", account: "Pacific Gas", value: "$3.9M", dueIn: "44d", serviceHealth: { label: "Verified", verified: true }, risk: { label: "Verified", verified: true } },
-  { contractId: "sla-duke", account: "Duke Energy", value: "$5.4M", dueIn: "58d", serviceHealth: { label: "Watch", verified: false }, risk: { label: "Medium", verified: false } },
-  { contractId: "sla-comed", account: "ComEd", value: "$4.8M", dueIn: "22d", serviceHealth: { label: "Issues open", verified: false }, risk: { label: "High", verified: false } },
-  { contractId: "sla-nv", account: "NV Energy", value: "$2.1M", dueIn: "31d", serviceHealth: { label: "Verified", verified: true }, risk: { label: "Verified", verified: true } },
+  { contractId: "sla-comed", account: "ComEd", value: "€4.8M", dueIn: "22d", serviceHealth: { label: "Issues open", verified: false }, risk: { label: "High", verified: false } },
+  { contractId: "sla-nv", account: "NV Energy", value: "€2.1M", dueIn: "31d", serviceHealth: { label: "Verified", verified: true }, risk: { label: "Verified", verified: true } },
+  { contractId: "sla-aep", account: "AEP Ohio", value: "€6.2M", dueIn: "38d", serviceHealth: { label: "Asset declining", verified: false }, risk: { label: "High", verified: false } },
+  { contractId: "sla-pacific", account: "Pacific Gas", value: "€3.9M", dueIn: "44d", serviceHealth: { label: "Verified", verified: true }, risk: { label: "Verified", verified: true } },
+  { contractId: "sla-duke", account: "Duke Energy", value: "€5.4M", dueIn: "58d", serviceHealth: { label: "Watch", verified: false }, risk: { label: "Medium", verified: false } },
+  { contractId: "sla-comed", account: "ComEd", value: "€4.8M", dueIn: "22d", serviceHealth: { label: "Issues open", verified: false }, risk: { label: "High", verified: false } },
+  { contractId: "sla-nv", account: "NV Energy", value: "€2.1M", dueIn: "31d", serviceHealth: { label: "Verified", verified: true }, risk: { label: "Verified", verified: true } },
 ];
 
 /* ── SLA contract detail (per account) ───────────────────────────── */
@@ -662,7 +662,7 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
   "sla-xcel": {
     account: "Xcel Energy",
     agreement: "Xcel Energy - 5-year HVDC Service Agreement (renewal)",
-    value: "$8.2M",
+    value: "€8.2M",
     term: "5 years · renewal in scoping",
     renewsIn: "in scoping",
     slaTarget: "98.0%",
@@ -670,14 +670,14 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
     owner: "Priya Nair",
     region: "North America",
     summary:
-      "Xcel's $8.2M HVDC service agreement renewal is stuck in Bidding with the Scope of Work still outstanding, and its largest unit (AST-001) is critical with a thermal fault signature - both need resolving before the renewal review.",
+      "Xcel's €8.2M HVDC service agreement renewal is stuck in Bidding with the Scope of Work still outstanding, and its largest unit (AST-001) is critical with a thermal fault signature - both need resolving before the renewal review.",
     serviceHealth: { label: "Issues open", verified: false },
     risk: { label: "Critical", verified: false },
     metrics: [
       { label: "SLA performance", value: "95.8% vs 98.0% target" },
       { label: "Response time", value: "4.4h avg (target 4h)" },
       { label: "Open service issues", value: "1" },
-      { label: "Penalty exposure", value: "$210k" },
+      { label: "Penalty exposure", value: "€210k" },
     ],
     obligations: [
       { label: "98% uptime commitment", met: false },
@@ -703,12 +703,12 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
     contacts: [
       { name: "Karen Ellis", role: "Asset Manager · Xcel Energy", email: "k.ellis@xcelenergy.com", phone: "+1 612 555 0142" },
     ],
-    finance: { revenue: "$8.2M", netMargin: "14.8%", asSoldMargin: "18.0%", invoiced: "$0", outstanding: "$0" },
+    finance: { revenue: "€8.2M", netMargin: "14.8%", asSoldMargin: "18.0%", invoiced: "€0", outstanding: "€0" },
     invoices: [
-      { code: "INV-X-01", milestone: "On offer acceptance", amount: "$1.6M", status: "Draft", due: "2026-10-15" },
+      { code: "INV-X-01", milestone: "On offer acceptance", amount: "€1.6M", status: "Draft", due: "2026-10-15" },
     ],
     payments: [
-      { date: "2026-10-15", event: "First invoice pending offer acceptance", amount: "$1.6M" },
+      { date: "2026-10-15", event: "First invoice pending offer acceptance", amount: "€1.6M" },
     ],
     risks: [
       { title: "Scope of Work outstanding", detail: "Renewal can't reach Offer until Engineering completes the Scope of Work.", level: "High" },
@@ -723,7 +723,7 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
   "sla-comed": {
     account: "ComEd",
     agreement: "ComEd - 5-year HVDC Service Agreement",
-    value: "$4.8M",
+    value: "€4.8M",
     term: "5 years · yr 4 of 5",
     renewsIn: "22 days",
     slaTarget: "98.0%",
@@ -731,14 +731,14 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
     owner: "Marcus Lee",
     region: "Midwest · US",
     summary:
-      "ComEd's HVDC service agreement is up for renewal in 22 days with two open asset issues (AST-001, AST-002) pulling service performance 1.6pp under the SLA target. Resolving the thermal and bearing findings before the renewal review is the priority to protect the $4.8M renewal.",
+      "ComEd's HVDC service agreement is up for renewal in 22 days with two open asset issues (AST-001, AST-002) pulling service performance 1.6pp under the SLA target. Resolving the thermal and bearing findings before the renewal review is the priority to protect the €4.8M renewal.",
     serviceHealth: { label: "Issues open", verified: false },
     risk: { label: "High", verified: false },
     metrics: [
       { label: "SLA performance", value: "96.4% vs 98.0% target" },
       { label: "Response time", value: "4.2h avg (target 4h)" },
       { label: "Open service issues", value: "2" },
-      { label: "Penalty exposure", value: "$120k" },
+      { label: "Penalty exposure", value: "€120k" },
     ],
     obligations: [
       { label: "99% uptime commitment", met: false },
@@ -766,20 +766,20 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
       { name: "Alan Pierce", role: "Reliability Manager · ComEd", email: "a.pierce@comed.com", phone: "+1 312 555 0110" },
       { name: "Nina Cole", role: "Contract Owner", email: "n.cole@comed.com", phone: "+1 312 555 0134" },
     ],
-    finance: { revenue: "$4.8M", netMargin: "15.4%", asSoldMargin: "18.0%", invoiced: "$3.6M", outstanding: "$0.4M" },
+    finance: { revenue: "€4.8M", netMargin: "15.4%", asSoldMargin: "18.0%", invoiced: "€3.6M", outstanding: "€0.4M" },
     invoices: [
-      { code: "INV-C-14", milestone: "Q3 service fee", amount: "$1.2M", status: "Paid", due: "2026-07-01" },
-      { code: "INV-C-15", milestone: "Q4 service fee", amount: "$1.2M", status: "Sent", due: "2026-10-01" },
-      { code: "INV-C-16", milestone: "Penalty credit (SLA miss)", amount: "-$120k", status: "Draft", due: "2026-10-15" },
+      { code: "INV-C-14", milestone: "Q3 service fee", amount: "€1.2M", status: "Paid", due: "2026-07-01" },
+      { code: "INV-C-15", milestone: "Q4 service fee", amount: "€1.2M", status: "Sent", due: "2026-10-01" },
+      { code: "INV-C-16", milestone: "Penalty credit (SLA miss)", amount: "-€120k", status: "Draft", due: "2026-10-15" },
     ],
     payments: [
-      { date: "2026-07-03", event: "INV-C-14 paid", amount: "+$1.2M" },
-      { date: "2026-10-01", event: "INV-C-15 due", amount: "$1.2M" },
-      { date: "2026-10-15", event: "Penalty credit if SLA missed", amount: "-$120k" },
+      { date: "2026-07-03", event: "INV-C-14 paid", amount: "+€1.2M" },
+      { date: "2026-10-01", event: "INV-C-15 due", amount: "€1.2M" },
+      { date: "2026-10-15", event: "Penalty credit if SLA missed", amount: "-€120k" },
     ],
     risks: [
-      { title: "SLA breach on uptime", detail: "Two open asset issues hold performance 1.6pp under the 98% target, exposing a $120k penalty at renewal.", level: "High" },
-      { title: "Renewal at risk", detail: "$4.8M renewal review in 22 days with issues unresolved.", level: "Critical" },
+      { title: "SLA breach on uptime", detail: "Two open asset issues hold performance 1.6pp under the 98% target, exposing a €120k penalty at renewal.", level: "High" },
+      { title: "Renewal at risk", detail: "€4.8M renewal review in 22 days with issues unresolved.", level: "Critical" },
     ],
     team: [
       { role: "Account Owner", name: "Marcus Lee" },
@@ -791,7 +791,7 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
   "sla-nv": {
     account: "NV Energy",
     agreement: "NV Energy - Service Agreement",
-    value: "$2.1M",
+    value: "€2.1M",
     term: "3 years · yr 2 of 3",
     renewsIn: "31 days",
     slaTarget: "98.0%",
@@ -806,7 +806,7 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
       { label: "SLA performance", value: "99.1% vs 98.0% target" },
       { label: "Response time", value: "3.1h avg (target 4h)" },
       { label: "Open service issues", value: "0" },
-      { label: "Penalty exposure", value: "$0" },
+      { label: "Penalty exposure", value: "€0" },
     ],
     obligations: [
       { label: "98% uptime commitment", met: true },
@@ -831,14 +831,14 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
     contacts: [
       { name: "Grace Lam", role: "Operations Manager · NV Energy", email: "g.lam@nvenergy.com", phone: "+1 702 555 0161" },
     ],
-    finance: { revenue: "$2.1M", netMargin: "19.6%", asSoldMargin: "19.4%", invoiced: "$1.4M", outstanding: "$0" },
+    finance: { revenue: "€2.1M", netMargin: "19.6%", asSoldMargin: "19.4%", invoiced: "€1.4M", outstanding: "€0" },
     invoices: [
-      { code: "INV-N-08", milestone: "Q2 service fee", amount: "$0.7M", status: "Paid", due: "2026-04-01" },
-      { code: "INV-N-09", milestone: "Q3 service fee", amount: "$0.7M", status: "Paid", due: "2026-07-01" },
+      { code: "INV-N-08", milestone: "Q2 service fee", amount: "€0.7M", status: "Paid", due: "2026-04-01" },
+      { code: "INV-N-09", milestone: "Q3 service fee", amount: "€0.7M", status: "Paid", due: "2026-07-01" },
     ],
     payments: [
-      { date: "2026-04-02", event: "INV-N-08 paid", amount: "+$0.7M" },
-      { date: "2026-07-02", event: "INV-N-09 paid", amount: "+$0.7M" },
+      { date: "2026-04-02", event: "INV-N-08 paid", amount: "+€0.7M" },
+      { date: "2026-07-02", event: "INV-N-09 paid", amount: "+€0.7M" },
     ],
     risks: [
       { title: "Aging Zone B fleet", detail: "Units approaching mid-life; a scope uplift would pre-empt future SLA pressure.", level: "Medium" },
@@ -852,7 +852,7 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
   "sla-aep": {
     account: "AEP Ohio",
     agreement: "AEP Ohio - Converter Service Agreement",
-    value: "$6.2M",
+    value: "€6.2M",
     term: "5 years · yr 3 of 5",
     renewsIn: "38 days",
     slaTarget: "98.0%",
@@ -860,14 +860,14 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
     owner: "Priya Nair",
     region: "Midwest · US",
     summary:
-      "AEP Ohio is the largest SLA in the pipeline at $6.2M, but a declining tap-changer on AST-004 is trending toward an SLA breach. A proactive intervention now de-risks the renewal and creates an upsell for a condition-monitoring add-on.",
+      "AEP Ohio is the largest SLA in the pipeline at €6.2M, but a declining tap-changer on AST-004 is trending toward an SLA breach. A proactive intervention now de-risks the renewal and creates an upsell for a condition-monitoring add-on.",
     serviceHealth: { label: "Asset declining", verified: false },
     risk: { label: "High", verified: false },
     metrics: [
       { label: "SLA performance", value: "97.2% vs 98.0% target" },
       { label: "Response time", value: "3.8h avg (target 4h)" },
       { label: "Open service issues", value: "1" },
-      { label: "Penalty exposure", value: "$180k" },
+      { label: "Penalty exposure", value: "€180k" },
     ],
     obligations: [
       { label: "98% uptime commitment", met: false },
@@ -893,16 +893,16 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
       { name: "Owen Frye", role: "Asset Manager · AEP Ohio", email: "o.frye@aepohio.com", phone: "+1 614 555 0125" },
       { name: "Sofia Marin", role: "Procurement", email: "s.marin@aepohio.com", phone: "+1 614 555 0148" },
     ],
-    finance: { revenue: "$6.2M", netMargin: "17.0%", asSoldMargin: "18.5%", invoiced: "$4.1M", outstanding: "$0.3M" },
+    finance: { revenue: "€6.2M", netMargin: "17.0%", asSoldMargin: "18.5%", invoiced: "€4.1M", outstanding: "€0.3M" },
     invoices: [
-      { code: "INV-A-21", milestone: "Q2 service fee", amount: "$1.55M", status: "Paid", due: "2026-04-01" },
-      { code: "INV-A-22", milestone: "Q3 service fee", amount: "$1.55M", status: "Sent", due: "2026-07-01" },
-      { code: "INV-A-23", milestone: "Condition-monitoring add-on", amount: "$0.3M", status: "Draft", due: "2026-10-01" },
+      { code: "INV-A-21", milestone: "Q2 service fee", amount: "€1.55M", status: "Paid", due: "2026-04-01" },
+      { code: "INV-A-22", milestone: "Q3 service fee", amount: "€1.55M", status: "Sent", due: "2026-07-01" },
+      { code: "INV-A-23", milestone: "Condition-monitoring add-on", amount: "€0.3M", status: "Draft", due: "2026-10-01" },
     ],
     payments: [
-      { date: "2026-04-04", event: "INV-A-21 paid", amount: "+$1.55M" },
-      { date: "2026-07-05", event: "INV-A-22 due", amount: "$1.55M" },
-      { date: "2026-10-01", event: "Add-on invoice (upsell)", amount: "$0.3M" },
+      { date: "2026-04-04", event: "INV-A-21 paid", amount: "+€1.55M" },
+      { date: "2026-07-05", event: "INV-A-22 due", amount: "€1.55M" },
+      { date: "2026-10-01", event: "Add-on invoice (upsell)", amount: "€0.3M" },
     ],
     risks: [
       { title: "Tap-changer decline", detail: "AST-004 trending toward an SLA breach; intervention needed before the renewal review.", level: "High" },
@@ -916,7 +916,7 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
   "sla-pacific": {
     account: "Pacific Gas",
     agreement: "Pacific Gas - Protection & Relay SLA",
-    value: "$3.9M",
+    value: "€3.9M",
     term: "4 years · yr 1 of 4",
     renewsIn: "44 days",
     slaTarget: "98.0%",
@@ -931,7 +931,7 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
       { label: "SLA performance", value: "98.6% vs 98.0% target" },
       { label: "Response time", value: "3.4h avg (target 4h)" },
       { label: "Open service issues", value: "0" },
-      { label: "Penalty exposure", value: "$0" },
+      { label: "Penalty exposure", value: "€0" },
     ],
     obligations: [
       { label: "98% uptime commitment", met: true },
@@ -956,14 +956,14 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
     contacts: [
       { name: "Diego Ramos", role: "Substation Manager · Pacific Gas", email: "d.ramos@pge.com", phone: "+1 415 555 0190" },
     ],
-    finance: { revenue: "$3.9M", netMargin: "19.2%", asSoldMargin: "19.0%", invoiced: "$2.9M", outstanding: "$0" },
+    finance: { revenue: "€3.9M", netMargin: "19.2%", asSoldMargin: "19.0%", invoiced: "€2.9M", outstanding: "€0" },
     invoices: [
-      { code: "INV-P-05", milestone: "Q1 service fee", amount: "$0.98M", status: "Paid", due: "2026-04-01" },
-      { code: "INV-P-06", milestone: "Q2 service fee", amount: "$0.98M", status: "Paid", due: "2026-07-01" },
+      { code: "INV-P-05", milestone: "Q1 service fee", amount: "€0.98M", status: "Paid", due: "2026-04-01" },
+      { code: "INV-P-06", milestone: "Q2 service fee", amount: "€0.98M", status: "Paid", due: "2026-07-01" },
     ],
     payments: [
-      { date: "2026-04-03", event: "INV-P-05 paid", amount: "+$0.98M" },
-      { date: "2026-07-03", event: "INV-P-06 paid", amount: "+$0.98M" },
+      { date: "2026-04-03", event: "INV-P-05 paid", amount: "+€0.98M" },
+      { date: "2026-07-03", event: "INV-P-06 paid", amount: "+€0.98M" },
     ],
     risks: [
       { title: "Expansion dependency", detail: "Relay-upgrade expansion lead relies on the verbal site-access agreement being formalised.", level: "Medium" },
@@ -977,7 +977,7 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
   "sla-duke": {
     account: "Duke Energy",
     agreement: "Duke Energy - Fleet Reliability SLA",
-    value: "$5.4M",
+    value: "€5.4M",
     term: "5 years · yr 2 of 5",
     renewsIn: "58 days",
     slaTarget: "98.0%",
@@ -992,7 +992,7 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
       { label: "SLA performance", value: "97.9% vs 98.0% target" },
       { label: "Response time", value: "4.0h avg (target 4h)" },
       { label: "Open service issues", value: "1" },
-      { label: "Penalty exposure", value: "$60k" },
+      { label: "Penalty exposure", value: "€60k" },
     ],
     obligations: [
       { label: "98% uptime commitment", met: false },
@@ -1017,16 +1017,16 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
     contacts: [
       { name: "Hannah Ford", role: "Fleet Manager · Duke Energy", email: "h.ford@duke-energy.com", phone: "+1 704 555 0173" },
     ],
-    finance: { revenue: "$5.4M", netMargin: "17.8%", asSoldMargin: "18.4%", invoiced: "$3.2M", outstanding: "$0.2M" },
+    finance: { revenue: "€5.4M", netMargin: "17.8%", asSoldMargin: "18.4%", invoiced: "€3.2M", outstanding: "€0.2M" },
     invoices: [
-      { code: "INV-D-11", milestone: "Q2 service fee", amount: "$1.35M", status: "Paid", due: "2026-04-01" },
-      { code: "INV-D-12", milestone: "Q3 service fee", amount: "$1.35M", status: "Sent", due: "2026-07-01" },
-      { code: "INV-D-13", milestone: "Reliability review", amount: "$0.2M", status: "Draft", due: "2026-10-01" },
+      { code: "INV-D-11", milestone: "Q2 service fee", amount: "€1.35M", status: "Paid", due: "2026-04-01" },
+      { code: "INV-D-12", milestone: "Q3 service fee", amount: "€1.35M", status: "Sent", due: "2026-07-01" },
+      { code: "INV-D-13", milestone: "Reliability review", amount: "€0.2M", status: "Draft", due: "2026-10-01" },
     ],
     payments: [
-      { date: "2026-04-05", event: "INV-D-11 paid", amount: "+$1.35M" },
-      { date: "2026-07-06", event: "INV-D-12 due", amount: "$1.35M" },
-      { date: "2026-10-01", event: "Reliability review invoice", amount: "$0.2M" },
+      { date: "2026-04-05", event: "INV-D-11 paid", amount: "+€1.35M" },
+      { date: "2026-07-06", event: "INV-D-12 due", amount: "€1.35M" },
+      { date: "2026-10-01", event: "Reliability review invoice", amount: "€0.2M" },
     ],
     risks: [
       { title: "SLA on the watch list", detail: "Performance sits 0.1pp under target; a fleet review would close the gap before renewal.", level: "Medium" },
@@ -1159,7 +1159,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     winConfidence: 65,id: "opp-xcel",
     account: "Xcel Energy",
     title: "5-year HVDC Service Agreement renewal",
-    value: "$8.2M",
+    value: "€8.2M",
     owner: "Elena Novak",
     stage: "Bidding",
     category: "Renewal",
@@ -1176,7 +1176,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     winConfidence: 70,id: "opp-comed",
     account: "ComEd",
     title: "Substation transformer upgrade",
-    value: "$4.8M",
+    value: "€4.8M",
     owner: "Tomás Ruiz",
     stage: "Bidding",
     category: "New lead",
@@ -1193,7 +1193,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     winConfidence: 35,id: "opp-aep",
     account: "AEP Ohio",
     title: "Converter transformer replacement",
-    value: "$6.2M",
+    value: "€6.2M",
     owner: "Hannah Cole",
     stage: "Prospects",
     category: "New lead",
@@ -1209,7 +1209,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     winConfidence: 40,id: "opp-duke",
     account: "Duke Energy",
     title: "Fleet reliability program",
-    value: "$5.4M",
+    value: "€5.4M",
     owner: "Tomás Ruiz",
     stage: "Prospects",
     category: "New lead",
@@ -1225,7 +1225,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     winConfidence: 85,id: "opp-nv",
     account: "NV Energy",
     title: "Protection relay retrofit",
-    value: "$2.1M",
+    value: "€2.1M",
     owner: "Elena Novak",
     stage: "Negotiation",
     category: "Renewal",
@@ -1233,7 +1233,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     rfqReceived: "2026-03-10",
     bidDue: "2026-06-19",
     expectedAward: "2026-09-25",
-    negotiation: { openItems: 3, forecast: "$1.8M at 85%", outcome: "Open" },
+    negotiation: { openItems: 3, forecast: "€1.8M at 85%", outcome: "Open" },
     requirements: req(true, true, true, true, false),
     recommendedAction: "Finalize legal T&Cs",
   },
@@ -1242,7 +1242,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     winConfidence: 25,id: "opp-pacific",
     account: "Pacific Gas",
     title: "Relay upgrade expansion",
-    value: "$1.9M",
+    value: "€1.9M",
     owner: "Hannah Cole",
     stage: "Bidding",
     category: "New lead",
@@ -1396,7 +1396,7 @@ export const PROPOSED_OPPORTUNITIES: ProposedOpportunity[] = [
     id: "prop-xcel-s19",
     account: "Xcel Energy",
     title: "S-19 converter transformer replacement",
-    estimatedValue: "$2.4M",
+    estimatedValue: "€2.4M",
     rationale:
       "S-19 is showing the same partial-discharge signature that drove the S-12 upgrade. At over 35 years old it's a strong replacement candidate to bundle into the SLA renewal before the autumn outage window.",
     signals: ["Asset health", "DGA trend", "SLA renewal"],
@@ -1405,9 +1405,9 @@ export const PROPOSED_OPPORTUNITIES: ProposedOpportunity[] = [
     id: "prop-comed-spares",
     account: "ComEd",
     title: "Standby spares program",
-    estimatedValue: "$3.1M",
+    estimatedValue: "€3.1M",
     rationale:
-      "AST-001 and AST-002 are both Critical with no standby capacity on the site. A spares program de-risks an unplanned outage worth ~$0.9M and fits the existing service agreement.",
+      "AST-001 and AST-002 are both Critical with no standby capacity on the site. A spares program de-risks an unplanned outage worth ~€0.9M and fits the existing service agreement.",
     signals: ["2 critical assets", "No standby", "Outage risk"],
   },
 ];

@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { X, ChevronDown, CalendarClock, ClipboardList, Package, UserPlus, ExternalLink, FileText, ScrollText, PencilRuler, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
+import { CHART } from "@/lib/chart-theme";
 import { ASSET_DETAILS, ASSET_CONDITION, DGA_TRENDS, DGA_MONTHS, sensorFaultsFor, type AssetDetail, type AssetReading, type AssetCondition, type GasTrend } from "@/lib/sales-data";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS } from "@/lib/operations-data";
 import { REPORTS_AWAITING } from "@/lib/field-reports-data";
@@ -26,7 +27,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 function ReadingState({ state }: { state: AssetReading["state"] }) {
   const cls =
-    state === "alert" ? "bg-gray-900 text-white"
+    state === "alert" ? "bg-status-critical text-white font-bold"
     : state === "watch" ? "bg-gray-200 text-gray-700"
     : "border border-gray-300 text-gray-500";
   const label = state === "alert" ? "Alert" : state === "watch" ? "Watch" : "OK";
@@ -34,7 +35,7 @@ function ReadingState({ state }: { state: AssetReading["state"] }) {
 }
 
 function RiskBadge({ level }: { level: "Critical" | "High" | "Medium" }) {
-  const cls = level === "Critical" ? "bg-gray-900 text-white" : level === "High" ? "bg-gray-700 text-white" : "bg-gray-200 text-gray-700";
+  const cls = level === "Critical" ? "bg-status-critical text-white font-bold" : level === "High" ? "border border-status-critical text-status-critical font-bold" : "bg-gray-200 text-gray-700";
   return <span className={`text-[11px] px-3 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{level}</span>;
 }
 
@@ -94,7 +95,7 @@ function GasSparkline({ points, over }: { points: number[]; over: boolean }) {
     .join(" L");
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="shrink-0">
-      <path d={`M${d}`} fill="none" stroke={over ? "#171717" : "#A3A3A3"} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={`M${d}`} fill="none" stroke={over ? CHART.alert : CHART.line} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -131,7 +132,7 @@ function GasTrends({ gases }: { gases: GasTrend[] }) {
               </span>
               <span
                 className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${
-                  isOver ? "bg-black text-white" : "border border-gray-200 text-gray-400"
+                  isOver ? "bg-status-critical text-white font-bold" : "border border-gray-200 text-gray-400"
                 }`}
               >
                 {isOver ? "Over limit" : "Normal"}
@@ -221,7 +222,7 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
               <div key={f.id} className="flex items-start gap-3 py-2.5 border-b border-gray-100 last:border-0">
                 <span
                   className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 mt-0.5 ${
-                    f.severity === "critical" ? "bg-black text-white" : "border border-gray-400 text-gray-700"
+                    f.severity === "critical" ? "bg-status-critical text-white font-bold" : "border border-gray-400 text-gray-700"
                   }`}
                 >
                   {f.severity === "critical" ? "Critical" : "Warning"}
@@ -317,7 +318,7 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
                 <div key={c.id}>
                   <div className="flex items-center justify-between gap-3 mb-1.5">
                     <span className="text-sm text-gray-900">{c.type}</span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${c.status === "conflict" ? "bg-gray-900 text-white" : "border border-gray-300 text-gray-500"}`}>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${c.status === "conflict" ? "bg-status-critical text-white font-bold" : "border border-gray-300 text-gray-500"}`}>
                       {c.status === "conflict" ? "Conflict" : "OK"}
                     </span>
                   </div>
@@ -629,8 +630,8 @@ export default function AssetDrawer({ assetId, onClose, back }: Props) {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white shadow-2xl flex flex-col transition-transform duration-500 ease-in-out font-patrick-hand ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${
+          open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
         }`}
       >
         {detail && (
@@ -674,7 +675,7 @@ export default function AssetDrawer({ assetId, onClose, back }: Props) {
                   <p className="text-[11px] text-gray-400 tracking-wider">Health</p>
                   <div className="flex items-center gap-2 mt-1.5">
                     <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-gray-900 rounded-full" style={{ width: `${detail.stats.healthPct}%` }} />
+                      <div className="h-full bg-chart-line rounded-full" style={{ width: `${detail.stats.healthPct}%` }} />
                     </div>
                     <span className="text-xs text-gray-500">{detail.stats.healthPct}%</span>
                   </div>

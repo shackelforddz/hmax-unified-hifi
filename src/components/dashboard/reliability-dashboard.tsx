@@ -7,9 +7,6 @@ import FleetHealth from "@/components/dashboard/sales/fleet-health";
 import AssetAlerts from "@/components/dashboard/sales/asset-alerts";
 import ScopeReviews from "@/components/dashboard/reliability/scope-reviews";
 import { ASSET_REVIEW_ALERTS, REVIEW_CATEGORY_OPTIONS } from "@/lib/reliability-data";
-import CustomWidgetView from "@/components/dashboard/sales/custom-widget-view";
-import CustomWidgetBuilder from "@/components/dashboard/sales/custom-widget-builder";
-import { type CustomWidgetConfig } from "@/lib/custom-widget";
 import DashboardTabs from "@/components/dashboard/dashboard-tabs";
 import ContractsTable from "@/components/dashboard/tables/contracts-table";
 import AssetsTable from "@/components/dashboard/tables/assets-table";
@@ -28,8 +25,6 @@ const HEALTH_KPIS = [
 ];
 
 export default function ReliabilityDashboard() {
-  const [widgets, setWidgets] = useState<CustomWidgetConfig[]>([]);
-  const [building, setBuilding] = useState(false);
   const [tab, setTab] = useState("Overview");
 
   // Draggable widgets, in their default order. Spans are out of 12.
@@ -55,9 +50,8 @@ export default function ReliabilityDashboard() {
         node: <AssetAlerts alerts={ASSET_REVIEW_ALERTS} categoryOptions={REVIEW_CATEGORY_OPTIONS} title="Assets to review" />,
       },
       { id: "scope-reviews", span: 12, node: <ScopeReviews /> },
-      ...widgets.map((w): GridItem => ({ id: w.id, span: 4, tile: true, node: <CustomWidgetView config={w} /> })),
     ],
-    [widgets]
+    []
   );
 
   if (tab !== "Overview") {
@@ -75,17 +69,8 @@ export default function ReliabilityDashboard() {
     <div className="flex flex-col gap-4">
       <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
 
-      <DashboardGrid storageKey="reliability" items={gridItems} onAddWidget={() => setBuilding(true)} />
+      <DashboardGrid storageKey="reliability" items={gridItems} />
 
-      {building && (
-        <CustomWidgetBuilder
-          onAdd={(config) => {
-            setWidgets((ws) => [...ws, config]);
-            setBuilding(false);
-          }}
-          onClose={() => setBuilding(false)}
-        />
-      )}
     </div>
   );
 }

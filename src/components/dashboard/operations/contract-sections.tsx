@@ -92,7 +92,7 @@ export default function ContractSections({ d }: { d: ContractSectionsData }) {
                   <p className="text-sm text-gray-700 truncate">{f.visit}</p>
                   <p className="text-xs text-gray-400">{f.engineer} · {f.date}</p>
                 </div>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${blocked ? "bg-gray-900 text-white" : "border border-gray-300 text-gray-500"}`}>{f.status}</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${blocked ? "bg-status-critical text-white font-bold" : "border border-gray-300 text-gray-500"}`}>{f.status}</span>
               </div>
             );
           })}

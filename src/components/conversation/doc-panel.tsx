@@ -23,7 +23,7 @@ const ALERTS = [
 const CASE_FIELDS = [
   { label: "Case ID", value: "1345-7861" },
   { label: "Customer", value: "Xcel Energy" },
-  { label: "Contract value", value: "$4.2M" },
+  { label: "Contract value", value: "€4.2M" },
   { label: "COTD", value: "9 Nov 2023" },
   { label: "Due date", value: "17 Nov 2023" },
   { label: "Stage", value: "Inspection - Diagnostic Testing" },
@@ -109,7 +109,7 @@ export default function DocPanel({ onClose }: Props) {
                 <img
                   src={s.img}
                   alt={s.name}
-                  className="w-8 h-8 rounded-full object-cover bg-gray-200 shrink-0 grayscale"
+                  className="w-8 h-8 rounded-full object-cover bg-gray-200 shrink-0"
                 />
                 <div>
                   <p className="text-sm text-gray-800">{s.name}</p>

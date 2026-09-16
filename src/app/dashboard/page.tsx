@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import TopNav from "@/components/dashboard/top-nav";
+import SideNav from "@/components/dashboard/side-nav";
 import ConversationsPanel from "@/components/dashboard/conversations-panel";
 import PmDashboard from "@/components/dashboard/pm-dashboard";
 import SalesDashboard from "@/components/dashboard/sales-dashboard";
@@ -43,58 +43,29 @@ export default function DashboardPage() {
 
   return (
     <ConversationLauncherContext.Provider value={openConversation}>
-    <div className="h-screen bg-[#F5F5F5] font-patrick-hand relative overflow-hidden">
+    <div className="h-screen bg-[#F5F5F5] overflow-hidden flex">
 
-      {/* Right conversations panel - anchored below nav, never scrolls under it */}
-      <div className="absolute top-[80px] right-4 bottom-4 w-[400px]">
+      {/* Rail - wordmark up top, utilities and account at the foot */}
+      <SideNav />
+
+      {/* Main panel - the dashboard lives on one white sheet */}
+      <main className="flex-1 min-w-0 my-4 bg-white rounded-2xl overflow-hidden flex flex-col">
+        <div className="no-scrollbar flex-1 overflow-y-auto">
+          <div className="p-6 flex flex-col gap-4">
+            {isSales ? <SalesDashboard /> : isOps ? <OperationsDashboard /> : isReliability ? <ReliabilityDashboard /> : isDiagnostics ? <DiagnosticsDashboard /> : <PmDashboard />}
+          </div>
+        </div>
+      </main>
+
+      {/* Conversation log */}
+      <aside className="w-[400px] shrink-0 px-6 py-6">
         <ConversationsPanel
           conversations={conversations}
           onNewConversation={() => openConversation()}
           onSelect={openStored}
           onStartPrompt={(prompt) => openConversation({ prompt })}
         />
-      </div>
-
-      {/* Left content - starts at top-0 so it can scroll under the nav */}
-      {/* right = 16px page pad + 400px panel + 16px gap = 432px */}
-      <div className="no-scrollbar absolute top-0 left-0 bottom-0 overflow-y-auto" style={{ right: 432 }}>
-        <div className="pl-4 pb-4 pt-[80px] flex flex-col gap-4">
-          {isSales ? <SalesDashboard /> : isOps ? <OperationsDashboard /> : isReliability ? <ReliabilityDashboard /> : isDiagnostics ? <DiagnosticsDashboard /> : <PmDashboard />}
-        </div>
-      </div>
-
-      {/* Progressive blur - covers exactly the nav zone (0–64px) */}
-      <div className="absolute top-0 left-0 right-0 z-20 h-[64px] pointer-events-none overflow-hidden">
-        <div style={{
-          position: "absolute", inset: 0,
-          backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-          maskImage: "linear-gradient(to bottom, black 0%, black 10%, transparent 40%)",
-          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 10%, transparent 40%)",
-        }} />
-        <div style={{
-          position: "absolute", inset: 0,
-          backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
-          maskImage: "linear-gradient(to bottom, black 0%, black 30%, transparent 65%)",
-          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 30%, transparent 65%)",
-        }} />
-        <div style={{
-          position: "absolute", inset: 0,
-          backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)",
-          maskImage: "linear-gradient(to bottom, black 0%, black 50%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 50%, transparent 100%)",
-        }} />
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(to bottom, rgba(245,245,245,0.97) 0%, rgba(245,245,245,0.55) 55%, rgba(245,245,245,0) 100%)",
-        }} />
-      </div>
-
-      {/* Nav content - above blur layers */}
-      <div className="absolute top-0 left-0 right-0 z-30 px-4 pt-4 pointer-events-none">
-        <div className="pointer-events-auto">
-          <TopNav />
-        </div>
-      </div>
+      </aside>
 
       {/* Unified conversation overlay - welcome → chat on one screen */}
       <ConversationOverlay

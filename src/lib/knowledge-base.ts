@@ -26,14 +26,14 @@ export interface KBAsset {
 }
 
 export const CONTRACTS: KBContract[] = [
-  { customer: "Xcel Energy", value: "$4.2M", margin: "14.2%", status: "Delivery at risk", owner: "Daniel Brooks", region: "North America", due: "8 Sep 2026", note: "HVDC winding replacement on S-12/S-14. 18 days late; $1.2M invoice blocked on site commissioning. Delta Coils is the critical dependency." },
-  { customer: "Siemens", value: "£2.4M", margin: "11.8%", status: "Invoice blocked", owner: "Sarah Mitchell", region: "North Sea", due: "15 Sep 2026", note: "Switchgear refurbishment. Change order CO-118 unsigned, holding a £680k progress invoice and dragging margin 14pts under baseline." },
-  { customer: "Baltic Wind NL", value: "£2.4M", margin: "19.4%", status: "Healthy", owner: "Sarah Mitchell", region: "North Sea", due: "20 Sep 2026", note: "Offshore transformer maintenance. On track, but two HSE certificates expire before the next visit and a verbal inspection extension is undocumented." },
-  { customer: "Pacific Gas", value: "£440k", margin: "21.0%", status: "Healthy", owner: "Lena Fischer", region: "North Sea", due: "25 Sep 2026", note: "Protection relay upgrade. On schedule; site access is verbal-only and needs a written agreement before mobilisation." },
-  { customer: "ComEd", value: "$4.8M", margin: "12.6%", status: "Issues open", owner: "Marcus Lee", region: "North America", due: "in 22 days", note: "SLA renewal with open service issues; flagged High risk in the pipeline." },
-  { customer: "NV Energy", value: "$2.1M", margin: "17.9%", status: "Verified", owner: "Marcus Lee", region: "North America", due: "in 31 days", note: "SLA renewal, service health verified and low risk." },
-  { customer: "AEP Ohio", value: "$6.2M", margin: "13.1%", status: "Asset declining", owner: "Priya N.", region: "North America", due: "in 38 days", note: "Largest renewal in the pipeline; asset health declining, flagged High risk." },
-  { customer: "Duke Energy", value: "$5.4M", margin: "15.5%", status: "Watch", owner: "Priya N.", region: "North America", due: "in 58 days", note: "SLA renewal on watch, medium risk." },
+  { customer: "Xcel Energy", value: "€4.2M", margin: "14.2%", status: "Delivery at risk", owner: "Daniel Brooks", region: "North America", due: "8 Sep 2026", note: "HVDC winding replacement on S-12/S-14. 18 days late; €1.2M invoice blocked on site commissioning. Delta Coils is the critical dependency." },
+  { customer: "Siemens", value: "€2.4M", margin: "11.8%", status: "Invoice blocked", owner: "Sarah Mitchell", region: "North Sea", due: "15 Sep 2026", note: "Switchgear refurbishment. Change order CO-118 unsigned, holding a €680k progress invoice and dragging margin 14pts under baseline." },
+  { customer: "Baltic Wind NL", value: "€2.4M", margin: "19.4%", status: "Healthy", owner: "Sarah Mitchell", region: "North Sea", due: "20 Sep 2026", note: "Offshore transformer maintenance. On track, but two HSE certificates expire before the next visit and a verbal inspection extension is undocumented." },
+  { customer: "Pacific Gas", value: "€440k", margin: "21.0%", status: "Healthy", owner: "Lena Fischer", region: "North Sea", due: "25 Sep 2026", note: "Protection relay upgrade. On schedule; site access is verbal-only and needs a written agreement before mobilisation." },
+  { customer: "ComEd", value: "€4.8M", margin: "12.6%", status: "Issues open", owner: "Marcus Lee", region: "North America", due: "in 22 days", note: "SLA renewal with open service issues; flagged High risk in the pipeline." },
+  { customer: "NV Energy", value: "€2.1M", margin: "17.9%", status: "Verified", owner: "Marcus Lee", region: "North America", due: "in 31 days", note: "SLA renewal, service health verified and low risk." },
+  { customer: "AEP Ohio", value: "€6.2M", margin: "13.1%", status: "Asset declining", owner: "Priya N.", region: "North America", due: "in 38 days", note: "Largest renewal in the pipeline; asset health declining, flagged High risk." },
+  { customer: "Duke Energy", value: "€5.4M", margin: "15.5%", status: "Watch", owner: "Priya N.", region: "North America", due: "in 58 days", note: "SLA renewal on watch, medium risk." },
 ];
 
 export const ASSETS: KBAsset[] = [
@@ -56,15 +56,15 @@ export const PORTFOLIO = {
   fleetHealth30d: 83,
   criticalAssets: 2,
   atRiskAssets: 3,
-  revenueAtRisk: "$7.1M",
+  revenueAtRisk: "€7.1M",
   upcomingRenewals: 12,
 };
 
 const VENDORS = [
-  { name: "Delta Coils Inc.", amount: "$4.8M", projects: 6 },
-  { name: "Nexans", amount: "$1.4M", projects: 3 },
-  { name: "Nynas AB", amount: "$0.6M", projects: 2 },
-  { name: "Air Liquide", amount: "$0.3M", projects: 1 },
+  { name: "Delta Coils Inc.", amount: "€4.8M", projects: 6 },
+  { name: "Nexans", amount: "€1.4M", projects: 3 },
+  { name: "Nynas AB", amount: "€0.6M", projects: 2 },
+  { name: "Air Liquide", amount: "€0.3M", projects: 1 },
 ];
 
 const MILESTONES = [
@@ -132,7 +132,7 @@ function vendorAnswer(): string {
     `Vendor concentration - ${PORTFOLIO.revenueAtRisk} of delivery-linked revenue rides on four suppliers:`,
     ...lines,
     ``,
-    `Delta Coils Inc. alone carries $4.8M across 6 projects - 68% of the exposure. That's a concentration problem, not six independent delays: one vendor slip cascades across the portfolio, and it's already the reason Xcel is 18 days late.`,
+    `Delta Coils Inc. alone carries €4.8M across 6 projects - 68% of the exposure. That's a concentration problem, not six independent delays: one vendor slip cascades across the portfolio, and it's already the reason Xcel is 18 days late.`,
     `Recommended: lock a secondary source for winding sets before the next PO cycle, and put Delta Coils on a weekly delivery check-in. A single qualified backup would cut the concentration from ${((4.8 / total) * 100).toFixed(0)}% to under 40%.`,
   ].join("\n");
 }
@@ -142,10 +142,10 @@ function slaAnswer(): string {
   const pipeline = CONTRACTS.filter((c) => c.due.startsWith("in "));
   const totalValue = pipeline.reduce((s, c) => s + parseFloat(c.value.replace(/[^0-9.]/g, "")), 0);
   return [
-    `SLA Pipeline - ${PORTFOLIO.upcomingRenewals} renewals upcoming, ~$${totalValue.toFixed(1)}M of contract value in the next 60 days:`,
+    `SLA Pipeline - ${PORTFOLIO.upcomingRenewals} renewals upcoming, ~€${totalValue.toFixed(1)}M of contract value in the next 60 days:`,
     ...pipeline.map((c) => `• ${c.customer} - ${c.value} · due ${c.due} · ${c.status}`),
     ``,
-    `${open.length} of these need attention before they renew. AEP Ohio ($6.2M) is the largest and its asset health is declining; ComEd ($4.8M) has open service issues and is due first, in 22 days.`,
+    `${open.length} of these need attention before they renew. AEP Ohio (€6.2M) is the largest and its asset health is declining; ComEd (€4.8M) has open service issues and is due first, in 22 days.`,
     `Recommended: sequence the renewal work by due date and risk - start AEP Ohio and ComEd this week so service health is defensible at the negotiation.`,
   ].join("\n");
 }
@@ -154,7 +154,7 @@ function deliveryAnswer(): string {
   return [
     `On-time delivery is ${PORTFOLIO.onTimeDelivery} - down 5pp on last month and 25pp under the 85% target, the fourth consecutive monthly decline (78 → 74 → 70 → 68 → 64 → 60).`,
     ``,
-    `The single biggest drag is Xcel Energy: 18 days late, pushing the work out of the autumn outage window into February. Every week of slip moves ~$0.3M of invoicing into the next quarter, and 60% is the exact number Xcel will quote back during the SLA renewal.`,
+    `The single biggest drag is Xcel Energy: 18 days late, pushing the work out of the autumn outage window into February. Every week of slip moves ~€0.3M of invoicing into the next quarter, and 60% is the exact number Xcel will quote back during the SLA renewal.`,
     `Recommended: escalate the Xcel schedule now and protect the outage window - recovering that one project lifts portfolio on-time delivery ~6pp on its own.`,
   ].join("\n");
 }
@@ -167,19 +167,19 @@ function marginAnswer(): string {
     ...worst.map((c) => `• ${c.customer} - ${c.margin} (${c.status})`),
     ``,
     `Siemens is the biggest distortion: reported margin sits ~14pts under baseline purely because change order CO-118 is unbooked. It's an accounting artefact, not a real loss - booking the CO recovers most of the gap.`,
-    `Recommended: book CO-118 to release the £680k invoice and restore Siemens margin; that alone lifts the portfolio ~0.5pp back toward plan.`,
+    `Recommended: book CO-118 to release the €680k invoice and restore Siemens margin; that alone lifts the portfolio ~0.5pp back toward plan.`,
   ].join("\n");
 }
 
 function revenueAnswer(): string {
   return [
     `${PORTFOLIO.revenueAtRisk} of revenue is at risk this quarter, concentrated in four triggers:`,
-    `• Delivery slip - $4.8M (Delta Coils vendor concentration)`,
-    `• Invoice blocked - $1.2M (Xcel, milestone 4 / site commissioning not achieved)`,
-    `• Change order unsigned - $0.7M (Siemens CO-118)`,
-    `• Scope creep - $0.4M`,
+    `• Delivery slip - €4.8M (Delta Coils vendor concentration)`,
+    `• Invoice blocked - €1.2M (Xcel, milestone 4 / site commissioning not achieved)`,
+    `• Change order unsigned - €0.7M (Siemens CO-118)`,
+    `• Scope creep - €0.4M`,
     ``,
-    `Two of these are one action away from clearing: raising the gasket-set PO unblocks the Xcel path, and signing CO-118 releases the Siemens invoice - together ~$1.9M recoverable this quarter.`,
+    `Two of these are one action away from clearing: raising the gasket-set PO unblocks the Xcel path, and signing CO-118 releases the Siemens invoice - together ~€1.9M recoverable this quarter.`,
     `Recommended: raise the transformer gasket-set PO today - it's the longest lead item (35 days) and the largest single blocker.`,
   ].join("\n");
 }
@@ -224,7 +224,7 @@ function portfolioAnswer(): string {
     `• Margin ${PORTFOLIO.portfolioMargin} (0.8pp under plan) · On-time delivery ${PORTFOLIO.onTimeDelivery} (25pp under target)`,
     `• ${PORTFOLIO.revenueAtRisk} of revenue at risk this quarter`,
     ``,
-    `Biggest exposures are Xcel Energy (delivery at risk, $4.2M) and Siemens (invoice blocked, £2.4M) - together the bulk of the at-risk revenue. Both have a defined next action.`,
+    `Biggest exposures are Xcel Energy (delivery at risk, €4.2M) and Siemens (invoice blocked, €2.4M) - together the bulk of the at-risk revenue. Both have a defined next action.`,
     `Recommended: focus this week on the two decisions that move the most - escalate Xcel's schedule and book Siemens CO-118.`,
   ].join("\n");
 }
@@ -402,7 +402,7 @@ export function visualFor(prompt: string, context?: string): CustomWidgetConfig 
 
   // Topic charts - order mirrors answerQuery so text and visual agree.
   if (/(vendor|delta coils|concentration|supplier)/.test(q))
-    return viz("Revenue at risk by vendor", "bar", VENDORS.map((v) => ({ label: v.name.replace(" Inc.", ""), value: parseFloat(v.amount.replace(/[^0-9.]/g, "")) })), "$M");
+    return viz("Revenue at risk by vendor", "bar", VENDORS.map((v) => ({ label: v.name.replace(" Inc.", ""), value: parseFloat(v.amount.replace(/[^0-9.]/g, "")) })), "€M");
 
   if (/(sla|renewal|pipeline)/.test(q))
     return viz("Upcoming SLA renewals", "line", VIZ_MONTHS.map((m, i) => ({ label: m, value: [8, 9, 11, 12, 12, 12][i] })));
@@ -419,7 +419,7 @@ export function visualFor(prompt: string, context?: string): CustomWidgetConfig 
       { label: "Invoice blocked", value: 1.2 },
       { label: "Change order", value: 0.7 },
       { label: "Scope creep", value: 0.4 },
-    ], "$M");
+    ], "€M");
 
   if (/(fleet|health|score)/.test(q))
     return viz("Fleet health - 6 mo", "line", VIZ_MONTHS.map((m, i) => ({ label: m, value: [83, 86, 80, 68, 72, 71][i] })));

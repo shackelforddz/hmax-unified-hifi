@@ -17,7 +17,7 @@ function parseValue(v: string): number {
   return /k\b/i.test(v) ? n / 1000 : n;
 }
 function fmtValue(m: number): string {
-  return m >= 1 ? `£${m.toFixed(1)}m` : `£${Math.round(m * 1000)}k`;
+  return m >= 1 ? `€${m.toFixed(1)}m` : `€${Math.round(m * 1000)}k`;
 }
 
 function Card({ children }: { children: React.ReactNode }) {
@@ -30,7 +30,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 function StatusBadge({ status }: { status: string }) {
   const critical = status === "critical" || status === "Critical";
   const atRisk = status === "at-risk" || status === "At risk";
-  const cls = critical ? "bg-black text-white" : atRisk ? "border border-gray-400 text-gray-700" : "border border-gray-200 text-gray-400";
+  const cls = critical ? "bg-status-critical text-white font-bold" : atRisk ? "border border-gray-400 text-gray-700" : "border border-gray-200 text-gray-400";
   const label = critical ? "Critical" : atRisk ? "At risk" : status === "In service" ? "In service" : "On track";
   return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${cls}`}>{label}</span>;
 }
@@ -40,7 +40,7 @@ function HealthBar({ pct }: { pct: number }) {
   return (
     <span className="flex items-center gap-2 w-24 shrink-0">
       <span className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-        <span className={`block h-full rounded-full ${low ? "bg-gray-900" : "bg-gray-400"}`} style={{ width: `${pct}%` }} />
+        <span className={`block h-full rounded-full ${low ? "bg-status-critical" : "bg-chart-line"}`} style={{ width: `${pct}%` }} />
       </span>
       <span className={`text-xs shrink-0 ${low ? "text-gray-900" : "text-gray-400"}`}>{pct}%</span>
     </span>
@@ -123,8 +123,8 @@ export default function CustomerDrawer({ customer, onClose, onOpenContract, onOp
         className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
       />
       <div
-        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white shadow-2xl flex flex-col transition-transform duration-500 ease-in-out font-patrick-hand ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${
+          open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
         }`}
       >
         {open && customer && (

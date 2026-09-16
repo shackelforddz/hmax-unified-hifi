@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { X, MessageSquareText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CHART } from "@/lib/chart-theme";
 
 export interface DocTable {
   columns: string[];
@@ -51,8 +52,8 @@ function DocChartView({ chart }: { chart: DocChart }) {
           <line x1={pad} x2={w - pad} y1={y(threshold)} y2={y(threshold)} stroke="#A3A3A3" strokeDasharray="4 3" strokeWidth={1} />
         )}
         <polygon points={area} fill="#1717711" fillOpacity={0.08} />
-        <polyline points={line} fill="none" stroke="#171717" strokeWidth={2} />
-        {points.map((p, i) => <circle key={i} cx={x(i)} cy={y(p.value)} r={2.5} fill="#171717" />)}
+        <polyline points={line} fill="none" stroke={CHART.line} strokeWidth={2} />
+        {points.map((p, i) => <circle key={i} cx={x(i)} cy={y(p.value)} r={2.5} fill={CHART.line} />)}
       </svg>
       <div className="flex justify-between text-[10px] text-gray-400 px-1">
         {points.map((p) => <span key={p.label}>{p.label}</span>)}
@@ -225,7 +226,7 @@ export default function DocumentViewer({ doc, onClose, onAsk }: Props) {
   if (!doc) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 font-patrick-hand">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div onClick={onClose} className="absolute inset-0 bg-black/40 animate-in fade-in" />
 

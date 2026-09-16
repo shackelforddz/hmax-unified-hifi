@@ -3,6 +3,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { GripVertical, RotateCcw, LayoutGrid, Check, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import AddWidgetDialog from "./add-widget-dialog";
+import { libraryWidget } from "./widget-library";
+import CustomWidgetView from "./sales/custom-widget-view";
+import { type CustomWidgetConfig } from "@/lib/custom-widget";
 
 /* A widget slot in the dashboard bento grid. Spans are out of 12 columns. */
 export interface GridItem {
@@ -53,14 +57,27 @@ const same = (a: string[], b: string[]) => a.length === b.length && a.every((x, 
 export default function DashboardGrid({
   storageKey,
   items,
-  onAddWidget,
 }: {
   storageKey: string;
   items: GridItem[];
-  /** Shown as the "Add custom widget" CTA on the right of the toolbar. */
-  onAddWidget?: () => void;
 }) {
-  const defaultOrder = useMemo(() => items.map((i) => i.id), [items]);
+  // Widgets the user added here - from the library, or built to order.
+  const [adding, setAdding] = useState(false);
+  const [libraryIds, setLibraryIds] = useState<string[]>([]);
+  const [customWidgets, setCustomWidgets] = useState<CustomWidgetConfig[]>([]);
+
+  const allItems = useMemo(() => {
+    const added: GridItem[] = [
+      ...libraryIds.flatMap((id) => {
+        const w = libraryWidget(id);
+        return w ? [{ id: `lib-${id}`, span: w.span, tile: true, node: w.render() }] : [];
+      }),
+      ...customWidgets.map((w) => ({ id: w.id, span: 6, tile: true, node: <CustomWidgetView config={w} /> })),
+    ];
+    return [...items, ...added];
+  }, [items, libraryIds, customWidgets]);
+
+  const defaultOrder = useMemo(() => allItems.map((i) => i.id), [allItems]);
   /** The committed layout. */
   const [order, setOrder] = useState<string[]>(defaultOrder);
   /** The in-progress layout while reorganizing; null when not editing. */
@@ -81,12 +98,12 @@ export default function DashboardGrid({
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setOrder((prev) => {
-      const next = reconcile(readOrder(storageKey), items);
+      const next = reconcile(readOrder(storageKey), allItems);
       return same(prev, next) ? prev : next;
     });
-  }, [storageKey, items]);
+  }, [storageKey, allItems]);
 
-  const byId = useMemo(() => new Map(items.map((i) => [i.id, i])), [items]);
+  const byId = useMemo(() => new Map(allItems.map((i) => [i.id, i])), [allItems]);
   // Pinned widgets always trail, wherever they end up in the saved order.
   const ordered = useMemo(() => {
     const live = active.map((id) => byId.get(id)).filter((i): i is GridItem => !!i);
@@ -131,10 +148,10 @@ export default function DashboardGrid({
   return (
     <>
       {/* Toolbar - reorganize on the left, add a widget on the right */}
-      <div className="flex items-center gap-2 -mb-1">
+      <div className="flex items-center gap-2 bg-secondary rounded-full px-2 py-2">
         {editing ? (
           <>
-            <span className="text-xs text-gray-400">Drag a widget by its handle to reorder, then save.</span>
+            <span className="text-xs text-gray-500 pl-1">Drag a widget by its handle to reorder, then save.</span>
             <div className="ml-auto flex items-center gap-2">
               {!isDefault && (
                 <button
@@ -157,25 +174,31 @@ export default function DashboardGrid({
           </>
         ) : (
           <>
-            <button
-              onClick={() => setDraft(order)}
-              className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
-            >
-              <LayoutGrid size={12} strokeWidth={1.5} />
+            <button onClick={() => setDraft(order)} className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:border-gray-400 transition-colors cursor-pointer shrink-0">
+              <LayoutGrid size={13} strokeWidth={1.5} />
               Reorganize
             </button>
-            {onAddWidget && (
-              <button
-                onClick={onAddWidget}
-                className="ml-auto flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
-              >
-                <Plus size={12} strokeWidth={1.5} />
-                Add custom widget
-              </button>
-            )}
+            <button onClick={() => setAdding(true)} className="ml-auto flex items-center gap-1.5 h-8 px-3 rounded-full bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:border-gray-400 transition-colors cursor-pointer shrink-0">
+              <Plus size={13} strokeWidth={1.5} />
+              Add widget
+            </button>
           </>
         )}
       </div>
+
+      {adding && (
+        <AddWidgetDialog
+          onDashboard={libraryIds}
+          onAddLibrary={(id) => {
+            setLibraryIds((ids) => (ids.includes(id) ? ids : [...ids, id]));
+          }}
+          onAddCustom={(config) => {
+            setCustomWidgets((ws) => [...ws, config]);
+            setAdding(false);
+          }}
+          onClose={() => setAdding(false)}
+        />
+      )}
 
       <div className="grid grid-cols-12 gap-4 items-stretch [&>*]:min-w-0 [&>.tile>*:not([data-grid-ui])]:h-full">
         {ordered.map((item) => {

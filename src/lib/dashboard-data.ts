@@ -25,14 +25,12 @@ export interface KpiData {
 
 /* Portfolio revenue - what has landed this month, and the whole book behind it. */
 export const PORTFOLIO_REVENUE = {
-  monthToDate: "£2.1m",
-  monthPlan: "£3.4m",
+  monthToDate: "€2.1m",
+  monthPlan: "€3.4m",
   monthPct: 62,
-  dayOfMonth: 11,
-  daysInMonth: 30,
   /** Total value of every active contract, not just what is recognised. */
-  contractValue: "£46.8m",
-  recognised: "£18.4m",
+  contractValue: "€46.8m",
+  recognised: "€18.4m",
 };
 
 /** The alert types a PM filters their attention list by. */
@@ -126,7 +124,7 @@ export const CUSTOMER_DETAILS: Record<string, CustomerDetail> = {
   "xcel-energy": {
     name: "Xcel Energy",
     subtitle: "Delivery at risk · North America",
-    stats: { owner: "Daniel Brooks", value: "$2.4m", margin: "14.2%", schedule: "18 days late", healthPct: 28 },
+    stats: { owner: "Daniel Brooks", value: "€2.4m", margin: "14.2%", schedule: "18 days late", healthPct: 28 },
     contextSummary:
       "Replacement of converter transformer windings on Units S-12 and S-14 at Sherco. The customer delivery date is contractually tied to the autumn outage window; slipping past 14 September pushes the work into the next available window in February.",
     recommendedActions: ["Adjust schedule", "Escalate delivery risk", "Raise gasket-set PO"],
@@ -139,7 +137,7 @@ export const CUSTOMER_DETAILS: Record<string, CustomerDetail> = {
     ],
     invoice: {
       readiness: "Blocked",
-      blocker: "Milestone 4 (site commissioning) not achieved - $1.2m invoice cannot be raised",
+      blocker: "Milestone 4 (site commissioning) not achieved - €1.2m invoice cannot be raised",
       criticalVendor: "Delta Coils Inc.",
     },
     ownership: {
@@ -151,12 +149,12 @@ export const CUSTOMER_DETAILS: Record<string, CustomerDetail> = {
       {
         title: "Project Phoenix will miss the customer delivery date by 18 days",
         detail:
-          "Slipping past 14 September pushes the work out of the autumn outage window into February. A $1.2m invoice moves into the next quarter and Xcel SLA negotiation loses its delivery reference.",
+          "Slipping past 14 September pushes the work out of the autumn outage window into February. A €1.2m invoice moves into the next quarter and Xcel SLA negotiation loses its delivery reference.",
       },
       {
         title: "Delta Coils Inc. is now the critical dependency on 6 projects",
         detail:
-          "A single vendor accounts for $4.8m of revenue at delivery risk across the portfolio. This is a concentration problem, not six separate delays.",
+          "A single vendor accounts for €4.8m of revenue at delivery risk across the portfolio. This is a concentration problem, not six separate delays.",
       },
       {
         title: "Vendor confirmation - conflicting",
@@ -175,14 +173,14 @@ export const CUSTOMER_DETAILS: Record<string, CustomerDetail> = {
       {
         title: "Project Phoenix will miss the customer delivery date by 18 days",
         detail:
-          "Slipping past 14 September pushes the work out of the autumn outage window into February. A $1.2m invoice moves into the next quarter and the Xcel SLA negotiation loses its delivery reference.",
+          "Slipping past 14 September pushes the work out of the autumn outage window into February. A €1.2m invoice moves into the next quarter and the Xcel SLA negotiation loses its delivery reference.",
         tags: ["SAP", "FSM", "Eng. Portal", "open 6d"],
         level: "Critical",
       },
       {
         title: "Delta Coils Inc. is now the critical dependency on 6 projects",
         detail:
-          "A single vendor accounts for $4.8m of revenue at delivery risk across the portfolio. This is a concentration problem, not six separate delays.",
+          "A single vendor accounts for €4.8m of revenue at delivery risk across the portfolio. This is a concentration problem, not six separate delays.",
         tags: ["SAP", "open 12d"],
         level: "High",
       },
@@ -212,21 +210,21 @@ export const CUSTOMER_DETAILS: Record<string, CustomerDetail> = {
     ],
     related: {
       customer: { title: "Xcel Energy", sub: "Transmission utility · North America · 1128 units" },
-      contract: { title: "Xcel Energy - 5-year HVDC Service Agreement", sub: "Xcel Energy - Service level agreement · $4.2m" },
+      contract: { title: "Xcel Energy - 5-year HVDC Service Agreement", sub: "Xcel Energy - Service level agreement · €4.2m" },
       assets: [
         { title: "S-12 - HVDC Converter Transformer", sub: "Xcel Energy - Sherco Converter Station, MN · Asset ID: 41" },
         { title: "S-14 - HVDC Converter Transformer", sub: "Xcel Energy - Sherco Converter Station, MN · Asset ID: 54" },
       ],
-      opportunity: { title: "Xcel Energy - 5-year HVDC Service Agreement", sub: "Xcel Energy - Contract renewal · $8.2m" },
+      opportunity: { title: "Xcel Energy - 5-year HVDC Service Agreement", sub: "Xcel Energy - Contract renewal · €8.2m" },
     },
   },
 
   siemens: {
     name: "Siemens",
     subtitle: "Invoice trigger pending · North Sea",
-    stats: { owner: "Sarah Mitchell", value: "£2.4m", margin: "11.8%", schedule: "In execution", healthPct: 46 },
+    stats: { owner: "Sarah Mitchell", value: "€2.4m", margin: "11.8%", schedule: "In execution", healthPct: 46 },
     contextSummary:
-      "Switchgear panel refurbishment across the North Sea platform cluster. A signed change order is outstanding, holding a £680k progress invoice below the trigger threshold and dragging reported margin 14 points under baseline.",
+      "Switchgear panel refurbishment across the North Sea platform cluster. A signed change order is outstanding, holding a €680k progress invoice below the trigger threshold and dragging reported margin 14 points under baseline.",
     recommendedActions: ["Raise change order", "Flag margin for review", "Document scope"],
     deliveryStatus: [
       { label: "Engineering approval", done: true, planned: "2026-05-02", actual: "2026-05-05" },
@@ -237,7 +235,7 @@ export const CUSTOMER_DETAILS: Record<string, CustomerDetail> = {
     ],
     invoice: {
       readiness: "Blocked",
-      blocker: "Change order CO-118 unsigned - £680k progress invoice cannot be raised",
+      blocker: "Change order CO-118 unsigned - €680k progress invoice cannot be raised",
       criticalVendor: "Nexans",
     },
     ownership: {
@@ -263,7 +261,7 @@ export const CUSTOMER_DETAILS: Record<string, CustomerDetail> = {
     ],
     openRisks: [
       {
-        title: "£680k progress invoice held below trigger",
+        title: "€680k progress invoice held below trigger",
         detail: "Unsigned change order keeps the milestone value under the billing threshold, deferring revenue into next quarter.",
         tags: ["SAP", "open 9d"],
         level: "High",
@@ -290,16 +288,16 @@ export const CUSTOMER_DETAILS: Record<string, CustomerDetail> = {
     ],
     related: {
       customer: { title: "Siemens", sub: "OEM partner · North Sea · 312 units" },
-      contract: { title: "Siemens - Switchgear Refurbishment Frame", sub: "Siemens - Service level agreement · £2.4m" },
+      contract: { title: "Siemens - Switchgear Refurbishment Frame", sub: "Siemens - Service level agreement · €2.4m" },
       assets: [{ title: "Panel cluster P-04 - MV Switchgear", sub: "Siemens - North Sea Platform B · Asset ID: 88" }],
-      opportunity: { title: "Siemens - Platform Modernisation", sub: "Siemens - Contract renewal · £5.1m" },
+      opportunity: { title: "Siemens - Platform Modernisation", sub: "Siemens - Contract renewal · €5.1m" },
     },
   },
 
   "baltic-wind-nl": {
     name: "Baltic Wind NL",
     subtitle: "Scope watch · North Sea",
-    stats: { owner: "Sarah Mitchell", value: "£2.4m", margin: "19.4%", schedule: "In execution", healthPct: 72 },
+    stats: { owner: "Sarah Mitchell", value: "€2.4m", margin: "19.4%", schedule: "In execution", healthPct: 72 },
     contextSummary:
       "Offshore transformer maintenance across the Baltic Wind NL array. Delivery is healthy, but two HSE certificates are approaching expiry and a verbally-agreed inspection extension has not been captured, creating a scope-creep watch item.",
     recommendedActions: ["Schedule cert renewal", "Document inspection extension"],
@@ -351,16 +349,16 @@ export const CUSTOMER_DETAILS: Record<string, CustomerDetail> = {
     ],
     related: {
       customer: { title: "Baltic Wind NL", sub: "Offshore operator · North Sea · 96 units" },
-      contract: { title: "Baltic Wind NL - Offshore Maintenance Frame", sub: "Baltic Wind NL - Service level agreement · £2.4m" },
+      contract: { title: "Baltic Wind NL - Offshore Maintenance Frame", sub: "Baltic Wind NL - Service level agreement · €2.4m" },
       assets: [{ title: "T-07 - Offshore Transformer", sub: "Baltic Wind NL - Array North · Asset ID: 33" }],
-      opportunity: { title: "Baltic Wind NL - Fleet Service Expansion", sub: "Baltic Wind NL - New scope · £3.6m" },
+      opportunity: { title: "Baltic Wind NL - Fleet Service Expansion", sub: "Baltic Wind NL - New scope · €3.6m" },
     },
   },
 
   "pacific-gas": {
     name: "Pacific Gas",
     subtitle: "Scope watch · North Sea",
-    stats: { owner: "Lena Fischer", value: "£440k", margin: "21.0%", schedule: "On schedule", healthPct: 81 },
+    stats: { owner: "Lena Fischer", value: "€440k", margin: "21.0%", schedule: "On schedule", healthPct: 81 },
     contextSummary:
       "Protection relay upgrade programme for Pacific Gas. Delivery is healthy and on schedule, but site access remains unresolved with only a verbal change order in place - a scope-creep item to formalise before the next mobilisation.",
     recommendedActions: ["Request written access", "Review access terms"],
@@ -408,9 +406,9 @@ export const CUSTOMER_DETAILS: Record<string, CustomerDetail> = {
     ],
     related: {
       customer: { title: "Pacific Gas", sub: "Distribution utility · North Sea · 540 units" },
-      contract: { title: "Pacific Gas - Protection Relay Upgrade", sub: "Pacific Gas - Service level agreement · £440k" },
+      contract: { title: "Pacific Gas - Protection Relay Upgrade", sub: "Pacific Gas - Service level agreement · €440k" },
       assets: [{ title: "R-21 - Protection Relay Bank", sub: "Pacific Gas - Substation West · Asset ID: 12" }],
-      opportunity: { title: "Pacific Gas - Grid Protection Programme", sub: "Pacific Gas - New scope · £1.9m" },
+      opportunity: { title: "Pacific Gas - Grid Protection Programme", sub: "Pacific Gas - New scope · €1.9m" },
     },
   },
 };
@@ -475,7 +473,7 @@ export const KPI_DATA: KpiData[] = [
     id: "revenue-mtd",
     label: "Revenue this month",
     value: PORTFOLIO_REVENUE.monthToDate,
-    trend: `${PORTFOLIO_REVENUE.monthPct}% of ${PORTFOLIO_REVENUE.monthPlan} plan · day ${PORTFOLIO_REVENUE.dayOfMonth} of ${PORTFOLIO_REVENUE.daysInMonth}`,
+    trend: `${PORTFOLIO_REVENUE.monthPct}% of ${PORTFOLIO_REVENUE.monthPlan} plan`,
     sparkline: "revenue-mtd",
     direction: "up",
   },
@@ -483,7 +481,7 @@ export const KPI_DATA: KpiData[] = [
     id: "portfolio-value",
     label: "Portfolio value",
     value: PORTFOLIO_REVENUE.contractValue,
-    trend: `${PORTFOLIO_HEALTH.activeContracts} contracts · ${PORTFOLIO_REVENUE.recognised} recognised`,
+    trend: `${PORTFOLIO_REVENUE.recognised} recognised`,
     sparkline: "portfolio-value",
     direction: "up",
   },
@@ -493,42 +491,42 @@ export const ATTENTION_ITEMS: AttentionItem[] = [
   {
     id: "xcel-energy",
     customer: "Xcel Energy",
-    meta: "Jan V. · $4.2M · Margin Risk",
+    meta: "Jan V. · €4.2M · Margin Risk",
     status: "critical",
     category: "progress",
     flags: [
       {
         title: "Will miss the customer delivery date by 18 days",
         detail:
-          "Slipping past 14 September pushes the work out of the autumn outage window into February. A $1.2m invoice moves into the next quarter and the Xcel SLA negotiation loses its delivery reference.",
+          "Slipping past 14 September pushes the work out of the autumn outage window into February. A €1.2m invoice moves into the next quarter and the Xcel SLA negotiation loses its delivery reference.",
         action: "Adjust Schedule",
         alertType: "Schedule",
-        impact: "$1.2m invoice deferred",
+        impact: "€1.2m invoice deferred",
       },
       {
         title: "Delta Coils Inc. is now the critical dependency on 6 projects",
         detail:
-          "A single vendor accounts for $4.8m of revenue at delivery risk across the portfolio. This is a concentration problem, not six separate delays.",
+          "A single vendor accounts for €4.8m of revenue at delivery risk across the portfolio. This is a concentration problem, not six separate delays.",
         action: "Reassign Vendor",
         alertType: "Spare parts",
-        impact: "$4.8m at delivery risk",
+        impact: "€4.8m at delivery risk",
       },
     ],
   },
   {
     id: "siemens",
     customer: "Siemens",
-    meta: "Sarah M. · North Sea · £2.4M · In execution",
+    meta: "Sarah M. · North Sea · €2.4M · In execution",
     status: "critical",
     category: "budget-invoicing",
     flags: [
       {
-        title: "Change order CO-118 unsigned - £680k invoice held",
+        title: "Change order CO-118 unsigned - €680k invoice held",
         detail:
           "The progress invoice can't be raised until CO-118 is signed, and reported margin sits 14pts under baseline until it's booked. Every week it stays unbooked pushes revenue into the next quarter.",
         action: "Raise Change Order",
         alertType: "Open case",
-        impact: "£680k invoice held",
+        impact: "€680k invoice held",
       },
       {
         title: "Verbal scope extension not yet documented",
@@ -543,7 +541,7 @@ export const ATTENTION_ITEMS: AttentionItem[] = [
   {
     id: "baltic-wind-nl",
     customer: "Baltic Wind NL",
-    meta: "Sarah M. · North Sea · £2.4M · In execution",
+    meta: "Sarah M. · North Sea · €2.4M · In execution",
     status: "at-risk",
     category: "scope-variations",
     flags: [
@@ -560,7 +558,7 @@ export const ATTENTION_ITEMS: AttentionItem[] = [
   {
     id: "pacific-gas",
     customer: "Pacific Gas",
-    meta: "Lena F. · North Sea · £440k",
+    meta: "Lena F. · North Sea · €440k",
     status: "at-risk",
     category: "site-access",
     flags: [
@@ -577,24 +575,24 @@ export const ATTENTION_ITEMS: AttentionItem[] = [
   {
     id: "comed",
     customer: "ComEd",
-    meta: "Marcus L. · Midwest · $4.8M · In execution",
+    meta: "Marcus L. · Midwest · €4.8M · In execution",
     status: "at-risk",
     category: "budget-invoicing",
     flags: [
       {
         title: "Progress invoice held pending milestone sign-off",
         detail:
-          "The substation upgrade milestone is complete but awaiting customer sign-off; a $1.1m progress invoice can't be raised until it clears.",
+          "The substation upgrade milestone is complete but awaiting customer sign-off; a €1.1m progress invoice can't be raised until it clears.",
         action: "Chase Sign-off",
         alertType: "Open case",
-        impact: "$1.1m invoice held",
+        impact: "€1.1m invoice held",
       },
     ],
   },
   {
     id: "aep-ohio",
     customer: "AEP Ohio",
-    meta: "Priya N. · Midwest · $6.2M · Mobilising",
+    meta: "Priya N. · Midwest · €6.2M · Mobilising",
     status: "at-risk",
     category: "progress",
     flags: [
@@ -699,13 +697,13 @@ export interface RiskBar {
   display: string;
 }
 export const REVENUE_AT_RISK: { total: string; caption: string; bars: RiskBar[] } = {
-  total: "$7.1m",
+  total: "€7.1m",
   caption: "revenue at risk this quarter",
   bars: [
-    { label: "Delivery slip", amount: 4.8, display: "$4.8m" },
-    { label: "Invoice blocked", amount: 1.2, display: "$1.2m" },
-    { label: "Change order unsigned", amount: 0.7, display: "$0.7m" },
-    { label: "Scope creep", amount: 0.4, display: "$0.4m" },
+    { label: "Delivery slip", amount: 4.8, display: "€4.8m" },
+    { label: "Invoice blocked", amount: 1.2, display: "€1.2m" },
+    { label: "Change order unsigned", amount: 0.7, display: "€0.7m" },
+    { label: "Scope creep", amount: 0.4, display: "€0.4m" },
   ],
 };
 
@@ -719,16 +717,18 @@ export interface ServicingVisit {
   due: string;
   dueIn: string;
   status: ServicingStatus;
+  /** The contract whose schedule this task sits on. */
+  contractId: string;
 }
 
 /* Scheduled maintenance drawn from the service schedules on OPS_CONTRACT_DETAILS,
-   flattened across the portfolio and ordered by how overdue it is. */
+   flattened across the portfolio, soonest first. */
 export const UPCOMING_SERVICING: ServicingVisit[] = [
-  { customer: "Xcel Energy", task: "DGA oil sampling", interval: "Monthly", owner: "Daniel B.", due: "15 Aug", dueIn: "27 days late", status: "late" },
-  { customer: "Siemens", task: "Switchgear inspection", interval: "6-monthly", owner: "Sarah M.", due: "28 Aug", dueIn: "14 days late", status: "late" },
-  { customer: "Siemens", task: "Relay function test", interval: "Quarterly", owner: "Sarah M.", due: "12 Sep", dueIn: "tomorrow", status: "at-risk" },
-  { customer: "Xcel Energy", task: "Bushing thermography", interval: "Quarterly", owner: "Daniel B.", due: "20 Sep", dueIn: "in 9 days", status: "on-track" },
-  { customer: "Pacific Gas", task: "Relay firmware upgrade", interval: "One-off", owner: "Lena F.", due: "21 Sep", dueIn: "in 10 days", status: "on-track" },
+  { customer: "Siemens", task: "Relay function test", interval: "Quarterly", owner: "Sarah M.", due: "12 Sep", dueIn: "tomorrow", status: "at-risk", contractId: "ct-northsea" },
+  { customer: "Xcel Energy", task: "DGA oil sampling", interval: "Monthly", owner: "Daniel B.", due: "16 Sep", dueIn: "in 5 days", status: "on-track", contractId: "ct-sherco" },
+  { customer: "Xcel Energy", task: "Bushing thermography", interval: "Quarterly", owner: "Daniel B.", due: "20 Sep", dueIn: "in 9 days", status: "on-track", contractId: "ct-sherco" },
+  { customer: "Pacific Gas", task: "Relay firmware upgrade", interval: "One-off", owner: "Lena F.", due: "21 Sep", dueIn: "in 10 days", status: "on-track", contractId: "ct-pacific" },
+  { customer: "Siemens", task: "Switchgear inspection", interval: "6-monthly", owner: "Sarah M.", due: "29 Sep", dueIn: "in 18 days", status: "on-track", contractId: "ct-northsea" },
 ];
 
 export interface VendorBar {
@@ -741,9 +741,9 @@ export interface VendorBar {
 export const VENDOR_CONCENTRATION: { caption: string; bars: VendorBar[] } = {
   caption: "revenue at risk by vendor",
   bars: [
-    { name: "Delta Coils Inc.", amount: 4.8, display: "$4.8m", projects: 6, critical: true },
-    { name: "Nexans", amount: 1.4, display: "$1.4m", projects: 3 },
-    { name: "Nynas AB", amount: 0.6, display: "$0.6m", projects: 2 },
-    { name: "Air Liquide", amount: 0.3, display: "$0.3m", projects: 1 },
+    { name: "Delta Coils Inc.", amount: 4.8, display: "€4.8m", projects: 6, critical: true },
+    { name: "Nexans", amount: 1.4, display: "€1.4m", projects: 3 },
+    { name: "Nynas AB", amount: 0.6, display: "€0.6m", projects: 2 },
+    { name: "Air Liquide", amount: 0.3, display: "€0.3m", projects: 1 },
   ],
 };

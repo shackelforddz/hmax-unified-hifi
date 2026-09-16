@@ -22,14 +22,14 @@ interface Estate {
   status: OpsContract["status"];
 }
 
-/** "£4.2m" / "£440k" -> millions. */
+/** "€4.2m" / "€440k" -> millions. */
 function parseValue(v: string): number {
   const n = parseFloat(v.replace(/[^0-9.]/g, ""));
   return /k\b/i.test(v) ? n / 1000 : n;
 }
 
 function fmtValue(m: number): string {
-  return m >= 1 ? `£${m.toFixed(1)}m` : `£${Math.round(m * 1000)}k`;
+  return m >= 1 ? `€${m.toFixed(1)}m` : `€${Math.round(m * 1000)}k`;
 }
 
 function coveredAssets(contract: OpsContract) {
@@ -56,7 +56,7 @@ const ESTATES: Estate[] = [...new Set(OPS_CONTRACTS.map((c) => c.customer))]
 function StatusBadge({ status }: { status: string }) {
   const critical = status === "critical" || status === "Critical";
   const atRisk = status === "at-risk" || status === "At risk";
-  const cls = critical ? "bg-black text-white" : atRisk ? "border border-gray-400 text-gray-700" : "border border-gray-200 text-gray-400";
+  const cls = critical ? "bg-status-critical text-white font-bold" : atRisk ? "border border-gray-400 text-gray-700" : "border border-gray-200 text-gray-400";
   const label = critical ? "Critical" : atRisk ? "At risk" : status === "In service" ? "In service" : "On track";
   return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{label}</span>;
 }
@@ -66,7 +66,7 @@ function HealthBar({ pct }: { pct: number }) {
   return (
     <div className="flex items-center gap-2 min-w-[110px]">
       <div className="relative flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-        <div className={`h-full rounded-full ${low ? "bg-gray-900" : "bg-gray-400"}`} style={{ width: `${pct}%` }} />
+        <div className={`h-full rounded-full ${low ? "bg-status-critical" : "bg-chart-line"}`} style={{ width: `${pct}%` }} />
       </div>
       <span className={`text-xs shrink-0 ${low ? "text-gray-900" : "text-gray-400"}`}>{pct}%</span>
     </div>

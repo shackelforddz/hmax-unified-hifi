@@ -55,6 +55,36 @@ export function groupByUrgency(alerts: AlertItem[]): [AlertUrgency, AlertItem[]]
   );
 }
 
+const URGENCY_RANK: Record<AlertUrgency, number> = { critical: 0, "at-risk": 1, watch: 2, proposed: 3 };
+
+/** Trim a list down to the `limit` most pressing alerts. Takes the top alert
+ *  from each entity before taking a second from any one of them, so a single
+ *  noisy contract or account can't fill the whole widget on its own. */
+export function topAlerts(all: AlertItem[], limit: number): AlertItem[] {
+  if (all.length <= limit) return all;
+
+  const byEntity = new Map<string, AlertItem[]>();
+  for (const a of all) {
+    const list = byEntity.get(a.detailId) ?? [];
+    list.push(a);
+    byEntity.set(a.detailId, list);
+  }
+  // Most severe entity first, so the round-robin starts where it matters.
+  const queues = [...byEntity.values()].sort((a, b) => URGENCY_RANK[a[0].urgency] - URGENCY_RANK[b[0].urgency]);
+
+  const out: AlertItem[] = [];
+  for (let round = 0; out.length < limit; round++) {
+    const before = out.length;
+    for (const q of queues) {
+      if (out.length === limit) break;
+      if (q[round]) out.push(q[round]);
+    }
+    if (out.length === before) break; // every queue exhausted
+  }
+  // Keep the caller's original ordering within the surviving set.
+  return all.filter((a) => out.includes(a));
+}
+
 /** Type filter options in first-seen order. */
 export function typesOf(alerts: AlertItem[]): string[] {
   return [...new Set(alerts.map((a) => a.type))];
@@ -70,10 +100,10 @@ export function customersOf(alerts: AlertItem[]): string[] {
   return [...new Set(alerts.map((a) => a.customer))].sort((a, b) => a.localeCompare(b));
 }
 
-const VALUE_RE = /^[£$€]/;
+const VALUE_RE = /^[€$£]/;
 const OWNER_RE = /^[A-Z][a-zA-Z'-]+ [A-Z]\.?$/;
 
-/** Several records carry their meta as one display string ("Jan V. · $4.2M ·
+/** Several records carry their meta as one display string ("Jan V. · €4.2M ·
  *  Margin Risk"). Split it and label the segments we can recognise; the rest
  *  ride along unlabelled rather than being dropped or given a made-up label. */
 export function parseMetaString(meta: string): AlertMetaItem[] {

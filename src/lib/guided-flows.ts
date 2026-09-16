@@ -88,7 +88,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
         fields: [
           { type: "text", label: "Contract", value: "Sherco HVDC winding replacement", star: true },
           { type: "chips", label: "Reason", options: ["Scope addition", "Weather standby", "Site access", "Variation"], value: "Scope addition" },
-          { type: "text", label: "Value", value: "£320k", star: true },
+          { type: "text", label: "Value", value: "€320k", star: true },
           { type: "textarea", label: "Description", value: "Additional winding sets beyond the original contract scope; requires technical review before pricing is booked.", full: true },
         ],
       },
@@ -140,7 +140,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
     match: /\b(create|draft|raise|generate|issue)\b.*\binvoice\b/,
     intro: "Let's draft an invoice - I'll pull the milestone and contract details.",
     cta: "Create invoice",
-    done: "✓ Invoice INV-3310 drafted for £1.2m.\n\nIt's tied to the milestone on the Sherco HVDC contract and ready for review before sending to Xcel Energy.",
+    done: "✓ Invoice INV-3310 drafted for €1.2m.\n\nIt's tied to the milestone on the Sherco HVDC contract and ready for review before sending to Xcel Energy.",
     doneSuggestions: ["Preview the invoice", "Send to the customer", "Change the payment terms"],
     entity: { kind: "contract", id: "ct-sherco" },
     steps: [
@@ -152,7 +152,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
           { type: "text", label: "Customer", value: "Xcel Energy", star: true },
           { type: "text", label: "Contract", value: "Sherco HVDC winding replacement" },
           { type: "text", label: "Milestone", value: "Engineering approval", star: true },
-          { type: "text", label: "Amount", value: "£1.2m", star: true },
+          { type: "text", label: "Amount", value: "€1.2m", star: true },
         ],
       },
       {
@@ -213,7 +213,7 @@ export const GUIDED_FLOWS: GuidedFlow[] = [
           { type: "text", label: "Customer", value: "ComEd", star: true },
           { type: "text", label: "Current SLA", value: "5-year Service Agreement" },
           { type: "date", label: "Expiry", value: "2026-12-31" },
-          { type: "text", label: "Annual value", value: "£1.8m" },
+          { type: "text", label: "Annual value", value: "€1.8m" },
         ],
       },
       {

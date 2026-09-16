@@ -11,10 +11,10 @@ export const PORTFOLIO_HEALTH = {
   executedMargin: "18.6%",
   asSoldMargin: "19.4%",
   marginDelta: "-0.8pp",
-  revenue: "£18.4m",
-  revenueForecast: "£18.9m",
-  revenueDelta: "-£0.5m",
-  outstandingPayments: "£2.3m",
+  revenue: "€18.4m",
+  revenueForecast: "€18.9m",
+  revenueDelta: "-€0.5m",
+  outstandingPayments: "€2.3m",
   outstandingNote: "4 invoices overdue",
   resourceNote: "3 roles to fill",
 };
@@ -68,15 +68,15 @@ const RAW_CONTRACTS: Omit<OpsContract, "progress">[] = [
     name: "Sherco HVDC winding replacement",
     customer: "Xcel Energy",
     owner: "Daniel Brooks",
-    value: "£4.2m",
+    value: "€4.2m",
     status: "critical",
     start: "2026-06-01",
     end: "2026-12-15",
     risk: { schedule: "high", cost: "med", quality: "low", safety: "med" },
     alerts: [
-      { category: "delivery", title: "18 days behind baseline - outage window at risk", detail: "Field mobilization slipped and the work is now tracking 18 days behind. Missing the 14 September outage window pushes delivery into February and defers a £1.2m milestone invoice.", action: "Adjust Schedule", impact: "£1.2m invoice deferred" },
+      { category: "delivery", title: "18 days behind baseline - outage window at risk", detail: "Field mobilization slipped and the work is now tracking 18 days behind. Missing the 14 September outage window pushes delivery into February and defers a €1.2m milestone invoice.", action: "Adjust Schedule", impact: "€1.2m invoice deferred" },
       { category: "delivery", title: "Delta Coils is the critical path on winding sets", detail: "A single vendor gates the remaining scope; a further slip cascades across six projects.", action: "Reassign Vendor", impact: "6 projects exposed" },
-      { category: "change-order", title: "Change order CO-204 · Additional winding sets - £320k", detail: "Scope adds two winding sets beyond the original contract. Review the technical impact and price before it's booked to release progress invoicing.", action: "Review change order", impact: "£320k unbooked" },
+      { category: "change-order", title: "Change order CO-204 · Additional winding sets - €320k", detail: "Scope adds two winding sets beyond the original contract. Review the technical impact and price before it's booked to release progress invoicing.", action: "Review change order", impact: "€320k unbooked" },
       { category: "quality", title: "NCR-071 · Weld porosity on winding set 2", detail: "QA radiography flagged porosity above the acceptance criteria on the second winding set. Disposition the non-conformance before assembly continues.", action: "Review NCR", impact: "Assembly on hold" },
       { category: "hse", title: "HSE complaint · Dropped-load near-miss during lift", detail: "A dropped-load near-miss was reported during the winding lift. HSE has opened a RIDDOR review - confirm the lifting-plan corrective actions.", action: "Review HSE report", impact: "RIDDOR review open" },
     ],
@@ -86,15 +86,15 @@ const RAW_CONTRACTS: Omit<OpsContract, "progress">[] = [
     name: "North Sea switchgear refurbishment",
     customer: "Siemens",
     owner: "Sarah Mitchell",
-    value: "£2.4m",
+    value: "€2.4m",
     status: "critical",
     start: "2026-04-15",
     end: "2027-02-01",
     risk: { schedule: "high", cost: "high", quality: "med", safety: "low" },
     alerts: [
       { category: "delivery", title: "Crew over-allocated across the platform cluster", detail: "Field Service is at 96% utilisation with no slack for the additional protection-relay scope.", action: "Rebalance Crew", impact: "No slack for relay scope" },
-      { category: "change-order", title: "Change order CO-118 · Protection-relay scope extension - £680k", detail: "Progress invoicing is blocked and reported margin sits 14pts under baseline until this change order is booked. Review and raise it for signature.", action: "Review change order", impact: "£680k invoice held" },
-      { category: "change-order", title: "Change order CO-131 · Weather standby days - £120k", detail: "Additional weather standby days claimed by the vessel operator. Verify the logs and approve before booking.", action: "Review change order", impact: "£120k unverified" },
+      { category: "change-order", title: "Change order CO-118 · Protection-relay scope extension - €680k", detail: "Progress invoicing is blocked and reported margin sits 14pts under baseline until this change order is booked. Review and raise it for signature.", action: "Review change order", impact: "€680k invoice held" },
+      { category: "change-order", title: "Change order CO-131 · Weather standby days - €120k", detail: "Additional weather standby days claimed by the vessel operator. Verify the logs and approve before booking.", action: "Review change order", impact: "€120k unverified" },
       { category: "hse", title: "HSE complaint · Working-at-height PPE non-use", detail: "A subcontractor was reported working at height without fall arrest. An HSE complaint is open - verify the toolbox-talk and re-induction records.", action: "Review HSE report", impact: "HSE complaint open" },
     ],
   },
@@ -103,7 +103,7 @@ const RAW_CONTRACTS: Omit<OpsContract, "progress">[] = [
     name: "Baltic array transformer maintenance",
     customer: "Baltic Wind NL",
     owner: "Sarah Mitchell",
-    value: "£2.4m",
+    value: "€2.4m",
     status: "at-risk",
     start: "2025-11-01",
     end: "2026-10-15",
@@ -119,14 +119,14 @@ const RAW_CONTRACTS: Omit<OpsContract, "progress">[] = [
     name: "Protection relay upgrade",
     customer: "Pacific Gas",
     owner: "Lena Fischer",
-    value: "£440k",
+    value: "€440k",
     status: "at-risk",
     start: "2026-07-01",
     end: "2027-03-01",
     risk: { schedule: "med", cost: "low", quality: "low", safety: "med" },
     alerts: [
       { category: "delivery", title: "Site access unresolved - verbal only", detail: "Only a verbal arrangement is in place; a written access agreement is required before the crew can mobilise.", action: "Request Written Access", impact: "Crew cannot mobilise" },
-      { category: "change-order", title: "Change order CO-241 · Written site-access agreement - £15k", detail: "Only a verbal access arrangement is in place. Review and issue the written change order before the crew can mobilise.", action: "Review change order", impact: "£15k unissued" },
+      { category: "change-order", title: "Change order CO-241 · Written site-access agreement - €15k", detail: "Only a verbal access arrangement is in place. Review and issue the written change order before the crew can mobilise.", action: "Review change order", impact: "€15k unissued" },
     ],
   },
 ];
@@ -167,7 +167,7 @@ export interface OpsContractDetail {
 export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
   "ct-sherco": {
     summary:
-      "HVDC converter-transformer winding replacement at Sherco. Execution is 18 days behind baseline after a field-mobilization slip, putting the contractually-tied autumn outage window at risk and deferring a £1.2m milestone invoice.",
+      "HVDC converter-transformer winding replacement at Sherco. Execution is 18 days behind baseline after a field-mobilization slip, putting the contractually-tied autumn outage window at risk and deferring a €1.2m milestone invoice.",
     recommendedActions: ["Adjust schedule", "Escalate delivery risk", "Reassign vendor"],
     milestones: [
       { label: "Engineering approval", done: true, planned: "2026-06-12", actual: "2026-06-16" },
@@ -208,22 +208,22 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { name: "Karen Ellis", role: "Asset Manager · Xcel Energy", email: "k.ellis@xcelenergy.com", phone: "+1 612 555 0142" },
       { name: "Raj Patel", role: "Procurement Lead", email: "r.patel@xcelenergy.com", phone: "+1 612 555 0177" },
     ],
-    finance: { revenue: "£4.2m", netMargin: "16.2%", asSoldMargin: "18.6%", invoiced: "£2.4m", outstanding: "£1.2m" },
+    finance: { revenue: "€4.2m", netMargin: "16.2%", asSoldMargin: "18.6%", invoiced: "€2.4m", outstanding: "€1.2m" },
     invoices: [
-      { code: "INV-3301", milestone: "Engineering approval", amount: "£0.8m", status: "Paid", due: "2026-06-30" },
-      { code: "INV-3302", milestone: "Material delivery", amount: "£1.6m", status: "Overdue", due: "2026-08-15" },
-      { code: "INV-3310", milestone: "Field mobilization", amount: "£1.2m", status: "Draft", due: "2026-09-30" },
+      { code: "INV-3301", milestone: "Engineering approval", amount: "€0.8m", status: "Paid", due: "2026-06-30" },
+      { code: "INV-3302", milestone: "Material delivery", amount: "€1.6m", status: "Overdue", due: "2026-08-15" },
+      { code: "INV-3310", milestone: "Field mobilization", amount: "€1.2m", status: "Draft", due: "2026-09-30" },
     ],
     payments: [
-      { date: "2026-07-02", event: "INV-3301 paid", amount: "+£0.8m" },
-      { date: "2026-08-15", event: "INV-3302 overdue", amount: "£1.6m" },
-      { date: "2026-09-30", event: "INV-3310 milestone invoice - at risk", amount: "£1.2m" },
+      { date: "2026-07-02", event: "INV-3301 paid", amount: "+€0.8m" },
+      { date: "2026-08-15", event: "INV-3302 overdue", amount: "€1.6m" },
+      { date: "2026-09-30", event: "INV-3310 milestone invoice - at risk", amount: "€1.2m" },
     ],
-    related: { customer: "Xcel Energy", value: "£4.2m", region: "North America" },
+    related: { customer: "Xcel Energy", value: "€4.2m", region: "North America" },
   },
   "ct-northsea": {
     summary:
-      "Switchgear refurbishment across the North Sea platform cluster. A signed change order is outstanding, holding a £680k progress invoice and dragging reported margin 14pts under baseline; the crew is also over-allocated for the added scope.",
+      "Switchgear refurbishment across the North Sea platform cluster. A signed change order is outstanding, holding a €680k progress invoice and dragging reported margin 14pts under baseline; the crew is also over-allocated for the added scope.",
     recommendedActions: ["Raise change order", "Rebalance crew", "Flag margin for review"],
     milestones: [
       { label: "Engineering approval", done: true, planned: "2026-05-02", actual: "2026-05-05" },
@@ -232,7 +232,7 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { label: "Change order sign-off", done: false, planned: "2026-08-25" },
     ],
     risks: [
-      { title: "Invoice blocked", detail: "£680k held until CO-118 is signed.", level: "High" },
+      { title: "Invoice blocked", detail: "€680k held until CO-118 is signed.", level: "High" },
       { title: "Crew over-allocation", detail: "Field Service at 96% with no slack.", level: "Medium" },
     ],
     team: [
@@ -261,18 +261,18 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { name: "Ingrid Vos", role: "Programme Manager · Siemens", email: "i.vos@siemens.com", phone: "+44 20 7946 0321" },
       { name: "Mark Reid", role: "Commercial Contact", email: "m.reid@siemens.com", phone: "+44 20 7946 0388" },
     ],
-    finance: { revenue: "£2.4m", netMargin: "4.6%", asSoldMargin: "18.6%", invoiced: "£1.1m", outstanding: "£0.68m" },
+    finance: { revenue: "€2.4m", netMargin: "4.6%", asSoldMargin: "18.6%", invoiced: "€1.1m", outstanding: "€0.68m" },
     invoices: [
-      { code: "INV-2811", milestone: "Engineering approval", amount: "£0.5m", status: "Paid", due: "2026-05-30" },
-      { code: "INV-2818", milestone: "Material delivery", amount: "£0.6m", status: "Sent", due: "2026-07-30" },
-      { code: "INV-2825", milestone: "CO-118 progress", amount: "£0.68m", status: "Draft", due: "2026-09-05" },
+      { code: "INV-2811", milestone: "Engineering approval", amount: "€0.5m", status: "Paid", due: "2026-05-30" },
+      { code: "INV-2818", milestone: "Material delivery", amount: "€0.6m", status: "Sent", due: "2026-07-30" },
+      { code: "INV-2825", milestone: "CO-118 progress", amount: "€0.68m", status: "Draft", due: "2026-09-05" },
     ],
     payments: [
-      { date: "2026-06-04", event: "INV-2811 paid", amount: "+£0.5m" },
-      { date: "2026-08-02", event: "INV-2818 paid", amount: "+£0.6m" },
-      { date: "2026-09-05", event: "INV-2825 blocked until CO-118 signed", amount: "£0.68m" },
+      { date: "2026-06-04", event: "INV-2811 paid", amount: "+€0.5m" },
+      { date: "2026-08-02", event: "INV-2818 paid", amount: "+€0.6m" },
+      { date: "2026-09-05", event: "INV-2825 blocked until CO-118 signed", amount: "€0.68m" },
     ],
-    related: { customer: "Siemens", value: "£2.4m", region: "North Sea" },
+    related: { customer: "Siemens", value: "€2.4m", region: "North Sea" },
   },
   "ct-baltic": {
     summary:
@@ -308,16 +308,16 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
     contacts: [
       { name: "Femke Bakker", role: "O&M Manager · Baltic Wind NL", email: "f.bakker@balticwind.nl", phone: "+31 10 555 2210" },
     ],
-    finance: { revenue: "£2.4m", netMargin: "17.1%", asSoldMargin: "18.2%", invoiced: "£1.9m", outstanding: "£0.5m" },
+    finance: { revenue: "€2.4m", netMargin: "17.1%", asSoldMargin: "18.2%", invoiced: "€1.9m", outstanding: "€0.5m" },
     invoices: [
-      { code: "INV-4102", milestone: "Field execution", amount: "£1.9m", status: "Paid", due: "2026-08-10" },
-      { code: "INV-4108", milestone: "HSE cert renewal visit", amount: "£0.5m", status: "Draft", due: "2026-09-15" },
+      { code: "INV-4102", milestone: "Field execution", amount: "€1.9m", status: "Paid", due: "2026-08-10" },
+      { code: "INV-4108", milestone: "HSE cert renewal visit", amount: "€0.5m", status: "Draft", due: "2026-09-15" },
     ],
     payments: [
-      { date: "2026-08-12", event: "INV-4102 paid", amount: "+£1.9m" },
-      { date: "2026-09-15", event: "INV-4108 pending cert renewal", amount: "£0.5m" },
+      { date: "2026-08-12", event: "INV-4102 paid", amount: "+€1.9m" },
+      { date: "2026-09-15", event: "INV-4108 pending cert renewal", amount: "€0.5m" },
     ],
-    related: { customer: "Baltic Wind NL", value: "£2.4m", region: "North Sea" },
+    related: { customer: "Baltic Wind NL", value: "€2.4m", region: "North Sea" },
   },
   "ct-pacific": {
     summary:
@@ -350,39 +350,79 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
     contacts: [
       { name: "Diego Ramos", role: "Substation Manager · Pacific Gas", email: "d.ramos@pge.com", phone: "+1 415 555 0190" },
     ],
-    finance: { revenue: "£440k", netMargin: "19.8%", asSoldMargin: "20.1%", invoiced: "£180k", outstanding: "£0" },
+    finance: { revenue: "€440k", netMargin: "19.8%", asSoldMargin: "20.1%", invoiced: "€180k", outstanding: "€0" },
     invoices: [
-      { code: "INV-1904", milestone: "Material delivery", amount: "£180k", status: "Paid", due: "2026-07-10" },
-      { code: "INV-1909", milestone: "Field execution", amount: "£260k", status: "Draft", due: "2026-09-30" },
+      { code: "INV-1904", milestone: "Material delivery", amount: "€180k", status: "Paid", due: "2026-07-10" },
+      { code: "INV-1909", milestone: "Field execution", amount: "€260k", status: "Draft", due: "2026-09-30" },
     ],
     payments: [
-      { date: "2026-07-11", event: "INV-1904 paid", amount: "+£180k" },
-      { date: "2026-09-30", event: "INV-1909 pending site access", amount: "£260k" },
+      { date: "2026-07-11", event: "INV-1904 paid", amount: "+€180k" },
+      { date: "2026-09-30", event: "INV-1909 pending site access", amount: "€260k" },
     ],
-    related: { customer: "Pacific Gas", value: "£440k", region: "North Sea" },
+    related: { customer: "Pacific Gas", value: "€440k", region: "North Sea" },
   },
 };
 
 /* Financial Performance */
-export const FINANCIALS = {
+export interface MarginCause {
+  label: string;
+  impact: string;
+}
+export interface MarginPoint {
+  label: string;
+  value: number;
+  /** What moved margin that month - revealed by clicking the point. */
+  causes: MarginCause[];
+}
+
+export const FINANCIALS: {
+  forecastMargin: string;
+  revenue: string;
+  cost: string;
+  marginVsPlan: string;
+  trend: MarginPoint[];
+  planMargin: number;
+} = {
   forecastMargin: "18.6%",
-  revenue: "£18.4m",
-  cost: "£15.0m",
+  revenue: "€18.4m",
+  cost: "€15.0m",
   marginVsPlan: "-0.8pp",
   trend: [
-    { label: "Mar", value: 19.4 },
-    { label: "Apr", value: 19.1 },
-    { label: "May", value: 18.9 },
-    { label: "Jun", value: 18.8 },
-    { label: "Jul", value: 18.6 },
-    { label: "Aug", value: 18.6 },
+    { label: "Mar", value: 19.4, causes: [] },
+    {
+      label: "Apr",
+      value: 19.1,
+      causes: [{ label: "Baltic array rework", impact: "−0.3pp" }],
+    },
+    {
+      label: "May",
+      value: 18.9,
+      causes: [{ label: "Nexans cable price uplift", impact: "−0.2pp" }],
+    },
+    {
+      label: "Jun",
+      value: 18.8,
+      causes: [{ label: "AEP Ohio mobilisation overrun", impact: "−0.1pp" }],
+    },
+    {
+      label: "Jul",
+      value: 18.6,
+      causes: [
+        { label: "Delta Coils vendor delay", impact: "−0.2pp" },
+        { label: "Scope creep (unbilled)", impact: "−0.1pp" },
+      ],
+    },
+    {
+      label: "Aug",
+      value: 18.6,
+      causes: [
+        { label: "Siemens change order unbooked", impact: "−0.5pp" },
+        { label: "Delta Coils vendor delay", impact: "−0.2pp" },
+        { label: "Scope creep (unbilled)", impact: "−0.1pp" },
+      ],
+    },
   ],
   planMargin: 19.4,
-  causes: [
-    { label: "Siemens change order unbooked", impact: "−0.5pp" },
-    { label: "Delta Coils vendor delay", impact: "−0.2pp" },
-    { label: "Scope creep (unbilled)", impact: "−0.1pp" },
-  ],
 };
 
 /* ── Response time ───────────────────────────────────────────────────
@@ -413,9 +453,9 @@ export const RESPONSE_TIME = {
    What has been invoiced against what has actually landed, plus how
    long the unpaid balance has been sitting. */
 export const REVENUE_TIMING = {
-  invoiced: "£16.1m",
-  collected: "£13.8m",
-  outstanding: "£2.3m",
+  invoiced: "€16.1m",
+  collected: "€13.8m",
+  outstanding: "€2.3m",
   points: [
     { label: "Mar", invoiced: 2.4, collected: 2.3 },
     { label: "Apr", invoiced: 2.8, collected: 2.6 },

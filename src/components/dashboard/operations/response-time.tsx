@@ -2,6 +2,7 @@
 
 import { ArrowDown } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer } from "recharts";
+import { CHART } from "@/lib/chart-theme";
 import { RESPONSE_TIME as R } from "@/lib/operations-data";
 import WidgetChat from "@/components/dashboard/widget-chat";
 
@@ -11,13 +12,12 @@ export default function ResponseTime() {
       <div className="flex items-start justify-between mb-1">
         <div>
           <h3 className="text-base text-gray-900">Response time</h3>
-          <p className="text-sm text-gray-400 mt-0.5">First qualified response vs {R.target}h SLA · 6 months</p>
         </div>
         <WidgetChat title="Response time" />
       </div>
 
       <div className="flex items-end gap-2 mb-3">
-        <span className="text-3xl text-gray-900 leading-none">{R.current}</span>
+        <span className="text-3xl font-bold text-gray-900 leading-none">{R.current}</span>
         <span className="flex items-center gap-0.5 text-xs text-gray-400 mb-0.5">
           <ArrowDown size={11} strokeWidth={2} />
           {R.delta}
@@ -29,8 +29,8 @@ export default function ResponseTime() {
           <AreaChart data={R.points} margin={{ top: 12, right: 14, bottom: 0, left: 14 }}>
             <defs>
               <linearGradient id="responseArea" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#171717" stopOpacity={0.15} />
-                <stop offset="100%" stopColor="#171717" stopOpacity={0} />
+                <stop offset="0%" stopColor={CHART.fill} stopOpacity={0.18} />
+                <stop offset="100%" stopColor={CHART.fill} stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis dataKey="label" interval={0} tick={{ fontSize: 10, fill: "#A3A3A3" }} tickLine={false} axisLine={false} />
@@ -44,10 +44,10 @@ export default function ResponseTime() {
             <Area
               type="monotone"
               dataKey="value"
-              stroke="#171717"
+              stroke={CHART.line}
               strokeWidth={2}
               fill="url(#responseArea)"
-              dot={{ r: 2, fill: "#ffffff", stroke: "#171717", strokeWidth: 1.5 }}
+              dot={{ r: 2, fill: "#ffffff", stroke: CHART.line, strokeWidth: 1.5 }}
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -60,7 +60,7 @@ export default function ResponseTime() {
             <span className="text-xs text-gray-500 w-16 shrink-0">{p.label}</span>
             <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full ${p.within >= 90 ? "bg-gray-900" : "bg-gray-400"}`}
+                className={`h-full rounded-full ${p.within >= 90 ? "bg-chart-line" : "bg-status-warning"}`}
                 style={{ width: `${p.within}%` }}
               />
             </div>

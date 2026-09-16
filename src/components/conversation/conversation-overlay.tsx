@@ -409,7 +409,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
           role: "ai",
           kind: "text",
           text:
-            "✓ Lead created and added to your pipeline.\n\nDuke Energy - Fleet reliability program is now in Discovery ($5.4M, Premium). Next steps: qualify the budget and capture the account & shipping details to move it toward Scoping.",
+            "✓ Lead created and added to your pipeline.\n\nDuke Energy - Fleet reliability program is now in Discovery (€5.4M, Premium). Next steps: qualify the budget and capture the account & shipping details to move it toward Scoping.",
           suggestions: {
             prompts: ["What's needed to reach the Offer stage?", "Show the Duke Energy fleet", "Draft a qualification plan"],
             actions: [
@@ -537,7 +537,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
             {!started ? (
               /* Welcome */
               <div className="w-full animate-message-in">
-                <h1 className="font-patrick-hand text-3xl text-gray-900 text-center mb-10">
+                <h1 className=" text-3xl text-gray-900 text-center mb-10">
                   Create A New Conversation
                 </h1>
                 <div className="grid grid-cols-3 gap-3">
