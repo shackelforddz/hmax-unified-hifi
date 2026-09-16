@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract } from "@/lib/operations-data";
 import { CUSTOMER_DETAILS } from "@/lib/dashboard-data";
+import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
 
 /** "Baltic Wind NL" -> "baltic-wind-nl", the CUSTOMER_DETAILS key. */
 function slug(name: string): string {
@@ -71,13 +72,11 @@ function DrillRow({ onClick, children }: { onClick: () => void; children: React.
 interface Props {
   customer: string | null;
   onClose: () => void;
-  /** Swap this drawer for the contract's own detail drawer. */
-  onOpenContract: (contractId: string) => void;
-  /** Swap this drawer for the asset's own detail drawer. */
-  onOpenAsset: (assetCode: string, contractId: string) => void;
 }
 
-export default function CustomerDrawer({ customer, onClose, onOpenContract, onOpenAsset }: Props) {
+export default function CustomerDrawer({ customer, onClose }: Props) {
+  // Contracts and assets open over this drawer.
+  const drawers = useDetailDrawers();
   const contracts: OpsContract[] = customer ? OPS_CONTRACTS.filter((c) => c.customer === customer) : [];
   const open = !!customer && contracts.length > 0;
   const launch = useConversationLauncher();
@@ -201,7 +200,7 @@ export default function CustomerDrawer({ customer, onClose, onOpenContract, onOp
                 </div>
                 <div className="flex flex-col">
                   {contracts.map((c) => (
-                    <DrillRow key={c.id} onClick={() => onOpenContract(c.id)}>
+                    <DrillRow key={c.id} onClick={() => drawers?.openContract({ kind: "ops", id: c.id })}>
                       <span className="flex-1 min-w-0">
                         <span className="block text-sm text-gray-700 truncate group-hover:text-gray-900 transition-colors">{c.name}</span>
                         <span className="block text-xs text-gray-400">
@@ -221,7 +220,7 @@ export default function CustomerDrawer({ customer, onClose, onOpenContract, onOp
                 </div>
                 <div className="flex flex-col">
                   {assets.map((a) => (
-                    <DrillRow key={a.code} onClick={() => onOpenAsset(a.code, a.contractId)}>
+                    <DrillRow key={a.code} onClick={() => drawers?.openAsset(a.code.toLowerCase())}>
                       <span className="flex-1 min-w-0">
                         <span className="block text-sm text-gray-700 truncate group-hover:text-gray-900 transition-colors">{a.code}</span>
                         <span className="block text-xs text-gray-400 truncate">{a.type}</span>

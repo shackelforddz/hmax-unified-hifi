@@ -14,6 +14,7 @@ import {
 } from "@/lib/dashboard-data";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "./conversation-launcher";
+import { AssetLink, ContractLink } from "@/components/dashboard/detail-drawers";
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
@@ -252,8 +253,8 @@ function DrawerBody({ d, onAction }: { d: CustomerDetail; onAction: (prompt: str
         <p className="text-xs text-gray-400 mb-4">The context around this object, not a copy of it.</p>
         <div className="flex flex-col gap-4">
           <RelatedGroup label="Customer" icon={<Building2 size={15} className="text-gray-400" />} refs={[d.related.customer]} />
-          <RelatedGroup label="Contract" icon={<FileText size={15} className="text-gray-400" />} refs={[d.related.contract]} />
-          <RelatedGroup label="Assets" icon={<Cpu size={15} className="text-gray-400" />} refs={d.related.assets} />
+          <RelatedGroup label="Contract" icon={<FileText size={15} className="text-gray-400" />} refs={[d.related.contract]} link="contract" />
+          <RelatedGroup label="Assets" icon={<Cpu size={15} className="text-gray-400" />} refs={d.related.assets} link="asset" />
           <RelatedGroup label="Originating lead" icon={<TrendingUp size={15} className="text-gray-400" />} refs={[d.related.opportunity]} />
         </div>
       </Card>
@@ -261,7 +262,7 @@ function DrawerBody({ d, onAction }: { d: CustomerDetail; onAction: (prompt: str
   );
 }
 
-function RelatedGroup({ label, icon, refs }: { label: string; icon: React.ReactNode; refs: { title: string; sub: string }[] }) {
+function RelatedGroup({ label, icon, refs, link }: { label: string; icon: React.ReactNode; refs: { title: string; sub: string }[]; link?: "asset" | "contract" }) {
   return (
     <div>
       <p className="text-[11px] text-gray-400 tracking-wider mb-2">{label}</p>
@@ -270,7 +271,7 @@ function RelatedGroup({ label, icon, refs }: { label: string; icon: React.ReactN
           <div key={r.title} className="flex items-start gap-3">
             <span className="shrink-0 mt-0.5">{icon}</span>
             <div>
-              <p className="text-sm text-gray-800 leading-snug">{r.title}</p>
+              <p className="text-sm text-gray-800 leading-snug">{link === "asset" ? <AssetLink asset={r.title} /> : link === "contract" ? <ContractLink contract={r.title} /> : r.title}</p>
               <p className="text-xs text-gray-400">{r.sub}</p>
             </div>
           </div>

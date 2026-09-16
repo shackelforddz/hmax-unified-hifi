@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import type { ContextEntity } from "@/components/dashboard/conversation-launcher";
 import {
-  ASSET_DETAILS,
   ASSET_CONDITION,
   OPPORTUNITIES,
   OPPORTUNITY_DETAILS,
   OPP_STAGES,
 } from "@/lib/sales-data";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type RiskProfile } from "@/lib/operations-data";
+import { getAssetDetail } from "@/lib/asset-lookup";
 import { ASSET_NAMEPLATE } from "@/lib/asset-nameplate-data";
 // Asset condition visuals are rendered inside the shared DrawerBody.
 import {
@@ -85,7 +85,7 @@ const LEVEL_CLS: Record<string, string> = { Critical: "bg-gray-900 text-white", 
 
 /* ── Asset - mirrors the asset detail drawer (Summary / Documents / History) ── */
 function AssetContext({ id, onAction }: { id: string; onAction?: (prompt: string) => void }) {
-  const d = ASSET_DETAILS[id];
+  const d = getAssetDetail(id);
   const cond = ASSET_CONDITION[id] ?? null;
   const [tab, setTab] = useState<DrawerTab>("summary");
   const [viewDoc, setViewDoc] = useState<ViewDoc | null>(null);

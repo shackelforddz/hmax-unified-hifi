@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { X, MessageSquareText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CHART } from "@/lib/chart-theme";
@@ -207,6 +207,68 @@ export function DocContent({ doc }: { doc: ViewDoc }) {
   );
 }
 
+/* The same document, with its fields and written sections editable in
+   place. Tables, charts and photos are data, so they stay read-only. */
+export function DocEditor({ doc, onSave, onCancel }: { doc: ViewDoc; onSave: (doc: ViewDoc) => void; onCancel: () => void }) {
+  const [draft, setDraft] = useState<ViewDoc>(doc);
+
+  const setField = (i: number, value: string) =>
+    setDraft((d) => ({ ...d, fields: d.fields.map((f, j) => (j === i ? { ...f, value } : f)) }));
+  const setSection = (i: number, text: string) =>
+    setDraft((d) => ({ ...d, sections: d.sections.map((s, j) => (j === i ? { ...s, text } : s)) }));
+
+  const input = "w-full px-3 py-1.5 text-sm text-gray-800 border border-gray-200 rounded-lg outline-none focus:border-gray-400 bg-white";
+
+  return (
+    <div className="bg-white border border-gray-300 rounded-lg p-5 flex flex-col gap-5">
+      <div className="flex items-start justify-between border-b border-gray-100 pb-4">
+        <div>
+          <p className="text-sm text-gray-900">HITACHI ENERGY</p>
+          <p className="text-xs text-gray-400 mt-0.5">{draft.docType} · editing</p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-gray-400 tracking-wider">Reference</p>
+          <p className="text-sm text-gray-800 mt-0.5">{draft.ref}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+        {draft.fields.map((f, i) => (
+          <label key={f.label} className="block">
+            <span className="block text-[11px] text-gray-400 tracking-wider mb-1">{f.label}</span>
+            <input value={f.value} onChange={(e) => setField(i, e.target.value)} className={input} />
+          </label>
+        ))}
+      </div>
+
+      {draft.sections.map((s, i) => (
+        <div key={s.heading} className="flex flex-col gap-2.5">
+          <p className="text-[11px] text-gray-400 tracking-wider">{s.heading}</p>
+          {s.text !== undefined && (
+            <textarea
+              value={s.text}
+              onChange={(e) => setSection(i, e.target.value)}
+              rows={Math.max(3, Math.ceil(s.text.length / 70))}
+              className={`${input} leading-relaxed resize-y`}
+            />
+          )}
+          {s.chart && <DocChartView chart={s.chart} />}
+          {s.table && <DocTableView table={s.table} />}
+        </div>
+      ))}
+
+      <div className="flex justify-end gap-2 border-t border-gray-100 pt-4">
+        <Button variant="outline" onClick={onCancel} className="rounded-full h-auto px-4 py-1.5 text-xs text-gray-700 cursor-pointer">
+          Cancel
+        </Button>
+        <Button onClick={() => onSave(draft)} className="rounded-full h-auto px-4 py-1.5 text-xs cursor-pointer">
+          Save changes
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 interface Props {
   doc: ViewDoc | null;
   onClose: () => void;
@@ -226,7 +288,7 @@ export default function DocumentViewer({ doc, onClose, onAsk }: Props) {
   if (!doc) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div onClick={onClose} className="absolute inset-0 bg-black/40 animate-in fade-in" />
 

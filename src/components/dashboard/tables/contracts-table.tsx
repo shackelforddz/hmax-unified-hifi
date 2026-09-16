@@ -26,7 +26,7 @@ const COLUMNS: Column<OpsContract>[] = [
   { header: "Customer", cell: (c) => <span className="text-gray-700">{c.customer}</span> },
   { header: "Value", cell: (c) => <span className="text-gray-700">{c.value}</span> },
   {
-    header: "Progress",
+    header: "Delivery progress",
     cell: (c) => <ProgressBar pct={c.progress} />,
     className: "w-44",
   },

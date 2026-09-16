@@ -5,7 +5,6 @@ import KpiCard from "@/components/dashboard/kpi-card";
 import FleetMap from "@/components/dashboard/sales/fleet-map";
 import FleetHealth from "@/components/dashboard/sales/fleet-health";
 import AssetAlerts from "@/components/dashboard/sales/asset-alerts";
-import ReportTurnaround from "@/components/dashboard/diagnostics/report-turnaround";
 import AssetsMonitored from "@/components/dashboard/operations/assets-monitored";
 import PeopleWidget from "@/components/dashboard/people-widget";
 import { FIELD_ENGINEERS } from "@/lib/people-data";
@@ -44,12 +43,10 @@ export default function DiagnosticsDashboard() {
           </div>
         ),
       },
-      // ── Bento: where the fleet is and how it's doing, then how long a
-      //    report takes to come back ──
+      // ── Bento: where the fleet is and how it's doing ──
       { id: "fleet-map", span: 8, tile: true, node: <FleetMap /> },
       { id: "fleet-health", span: 4, tile: true, node: <FleetHealth /> },
-      { id: "assets-monitored", span: 4, tile: true, node: <AssetsMonitored /> },
-      { id: "report-turnaround", span: 8, tile: true, node: <ReportTurnaround /> },
+      { id: "assets-monitored", span: 12, tile: true, node: <AssetsMonitored /> },
       {
         id: "reports-to-review",
         span: 12,

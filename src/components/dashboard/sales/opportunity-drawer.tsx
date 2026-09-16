@@ -7,6 +7,7 @@ import { useConversationLauncher } from "@/components/dashboard/conversation-lau
 import { OPP_STAGES, OPPORTUNITIES, leadMeta, type Opportunity, type OpportunityDetail } from "@/lib/sales-data";
 import OwnerBadge from "./owner-badge";
 import DocumentViewer, { type ViewDoc } from "./document-viewer";
+import { AssetLink, ContractLink } from "@/components/dashboard/detail-drawers";
 
 // The lead rendered as a full brief document.
 function opportunityDoc(opp: Opportunity, detail: OpportunityDetail): ViewDoc {
@@ -186,7 +187,7 @@ function DrawerBody({ opp, detail, onAction }: { opp: Opportunity; detail: Oppor
                   <Cpu size={15} className="text-gray-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-800">{a.code}</p>
+                  <p className="text-sm text-gray-800"><AssetLink asset={a.code} /></p>
                   <p className="text-xs text-gray-400">{a.note}</p>
                 </div>
               </div>
@@ -203,7 +204,7 @@ function DrawerBody({ opp, detail, onAction }: { opp: Opportunity; detail: Oppor
         <div className="flex flex-col gap-3">
           {[
             { label: "Customer", value: detail.related.customer },
-            { label: "Contract", value: detail.related.contract },
+            { label: "Contract", value: <ContractLink contract={detail.related.contract} customer={detail.related.customer} /> },
             { label: "Region", value: detail.related.region },
           ].map((r) => (
             <div key={r.label}>

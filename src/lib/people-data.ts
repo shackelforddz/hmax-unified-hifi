@@ -142,6 +142,9 @@ export const SALES_PEOPLE: Person[] = [
   },
 ];
 
+/** Everyone who can be brought into a conversation. */
+export const ALL_PEOPLE: Person[] = [...PEOPLE, ...SALES_PEOPLE];
+
 export const FIELD_ENGINEERS: Person[] = PEOPLE.filter((p) => p.field);
 
 /** Delivery-side team - the people who run contracts, not leads. */
@@ -154,7 +157,7 @@ export const SALES_TEAM: Person[] = SALES_PEOPLE;
  *  widgets that only carry the short form can still show a face. */
 export function personByShortName(short: string): Person | undefined {
   const [first, initial] = short.replace(/\.$/, "").split(" ");
-  return [...PEOPLE, ...SALES_PEOPLE].find(
+  return ALL_PEOPLE.find(
     (p) => p.name.startsWith(`${first} `) && (!initial || p.name.split(" ")[1]?.startsWith(initial))
   );
 }

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { SLA_CONTRACTS, type SlaContractDetail, type SlaBadge } from "@/lib/sales-data";
 import ContractSections from "@/components/dashboard/operations/contract-sections";
+import { AssetLink, drawerLayer } from "@/components/dashboard/detail-drawers";
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">{children}</div>;
@@ -126,7 +127,15 @@ function DrawerBody({ d, onAction }: { d: SlaContractDetail; onAction: (p: strin
         <div className="flex flex-col gap-3">
           {[
             { label: "Customer", value: d.related.customer },
-            { label: "Assets", value: d.related.assets },
+            {
+              label: "Assets",
+              value: d.related.assets.split(", ").map((code, i) => (
+                <span key={code}>
+                  {i > 0 && ", "}
+                  <AssetLink asset={code} />
+                </span>
+              )),
+            },
             { label: "Contract", value: d.related.contract },
             { label: "Region", value: d.region },
           ].map((r) => (
@@ -144,11 +153,17 @@ function DrawerBody({ d, onAction }: { d: SlaContractDetail; onAction: (p: strin
 interface Props {
   contractId: string | null;
   onClose: () => void;
+  /** Stack depth when opened over another drawer (see DetailDrawerProvider). */
+  layer?: number;
+  /** Keep the content mounted but slid off-screen, for enter/exit animation. */
+  hidden?: boolean;
 }
 
-export default function SlaContractDrawer({ contractId, onClose }: Props) {
+export default function SlaContractDrawer({ contractId, onClose, layer, hidden }: Props) {
   const d = contractId ? SLA_CONTRACTS[contractId] ?? null : null;
-  const open = !!d;
+  const open = !!d && !hidden;
+  const stacked = layer !== undefined;
+  const shell = drawerLayer(open, layer);
   const launch = useConversationLauncher();
 
   const runAction = (prompt: string) => {
@@ -157,16 +172,17 @@ export default function SlaContractDrawer({ contractId, onClose }: Props) {
   };
 
   useEffect(() => {
-    if (!open) return;
+    // Stacked drawers leave Escape to the provider, which closes the top one.
+    if (!open || stacked) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, onClose, stacked]);
 
   return (
     <>
-      <div onClick={onClose} className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
-      <div className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"}`}>
+      <div onClick={onClose} {...shell.backdrop} />
+      <div {...shell.panel}>
         {d && (
           <>
             <div className="shrink-0 px-6 pt-6 pb-4 border-b border-gray-100">

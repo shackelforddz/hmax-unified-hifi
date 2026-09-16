@@ -5,6 +5,7 @@ import { X, ChevronDown, CheckCircle2, Circle, CalendarClock, ClipboardList, Pac
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { WORK_ORDERS, WORK_ORDER_DETAILS, type WorkOrder, type WorkOrderDetail, type WoStatus, type WoPriority } from "@/lib/work-orders-data";
+import { AssetLink, ContractLink } from "@/components/dashboard/detail-drawers";
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">{children}</div>;
@@ -161,9 +162,9 @@ function DrawerBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDetail; onAc
         <SectionTitle>Related</SectionTitle>
         <div className="flex flex-col gap-3">
           {[
-            { label: "Asset", value: d.related.asset },
+            { label: "Asset", value: <AssetLink asset={d.related.asset} /> },
             { label: "Customer", value: d.related.customer },
-            { label: "Contract", value: d.related.contract },
+            { label: "Contract", value: <ContractLink contract={d.related.contract} customer={d.related.customer} /> },
           ].map((r) => (
             <div key={r.label}>
               <p className="text-[11px] text-gray-400 tracking-wider">{r.label}</p>
@@ -221,7 +222,7 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
                   { label: "Priority", value: PRIORITY_LABEL[w.priority] },
                   { label: "Type", value: w.type },
                   { label: "Assignee", value: w.assignee },
-                  { label: "Asset", value: w.asset },
+                  { label: "Asset", value: <AssetLink asset={w.asset} /> },
                   { label: "Due", value: w.due },
                 ].map((s) => (
                   <div key={s.label}>

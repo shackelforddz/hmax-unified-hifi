@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { UserRoundPlus, Search, X, ClipboardCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PEOPLE, type Person } from "@/lib/people-data";
+import { ALL_PEOPLE, type Person } from "@/lib/people-data";
 import { type AssignedTask } from "./chat-panel";
 
 /* ── Assign a task ───────────────────────────────────────────────── */
@@ -127,12 +127,14 @@ function AssignTaskDialog({
 /* ── Participants + add-people popover ───────────────────────────── */
 interface Props {
   participants: Person[];
+  /** People the assistant recommends adding - listed first. */
+  suggested?: Person[];
   onAdd: (person: Person) => void;
   onRemove: (person: Person) => void;
   onAssign: (task: AssignedTask) => void;
 }
 
-export default function ConversationPeople({ participants, onAdd, onRemove, onAssign }: Props) {
+export default function ConversationPeople({ participants, suggested = [], onAdd, onRemove, onAssign }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [assignFor, setAssignFor] = useState<Person | null>(null);
@@ -155,12 +157,14 @@ export default function ConversationPeople({ participants, onAdd, onRemove, onAs
   const inConversation = useMemo(() => new Set(participants.map((p) => p.id)), [participants]);
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return PEOPLE.filter(
+    const suggestedIds = new Set(suggested.map((p) => p.id));
+    return ALL_PEOPLE.filter(
       (p) =>
         !inConversation.has(p.id) &&
         (!q || p.name.toLowerCase().includes(q) || p.role.toLowerCase().includes(q))
-    );
-  }, [query, inConversation]);
+    ).sort((a, b) => Number(suggestedIds.has(b.id)) - Number(suggestedIds.has(a.id)));
+  }, [query, inConversation, suggested]);
+  const isSuggested = (p: Person) => suggested.some((s) => s.id === p.id);
 
   return (
     <>
@@ -269,6 +273,9 @@ export default function ConversationPeople({ participants, onAdd, onRemove, onAs
                         {p.role} · {p.allocation}% allocated
                       </span>
                     </span>
+                    {isSuggested(p) && (
+                      <span className="shrink-0 text-[10px] px-2 py-0.5 rounded-full bg-gray-900 text-white">Suggested</span>
+                    )}
                     <span className="shrink-0 text-xs text-gray-400">Add</span>
                   </button>
                 ))

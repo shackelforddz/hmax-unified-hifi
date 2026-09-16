@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import KpiCard from "@/components/dashboard/kpi-card";
 import FleetMap from "@/components/dashboard/sales/fleet-map";
 import FleetHealth from "@/components/dashboard/sales/fleet-health";
+import AssetsMonitored from "@/components/dashboard/operations/assets-monitored";
 import AssetAlerts from "@/components/dashboard/sales/asset-alerts";
 import ScopeReviews from "@/components/dashboard/reliability/scope-reviews";
 import { ASSET_REVIEW_ALERTS, REVIEW_CATEGORY_OPTIONS } from "@/lib/reliability-data";
@@ -42,8 +43,10 @@ export default function ReliabilityDashboard() {
           </div>
         ),
       },
+      // ── Bento: where the fleet is and how it scores, then the estate ──
       { id: "fleet-map", span: 8, tile: true, node: <FleetMap /> },
       { id: "fleet-health", span: 4, tile: true, node: <FleetHealth /> },
+      { id: "assets-monitored", span: 12, tile: true, node: <AssetsMonitored /> },
       {
         id: "assets-to-review",
         span: 12,

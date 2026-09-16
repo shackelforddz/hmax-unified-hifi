@@ -28,7 +28,7 @@ export default function SalesDashboard() {
     () => [
       { id: "lead-stats", span: 12, node: <OpportunityStats /> },
       // ── Bento: the fleet leads, then the commercial tiles ──
-      { id: "fleet-map", span: 8, tile: true, node: <FleetMap /> },
+      { id: "fleet-map", span: 8, tile: true, node: <FleetMap mode="sales" /> },
       { id: "fleet-health", span: 4, tile: true, node: <FleetHealth /> },
       { id: "financial", span: 4, tile: true, node: <FinancialPerformance /> },
       { id: "revenue-timing", span: 4, tile: true, node: <RevenueTiming /> },

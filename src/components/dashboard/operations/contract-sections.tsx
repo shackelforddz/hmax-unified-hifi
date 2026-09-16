@@ -1,4 +1,5 @@
 import type { PartStatus, MaintStatus, InvoiceStatus } from "@/lib/operations-data";
+import { AssetLink } from "@/components/dashboard/detail-drawers";
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">{children}</div>;
@@ -34,7 +35,7 @@ export default function ContractSections({ d }: { d: ContractSectionsData }) {
             const cls = a.status === "Critical" ? "bg-gray-900 text-white" : a.status === "At risk" ? "bg-gray-200 text-gray-700" : "border border-gray-300 text-gray-500";
             return (
               <div key={a.code} className="flex items-center gap-3 py-2.5 border-b border-gray-100 last:border-0">
-                <span className="text-sm text-gray-500 w-20 shrink-0">{a.code}</span>
+                <AssetLink asset={a.code} className="text-sm text-gray-500 w-20 shrink-0" />
                 <span className="text-sm text-gray-700 flex-1 min-w-0 truncate">{a.type}</span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${cls}`}>{a.status}</span>
               </div>

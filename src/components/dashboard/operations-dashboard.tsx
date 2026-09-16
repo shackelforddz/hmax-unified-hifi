@@ -72,7 +72,7 @@ export default function OperationsDashboard() {
       //    operations is running, then what is due next ──
       { id: "financial", span: 8, tile: true, node: <FinancialPerformance /> },
       { id: "revenue-timing", span: 4, tile: true, node: <RevenueTiming /> },
-      { id: "fleet-map", span: 8, tile: true, node: <FleetMap /> },
+      { id: "fleet-map", span: 8, tile: true, node: <FleetMap mode="ops" /> },
       { id: "assets-monitored", span: 4, tile: true, node: <AssetsMonitored /> },
       { id: "delivery-trend", span: 6, tile: true, node: <DeliveryTrend /> },
       { id: "response-time", span: 6, tile: true, node: <ResponseTime /> },

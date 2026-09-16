@@ -2,9 +2,9 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from "react";
-import { MAP_MARKERS, ASSET_DETAILS } from "@/lib/sales-data";
+import { createRoot, type Root } from "react-dom/client";
 import WidgetChat from "@/components/dashboard/widget-chat";
-import AssetDrawer from "./asset-drawer";
+import type { MapProps } from "./fleet-map";
 
 const MILAN = { lat: 45.4642, lng: 9.19 };
 
@@ -34,13 +34,19 @@ function loadGoogleMaps(key: string): Promise<void> {
   return scriptPromise;
 }
 
-export default function GoogleFleetMap({ apiKey }: { apiKey: string }) {
+export default function GoogleFleetMap({ apiKey, sites, renderTip, overlay }: MapProps & { apiKey: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<any>(null);
+  const infoRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+  const tipRoot = useRef<Root | null>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [drawerId, setDrawerId] = useState<string | null>(null);
-  const openAsset = useRef((id: string) => setDrawerId(id));
-  openAsset.current = (id: string) => setDrawerId(id);
+  // Read at click time, so a tooltip always renders with the latest handlers.
+  const renderTipRef = useRef(renderTip);
+  useEffect(() => {
+    renderTipRef.current = renderTip;
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -48,7 +54,7 @@ export default function GoogleFleetMap({ apiKey }: { apiKey: string }) {
       .then(() => {
         if (cancelled || !ref.current) return;
         const g = (window as any).google;
-        const map = new g.maps.Map(ref.current, {
+        mapRef.current = new g.maps.Map(ref.current, {
           center: MILAN,
           zoom: 11,
           styles: BASE_STYLE,
@@ -58,64 +64,52 @@ export default function GoogleFleetMap({ apiKey }: { apiKey: string }) {
           fullscreenControl: false,
           clickableIcons: false,
         });
-        const info = new g.maps.InfoWindow();
-
-        MAP_MARKERS.forEach((m) => {
-          const asset = ASSET_DETAILS[m.id];
-          if (!asset) return;
-          const marker = new g.maps.Marker({
-            position: { lat: m.lat, lng: m.lng },
-            map,
-            title: asset.code,
-            icon: {
-              path: g.maps.SymbolPath.CIRCLE,
-              // scale is the radius, so 5 draws a 10px dot.
-              scale: 5,
-              // A pinging marker is one raising an alert - it reads red.
-              fillColor: m.ping ? "#fa000f" : "#171717",
-              fillOpacity: 1,
-              strokeWeight: 0,
-            },
-          });
-          marker.addListener("click", () => {
-            const statusCls = asset.stats.status === "Critical" ? "bg-gray-900 text-white" : "border border-gray-300 text-gray-500";
-            const node = document.createElement("div");
-            node.className = "";
-            node.style.width = "190px";
-            node.innerHTML = `
-              <div class="flex items-start justify-between gap-2">
-                <div class="min-w-0">
-                  <p class="text-sm text-gray-900">${asset.code}</p>
-                  <p class="text-xs text-gray-400">${asset.type}</p>
-                </div>
-                <span class="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${statusCls}">${asset.stats.status}</span>
-              </div>
-              <p class="text-xs text-gray-400 mt-1">${asset.location}</p>
-              <div class="flex items-center gap-2 mt-2">
-                <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-chart-line rounded-full" style="width:${asset.stats.healthPct}%"></div></div>
-                <span class="text-xs text-gray-500">${asset.stats.healthPct}%</span>
-              </div>
-              <button class="fleet-view mt-3 w-full text-xs text-gray-700 border border-gray-200 rounded-full py-1.5 cursor-pointer">View details</button>`;
-            node.querySelector(".fleet-view")?.addEventListener("click", () => {
-              info.close();
-              openAsset.current(m.id);
-            });
-            info.setContent(node);
-            info.open({ map, anchor: marker });
-          });
-        });
-
-        if (!cancelled) setReady(true);
+        infoRef.current = new g.maps.InfoWindow();
+        setReady(true);
       })
       .catch(() => !cancelled && setFailed(true));
     return () => { cancelled = true; };
   }, [apiKey]);
 
+  // Redraw the pins whenever the filtered set changes.
+  useEffect(() => {
+    if (!ready) return;
+    const g = (window as any).google;
+    const map = mapRef.current;
+    const info = infoRef.current;
+    info.close();
+    markersRef.current.forEach((m) => m.setMap(null));
+    markersRef.current = sites.map((site) => {
+      const marker = new g.maps.Marker({
+        position: { lat: site.lat, lng: site.lng },
+        map,
+        title: site.code,
+        icon: {
+          path: g.maps.SymbolPath.CIRCLE,
+          // scale is the radius, so 5 draws a 10px dot.
+          scale: 5,
+          // A pinging marker is one raising an alert - it reads red.
+          fillColor: site.ping ? "#fa000f" : "#171717",
+          fillOpacity: 1,
+          strokeWeight: 0,
+        },
+      });
+      marker.addListener("click", () => {
+        tipRoot.current?.unmount();
+        const node = document.createElement("div");
+        node.style.width = "260px";
+        tipRoot.current = createRoot(node);
+        tipRoot.current.render(renderTipRef.current(site));
+        info.setContent(node);
+        info.open({ map, anchor: marker });
+      });
+      return marker;
+    });
+  }, [ready, sites]);
+
   return (
     <div className="relative rounded-xl overflow-hidden border border-gray-200 h-full min-h-[420px] bg-gray-100">
-      <AssetDrawer assetId={drawerId} onClose={() => setDrawerId(null)} />
-
-            <div ref={ref} className="absolute inset-0" />
+      <div ref={ref} className="absolute inset-0" />
 
       {!ready && !failed && <div className="absolute inset-0 bg-gray-100 animate-pulse" />}
       {failed && (
@@ -123,6 +117,8 @@ export default function GoogleFleetMap({ apiKey }: { apiKey: string }) {
           <p className="text-sm text-gray-400">Couldn&apos;t load Google Maps - check the API key.</p>
         </div>
       )}
+
+      {overlay}
 
       {/* Chat affordance */}
       <div className="absolute top-4 right-4 z-10">

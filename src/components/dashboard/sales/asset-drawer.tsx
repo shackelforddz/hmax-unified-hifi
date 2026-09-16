@@ -5,15 +5,17 @@ import { X, ChevronDown, CalendarClock, ClipboardList, Package, UserPlus, Extern
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { CHART } from "@/lib/chart-theme";
-import { ASSET_DETAILS, ASSET_CONDITION, DGA_TRENDS, DGA_MONTHS, sensorFaultsFor, type AssetDetail, type AssetReading, type AssetCondition, type GasTrend } from "@/lib/sales-data";
+import { ASSET_CONDITION, DGA_TRENDS, DGA_MONTHS, sensorFaultsFor, type AssetDetail, type AssetReading, type AssetCondition, type GasTrend } from "@/lib/sales-data";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS } from "@/lib/operations-data";
 import { REPORTS_AWAITING } from "@/lib/field-reports-data";
+import { getAssetDetail } from "@/lib/asset-lookup";
 import { ASSET_SERVICE_HISTORY } from "@/lib/asset-history-data";
 import { ASSET_NAMEPLATE, type Nameplate } from "@/lib/asset-nameplate-data";
 import { ASSET_DRAWINGS } from "@/lib/asset-drawings-data";
 import { SITE_CONSTRAINTS } from "@/lib/reliability-data";
 import { Aging, ScoreCalculation, RiskMatrix, ConditionTrend, ParameterTrend, Diagnostics } from "./asset-condition";
 import DocumentViewer, { type ViewDoc } from "./document-viewer";
+import { drawerLayer, ContractLink } from "@/components/dashboard/detail-drawers";
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -243,20 +245,22 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
       )}
 
       {/* Condition & readings */}
-      <Card>
-        <SectionTitle>Condition &amp; readings</SectionTitle>
-        <div className="flex flex-col">
-          {d.readings.map((r) => (
-            <div key={r.label} className="flex items-center justify-between gap-3 py-2 border-b border-gray-100 last:border-0">
-              <span className="text-sm text-gray-700">{r.label}</span>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-sm text-gray-500">{r.value}</span>
-                <ReadingState state={r.state} />
+      {d.readings.length > 0 && (
+        <Card>
+          <SectionTitle>Condition &amp; readings</SectionTitle>
+          <div className="flex flex-col">
+            {d.readings.map((r) => (
+              <div key={r.label} className="flex items-center justify-between gap-3 py-2 border-b border-gray-100 last:border-0">
+                <span className="text-sm text-gray-700">{r.label}</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-sm text-gray-500">{r.value}</span>
+                  <ReadingState state={r.state} />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* Dissolved gas analysis - every gas, not just hydrogen */}
       {gases.length > 0 && <GasTrends gases={gases} />}
@@ -272,39 +276,43 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
       )}
 
       {/* Maintenance history */}
-      <Card>
-        <SectionTitle>Maintenance history</SectionTitle>
-        <div className="flex flex-col">
-          {d.maintenance.map((m, i) => (
-            <div key={i} className="flex gap-3 pb-4 last:pb-0">
-              <div className="flex flex-col items-center shrink-0 pt-1.5">
-                <span className="w-2 h-2 rounded-full bg-gray-400" />
-                {i < d.maintenance.length - 1 && <span className="w-px flex-1 bg-gray-200 mt-1" />}
+      {d.maintenance.length > 0 && (
+        <Card>
+          <SectionTitle>Maintenance history</SectionTitle>
+          <div className="flex flex-col">
+            {d.maintenance.map((m, i) => (
+              <div key={i} className="flex gap-3 pb-4 last:pb-0">
+                <div className="flex flex-col items-center shrink-0 pt-1.5">
+                  <span className="w-2 h-2 rounded-full bg-gray-400" />
+                  {i < d.maintenance.length - 1 && <span className="w-px flex-1 bg-gray-200 mt-1" />}
+                </div>
+                <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
+                  <p className="text-sm text-gray-800">{m.label}</p>
+                  <span className="text-xs text-gray-400 whitespace-nowrap shrink-0">{m.date}</span>
+                </div>
               </div>
-              <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
-                <p className="text-sm text-gray-800">{m.label}</p>
-                <span className="text-xs text-gray-400 whitespace-nowrap shrink-0">{m.date}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* Open risks */}
-      <Card>
-        <SectionTitle>Open risks</SectionTitle>
-        <div className="flex flex-col gap-4">
-          {d.risks.map((r, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-800 mb-1">{r.title}</p>
-                <p className="text-xs text-gray-500 leading-relaxed">{r.detail}</p>
+      {d.risks.length > 0 && (
+        <Card>
+          <SectionTitle>Open risks</SectionTitle>
+          <div className="flex flex-col gap-4">
+            {d.risks.map((r, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-800 mb-1">{r.title}</p>
+                  <p className="text-xs text-gray-500 leading-relaxed">{r.detail}</p>
+                </div>
+                <RiskBadge level={r.level} />
               </div>
-              <RiskBadge level={r.level} />
-            </div>
-          ))}
-        </div>
-      </Card>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* Site constraints that apply to this asset */}
       {(() => {
@@ -343,7 +351,7 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
         <div className="flex flex-col gap-3">
           {[
             { label: "Customer", value: d.related.customer },
-            { label: "Contract", value: d.related.contract },
+            { label: "Contract", value: <ContractLink contract={d.related.contract} customer={d.related.customer} /> },
             { label: "Station", value: d.related.station },
           ].map((r) => (
             <div key={r.label}>
@@ -582,18 +590,22 @@ export const DRAWER_TABS = [
 ] as const;
 export type DrawerTab = (typeof DRAWER_TABS)[number]["value"];
 
-import { type DrawerBack, BackLink } from "@/components/dashboard/operations/contract-drawer";
 
 interface Props {
   assetId: string | null;
   onClose: () => void;
-  back?: DrawerBack;
+  /** Stack depth when opened over another drawer (see DetailDrawerProvider). */
+  layer?: number;
+  /** Keep the content mounted but slid off-screen, for enter/exit animation. */
+  hidden?: boolean;
 }
 
-export default function AssetDrawer({ assetId, onClose, back }: Props) {
-  const detail = assetId ? ASSET_DETAILS[assetId] : null;
+export default function AssetDrawer({ assetId, onClose, layer, hidden }: Props) {
+  const detail = assetId ? getAssetDetail(assetId) : null;
   const cond = assetId ? ASSET_CONDITION[assetId] ?? null : null;
-  const open = !!detail;
+  const open = !!detail && !hidden;
+  const stacked = layer !== undefined;
+  const shell = drawerLayer(open, layer);
   const launch = useConversationLauncher();
   const [tab, setTab] = useState<DrawerTab>("summary");
   const [viewDoc, setViewDoc] = useState<ViewDoc | null>(null);
@@ -612,28 +624,20 @@ export default function AssetDrawer({ assetId, onClose, back }: Props) {
   };
 
   useEffect(() => {
-    if (!open) return;
+    // Stacked drawers leave Escape to the provider, which closes the top one.
+    if (!open || stacked) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, onClose, stacked]);
 
   return (
     <>
       {/* Backdrop */}
-      <div
-        onClick={onClose}
-        className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${
-          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-      />
+      <div onClick={onClose} {...shell.backdrop} />
 
       {/* Drawer */}
-      <div
-        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${
-          open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
-        }`}
-      >
+      <div {...shell.panel}>
         {detail && (
           <>
             {/* Header */}
@@ -645,7 +649,6 @@ export default function AssetDrawer({ assetId, onClose, back }: Props) {
                     <img src="/transformer.png" alt={detail.code} className="w-full h-full object-contain grayscale" />
                   </div>
                   <div>
-                    <BackLink back={back} />
                     <h2 className="text-2xl text-gray-900">{detail.code}</h2>
                     <p className="text-sm text-gray-400 mt-0.5">{detail.type} · {detail.location}</p>
                   </div>

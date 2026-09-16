@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { X, ChevronDown, CheckCircle2, Circle, CalendarClock, ClipboardList, RefreshCw, UserPlus, ExternalLink, ChevronLeft } from "lucide-react";
+import { X, ChevronDown, CheckCircle2, Circle, CalendarClock, ClipboardList, RefreshCw, UserPlus, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract, type OpsContractDetail, type RiskProfile } from "@/lib/operations-data";
 import { SCOPE_REVIEWS } from "@/lib/reliability-data";
 import ContractSections from "./contract-sections";
+import { drawerLayer } from "@/components/dashboard/detail-drawers";
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">{children}</div>;
@@ -185,34 +186,21 @@ function DrawerBody({ c, d, onAction }: { c: OpsContract; d: OpsContractDetail; 
 
 /** An optional "back" trail shown above the title, for a drawer that was
  *  opened by drilling out of another one. */
-export interface DrawerBack {
-  label: string;
-  onClick: () => void;
-}
-
-export function BackLink({ back }: { back?: DrawerBack }) {
-  if (!back) return null;
-  return (
-    <button
-      onClick={back.onClick}
-      className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer mb-1.5"
-    >
-      <ChevronLeft size={13} strokeWidth={1.5} />
-      {back.label}
-    </button>
-  );
-}
-
 interface Props {
   contractId: string | null;
   onClose: () => void;
-  back?: DrawerBack;
+  /** Stack depth when opened over another drawer (see DetailDrawerProvider). */
+  layer?: number;
+  /** Keep the content mounted but slid off-screen, for enter/exit animation. */
+  hidden?: boolean;
 }
 
-export default function ContractDrawer({ contractId, onClose, back }: Props) {
+export default function ContractDrawer({ contractId, onClose, layer, hidden }: Props) {
   const c = contractId ? OPS_CONTRACTS.find((x) => x.id === contractId) ?? null : null;
   const d = contractId ? OPS_CONTRACT_DETAILS[contractId] ?? null : null;
-  const open = !!(c && d);
+  const open = !!(c && d) && !hidden;
+  const stacked = layer !== undefined;
+  const shell = drawerLayer(open, layer);
   const launch = useConversationLauncher();
 
   const runAction = (prompt: string) => {
@@ -221,22 +209,22 @@ export default function ContractDrawer({ contractId, onClose, back }: Props) {
   };
 
   useEffect(() => {
-    if (!open) return;
+    // Stacked drawers leave Escape to the provider, which closes the top one.
+    if (!open || stacked) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, onClose, stacked]);
 
   return (
     <>
-      <div onClick={onClose} className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
-      <div className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"}`}>
+      <div onClick={onClose} {...shell.backdrop} />
+      <div {...shell.panel}>
         {c && d && (
           <>
             <div className="shrink-0 px-6 pt-6 pb-4 border-b border-gray-100">
               <div className="flex items-start justify-between">
                 <div>
-                  <BackLink back={back} />
                   <h2 className="text-2xl text-gray-900">{c.name}</h2>
                   <p className="text-sm text-gray-400 mt-0.5">{c.customer} · {c.value}</p>
                 </div>

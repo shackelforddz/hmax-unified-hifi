@@ -9,7 +9,7 @@
    The situation is passed in from the alert's detail (already grounded);
    the recommendation + steps are keyed off the primary action label. */
 
-import { PEOPLE } from "@/lib/people-data";
+import { PEOPLE, SALES_PEOPLE } from "@/lib/people-data";
 import { ALT_VENDORS } from "@/lib/vendors-data";
 import { SCHEDULE_OPTIONS } from "@/lib/schedule-options-data";
 import { CHANGE_ORDERS } from "@/lib/change-orders-data";
@@ -44,7 +44,7 @@ export interface PanelField {
 
 export type PlaybookPanel =
   | { kind: "options"; heading: string; note?: string; options: PanelOption[] }
-  | { kind: "recap"; heading: string; rows: { label: string; value: string }[]; note?: string; doc?: ViewDoc }
+  | { kind: "recap"; heading: string; rows: { label: string; value: string }[]; note?: string; doc?: ViewDoc; /** The linked document can be edited in the conversation. */ editable?: boolean }
   | { kind: "form"; heading: string; note?: string; fields: PanelField[]; submitLabel: string; submitPrompt: string }
   | { kind: "draft"; heading: string; note?: string; value: string; submitLabel: string; submitPrompt: string };
 
@@ -53,6 +53,8 @@ export interface Playbook {
   recommendation: string;
   steps: PlaybookStep[];
   panel?: PlaybookPanel;
+  /** A coworker worth bringing into the conversation, and why. */
+  suggestedPerson?: { personId: string; reason: string };
 }
 
 export interface PlaybookContext {
@@ -66,6 +68,8 @@ export interface PlaybookContext {
   scope?: string;
   value?: string;
   from?: string;
+  contractId?: string;
+  account?: string;
 }
 
 interface Recipe {
@@ -702,7 +706,7 @@ function feasibilityPanel(ctx: PlaybookContext, situation: string): PlaybookPane
       { heading: "Sign-off recommendation", text: feasibilityRecommendation(v) },
     ],
   };
-  return { kind: "recap", heading: `Scope feasibility - ${label}`, rows, doc };
+  return { kind: "recap", heading: `Scope feasibility - ${label}`, rows, doc, editable: true };
 }
 
 function reviewRecapPanel(action: string, situation: string, ctx?: PlaybookContext): PlaybookPanel {
@@ -850,5 +854,21 @@ export function buildPlaybook(action: string, situation: string, ctx?: PlaybookC
   const steps = panel && (panel.kind === "options" || panel.kind === "form" || panel.kind === "draft") ? [] : r.steps;
   // A scope review's recommendation is the sign-off call for its verdict.
   const recommendation = ctx?.verdict ? feasibilityRecommendation(ctx.verdict) : r.recommendation;
-  return { situation, recommendation, steps, panel };
+  return { situation, recommendation, steps, panel, suggestedPerson: ctx?.verdict ? salesOwnerFor(ctx) : undefined };
+}
+
+/* A scope review lands back with sales whatever the verdict, so suggest the
+   account owner on the contract being reviewed. */
+const SALES_REASON: Record<NonNullable<PlaybookContext["verdict"]>, string> = {
+  feasible: "can take the confirmed scope into the offer",
+  "at-risk": "needs to price in the mitigation before the offer goes out",
+  "not-feasible": "will have to rescope this with the customer",
+  pending: "can chase the open points with the customer",
+};
+
+function salesOwnerFor(ctx: PlaybookContext): Playbook["suggestedPerson"] {
+  const owner = ctx.contractId ? SALES_PEOPLE.find((p) => p.contractIds.includes(ctx.contractId!)) : undefined;
+  if (!owner) return undefined;
+  const account = ctx.account ? `the ${ctx.account} account` : "this account";
+  return { personId: owner.id, reason: `Owns ${account} and ${SALES_REASON[ctx.verdict!]}.` };
 }

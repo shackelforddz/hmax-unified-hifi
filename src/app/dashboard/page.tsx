@@ -10,6 +10,7 @@ import ReliabilityDashboard from "@/components/dashboard/reliability-dashboard";
 import DiagnosticsDashboard from "@/components/dashboard/diagnostics-dashboard";
 import ConversationOverlay from "@/components/conversation/conversation-overlay";
 import { type StoredConversation } from "@/components/conversation/chat-panel";
+import { DetailDrawerProvider } from "@/components/dashboard/detail-drawers";
 import { ConversationLauncherContext, type LaunchArgs } from "@/components/dashboard/conversation-launcher";
 import { useAppSelector } from "@/store/hooks";
 
@@ -43,6 +44,7 @@ export default function DashboardPage() {
 
   return (
     <ConversationLauncherContext.Provider value={openConversation}>
+    <DetailDrawerProvider>
     <div className="h-screen bg-[#F5F5F5] overflow-hidden flex">
 
       {/* Rail - wordmark up top, utilities and account at the foot */}
@@ -79,6 +81,7 @@ export default function DashboardPage() {
         onClose={() => setConv((c) => ({ ...c, visible: false }))}
       />
     </div>
+    </DetailDrawerProvider>
     </ConversationLauncherContext.Provider>
   );
 }

@@ -1,0 +1,169 @@
+"use client";
+
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
+import AssetDrawer from "@/components/dashboard/sales/asset-drawer";
+import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
+import SlaContractDrawer from "@/components/dashboard/sales/sla-contract-drawer";
+import { ConversationLauncherContext, useConversationLauncher, type LaunchFn } from "@/components/dashboard/conversation-launcher";
+import { getAssetDetail, resolveAssetId } from "@/lib/asset-lookup";
+import { resolveContract, type ContractRef } from "@/lib/contract-lookup";
+
+/* ── Stacked detail drawers ──────────────────────────────────────────
+   Drilling into an asset or contract from inside a drawer slides its
+   detail drawer over the current one, with no dimming. Each close (X,
+   Escape or a click beside it) peels back just the top drawer. */
+
+type Detail = { kind: "asset"; id: string } | ContractRef;
+type Layer = { key: number; detail: Detail; closing: boolean };
+
+interface DetailDrawers {
+  openAsset: (assetId: string) => void;
+  openContract: (ref: ContractRef) => void;
+}
+
+const DetailDrawersContext = createContext<DetailDrawers | null>(null);
+
+const SLIDE_MS = 500;
+const noopSubscribe = () => () => {};
+
+export function DetailDrawerProvider({ children }: { children: React.ReactNode }) {
+  const [layers, setLayers] = useState<Layer[]>([]);
+  const keyRef = useRef(0);
+  // Portals need document.body, which only exists once on the client.
+  const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false);
+
+  const open = useCallback((detail: Detail) => {
+    setLayers((ls) => [...ls, { key: ++keyRef.current, detail, closing: false }]);
+  }, []);
+
+  const close = useCallback((key: number) => {
+    setLayers((ls) => ls.map((l) => (l.key === key ? { ...l, closing: true } : l)));
+    setTimeout(() => setLayers((ls) => ls.filter((l) => l.key !== key)), SLIDE_MS);
+  }, []);
+
+  // Escape closes only the top drawer, before any drawer beneath sees it.
+  const top = layers.filter((l) => !l.closing).at(-1);
+  useEffect(() => {
+    if (!top) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.stopImmediatePropagation();
+      close(top.key);
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [top, close]);
+
+  const api = useMemo<DetailDrawers>(
+    () => ({ openAsset: (id) => open({ kind: "asset", id }), openContract: (ref) => open(ref) }),
+    [open]
+  );
+
+  // Starting a conversation from any drawer clears the whole stack, so no
+  // stacked drawer is left sitting over the conversation.
+  const launch = useConversationLauncher();
+  const launchAndClear = useCallback<LaunchFn>(
+    (args) => {
+      setLayers([]);
+      launch(args);
+    },
+    [launch]
+  );
+
+  return (
+    <ConversationLauncherContext.Provider value={launchAndClear}>
+      <DetailDrawersContext.Provider value={api}>
+        {children}
+        {mounted &&
+          createPortal(
+            layers.map((l, i) => <StackedDrawer key={l.key} layer={l} depth={i} onClose={() => close(l.key)} />),
+            document.body
+          )}
+      </DetailDrawersContext.Provider>
+    </ConversationLauncherContext.Provider>
+  );
+}
+
+/* Mounts off-screen, then slides in on the next frame; slides out before
+   it is removed. */
+function StackedDrawer({ layer, depth, onClose }: { layer: Layer; depth: number; onClose: () => void }) {
+  const [entered, setEntered] = useState(false);
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setEntered(true));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  const hidden = !entered || layer.closing;
+  const d = layer.detail;
+  if (d.kind === "asset") return <AssetDrawer assetId={d.id} onClose={onClose} layer={depth} hidden={hidden} />;
+  if (d.kind === "ops") return <ContractDrawer contractId={d.id} onClose={onClose} layer={depth} hidden={hidden} />;
+  return <SlaContractDrawer contractId={d.id} onClose={onClose} layer={depth} hidden={hidden} />;
+}
+
+export const useDetailDrawers = () => useContext(DetailDrawersContext);
+
+/** Classes and z-index for a drawer: base drawers dim the page, stacked
+ *  ones (`layer` set) sit above them with a clear click-to-close backdrop. */
+export function drawerLayer(open: boolean, layer?: number) {
+  const stacked = layer !== undefined;
+  const z = stacked ? 55 + layer * 2 : undefined;
+  return {
+    backdrop: {
+      className: `fixed inset-0 ${stacked ? "" : "z-40 bg-black/20"} transition-opacity duration-300 ${
+        open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`,
+      style: z !== undefined ? { zIndex: z - 1 } : undefined,
+    },
+    panel: {
+      className: `fixed top-0 right-0 bottom-0 ${stacked ? "" : "z-50"} w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${
+        open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
+      }`,
+      style: z !== undefined ? { zIndex: z } : undefined,
+    },
+  };
+}
+
+const LINK_CLS =
+  "text-left underline decoration-gray-300 underline-offset-2 hover:decoration-gray-700 hover:text-gray-900 transition-colors cursor-pointer";
+
+/** An asset reference that opens its detail drawer. `asset` is a code or unit
+ *  tag ("AST-014", "S-12 - HVDC Converter Transformer"); references that don't
+ *  resolve to a known asset render as plain content. */
+export function AssetLink({ asset, children, className = "" }: { asset: string; children?: React.ReactNode; className?: string }) {
+  const drawers = useDetailDrawers();
+  const id = resolveAssetId(asset);
+  const content = children ?? asset;
+  if (!drawers || !id || !getAssetDetail(id)) return <span className={className}>{content}</span>;
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        drawers.openAsset(id);
+      }}
+      className={`${LINK_CLS} ${className}`}
+    >
+      {content}
+    </button>
+  );
+}
+
+/** A contract reference that opens its detail drawer. */
+export function ContractLink({ contract, customer, children, className = "" }: { contract: string; customer?: string; children?: React.ReactNode; className?: string }) {
+  const drawers = useDetailDrawers();
+  const ref = resolveContract(contract, customer);
+  const content = children ?? contract;
+  if (!drawers || !ref) return <span className={className}>{content}</span>;
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        drawers.openContract(ref);
+      }}
+      className={`${LINK_CLS} ${className}`}
+    >
+      {content}
+    </button>
+  );
+}

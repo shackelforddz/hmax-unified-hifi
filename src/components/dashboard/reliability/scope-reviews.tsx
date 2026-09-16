@@ -54,6 +54,8 @@ function toAlerts(): AlertItem[] {
       value: review.value,
       from: review.from,
       title: `${review.account} - ${review.scope}`,
+      contractId: review.contractId,
+      account: review.account,
     }),
     detailId: review.contractId,
   }));

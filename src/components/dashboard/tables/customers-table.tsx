@@ -3,10 +3,7 @@
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 import DataTable, { type Column } from "@/components/dashboard/data-table";
-import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
 import CustomerDrawer from "@/components/dashboard/operations/customer-drawer";
-import AssetDrawer from "@/components/dashboard/sales/asset-drawer";
-import { ASSET_DETAILS } from "@/lib/sales-data";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract } from "@/lib/operations-data";
 
 /* ── Estate roll-up ──────────────────────────────────────────────────
@@ -95,61 +92,11 @@ const ESTATE_COLUMNS: Column<Estate>[] = [
 
 export default function CustomersTable() {
   const [customer, setCustomer] = useState<string | null>(null);
-  const [contractDrawer, setContractDrawer] = useState<string | null>(null);
-  const [assetDrawer, setAssetDrawer] = useState<string | null>(null);
-  // Which customer a contract/asset drawer was drilled out of, so it can
-  // offer a way back up.
-  const [cameFrom, setCameFrom] = useState<string | null>(null);
-
-  const back = cameFrom
-    ? {
-        label: `Back to ${cameFrom}`,
-        onClick: () => {
-          setContractDrawer(null);
-          setAssetDrawer(null);
-          setCustomer(cameFrom);
-          setCameFrom(null);
-        },
-      }
-    : undefined;
 
   return (
     <>
-      {/* The three drawers swap between each other rather than stacking. */}
-      <CustomerDrawer
-        customer={customer}
-        onClose={() => setCustomer(null)}
-        onOpenContract={(id) => {
-          setCameFrom(customer);
-          setCustomer(null);
-          setContractDrawer(id);
-        }}
-        onOpenAsset={(code, contractId) => {
-          setCameFrom(customer);
-          setCustomer(null);
-          // Only assets with a detail record have an asset drawer; the rest
-          // fall back to the contract that covers them.
-          const id = code.toLowerCase();
-          if (ASSET_DETAILS[id]) setAssetDrawer(id);
-          else setContractDrawer(contractId);
-        }}
-      />
-      <ContractDrawer
-        contractId={contractDrawer}
-        onClose={() => {
-          setContractDrawer(null);
-          setCameFrom(null);
-        }}
-        back={back}
-      />
-      <AssetDrawer
-        assetId={assetDrawer}
-        onClose={() => {
-          setAssetDrawer(null);
-          setCameFrom(null);
-        }}
-        back={back}
-      />
+      {/* Contracts and assets open over the customer drawer. */}
+      <CustomerDrawer customer={customer} onClose={() => setCustomer(null)} />
 
       <DataTable
         title="Customers"

@@ -11,10 +11,10 @@ import EntityContextPanel from "./context-panel-entity";
 import DocPanel from "./doc-panel";
 import ConversationPeople from "./conversation-people";
 import { ChatThread, type AssignedTask, type ChatMsg, type StoredConversation } from "./chat-panel";
-import { PEOPLE, type Person } from "@/lib/people-data";
+import { ALL_PEOPLE, type Person } from "@/lib/people-data";
 import { answerQuery, detectCustomer, suggestNext, visualFor } from "@/lib/knowledge-base";
 import { flowFor, flowById } from "@/lib/guided-flows";
-import { type Playbook } from "@/lib/alert-playbooks";
+import { type Playbook, type PlaybookPanel } from "@/lib/alert-playbooks";
 import DocumentViewer, { type ViewDoc } from "@/components/dashboard/sales/document-viewer";
 import { type ContextEntity } from "@/components/dashboard/conversation-launcher";
 import { useAppSelector } from "@/store/hooks";
@@ -256,7 +256,25 @@ export default function ConversationOverlay({ visible, onClose, context, initial
     push({ role: "ai", kind: "event", text: `${person.name} left the conversation` });
   };
 
+  const addPersonById = (personId: string) => {
+    const person = ALL_PEOPLE.find((p) => p.id === personId);
+    if (person) addPerson(person);
+  };
+
   const assignTask = (task: AssignedTask) => push({ role: "ai", kind: "task", task });
+
+  // Save an edited playbook document back into its message, and note the
+  // revision in the thread so anyone joining later can see it changed.
+  const updatePanel = (messageId: number, panel: PlaybookPanel) => {
+    setMessages((m) => m.map((msg) => (msg.id === messageId ? { ...msg, panel } : msg)));
+    const title = panel.kind === "recap" && panel.doc ? panel.doc.docType : "Document";
+    push({ role: "ai", kind: "event", text: `${title} edited by you` });
+  };
+
+  // People the assistant has suggested bringing in who aren't in yet.
+  const suggestedPeople = messages
+    .map((m) => (m.kind === "suggest-person" ? ALL_PEOPLE.find((p) => p.id === m.suggestion?.personId) : undefined))
+    .filter((p): p is Person => !!p && !participants.some((x) => x.id === p.id));
 
   // Open an alert conversation with a grounded playbook: the situation (data),
   // a recommendation, then next-step buttons - many of which start a wizard.
@@ -288,6 +306,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
           push(recommendation);
           if (pb.panel) push({ role: "ai", kind: "panel", panel: pb.panel });
         }
+        if (pb.suggestedPerson) push({ role: "ai", kind: "suggest-person", suggestion: pb.suggestedPerson });
       }, 1900)
     );
     // Keep the widget context / customer in sync for the left pane.
@@ -325,7 +344,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
       setActiveEntity(restore.entity ?? null);
       setDetectedCustomer(restore.detectedCustomer ?? null);
       setParticipants(
-        (restore.participantIds ?? []).map((id) => PEOPLE.find((p) => p.id === id)).filter((p): p is Person => !!p)
+        (restore.participantIds ?? []).map((id) => ALL_PEOPLE.find((p) => p.id === id)).filter((p): p is Person => !!p)
       );
       if (restore.messages.length > 0) {
         // Restore the existing thread
@@ -516,6 +535,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
             <div className="flex items-center gap-1 shrink-0">
               <ConversationPeople
                 participants={participants}
+                suggested={suggestedPeople}
                 onAdd={addPerson}
                 onRemove={removePerson}
                 onAssign={assignTask}
@@ -566,6 +586,9 @@ export default function ConversationOverlay({ visible, onClose, context, initial
                 onFlowComplete={flowComplete}
                 onOpenDoc={setViewDoc}
                 onSend={(t) => send(t)}
+                onUpdatePanel={updatePanel}
+                participantIds={participants.map((p) => p.id)}
+                onAddPerson={addPersonById}
               />
             )}
           </div>

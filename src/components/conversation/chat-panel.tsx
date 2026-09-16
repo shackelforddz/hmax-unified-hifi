@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Asterisk, Info, Check, AlertTriangle, ChevronLeft, ChevronRight, X, Plus, GripVertical, BarChart2, ClipboardCheck, CalendarClock, Send } from "lucide-react";
+import { Asterisk, Info, Check, AlertTriangle, ChevronLeft, ChevronRight, X, Plus, GripVertical, BarChart2, ClipboardCheck, CalendarClock, Send, Lightbulb, Pencil, UserRoundPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type Suggestions } from "@/lib/knowledge-base";
 import { type CustomWidgetConfig } from "@/lib/custom-widget";
@@ -9,7 +9,8 @@ import { type ContextEntity } from "@/components/dashboard/conversation-launcher
 import { ChartBody } from "@/components/dashboard/sales/custom-widget-view";
 import { flowById, type GuidedFlow, type FlowField } from "@/lib/guided-flows";
 import { type PlaybookPanel } from "@/lib/alert-playbooks";
-import { DocContent, type ViewDoc } from "@/components/dashboard/sales/document-viewer";
+import { DocContent, DocEditor, type ViewDoc } from "@/components/dashboard/sales/document-viewer";
+import { ALL_PEOPLE } from "@/lib/people-data";
 import { OPS_CONTRACT_DETAILS } from "@/lib/operations-data";
 
 /* ── Typing indicator ────────────────────────────────────────────── */
@@ -120,7 +121,7 @@ function StepCase() {
       <div>
         <label className="text-xs text-gray-500 mb-2 block">Case type</label>
         <div className="flex gap-2">
-          {["Corrective", "Preventive", "Mobilisation"].map((t) => (
+          {["Corrective", "Preventive"].map((t) => (
             <button
               key={t}
               onClick={() => setCaseType(t)}
@@ -414,14 +415,65 @@ interface Part {
   stock: string;
   stockKind: StockKind;
   lead: string;
+  /** Set once the user takes one of the offered ways round a shortage. */
+  resolvedWith?: string;
 }
+
+/** A way round a part that can't be supplied as scheduled. */
+interface Fix {
+  id: string;
+  label: string;
+  detail: string;
+  /** What the part looks like once this fix is taken. */
+  outcome: Pick<Part, "supplier" | "stock" | "stockKind" | "lead">;
+}
+
+/* Offered on any part that isn't sitting in stock. Each one is a real route a
+   planner would take: pull from another store, swap in an approved equivalent,
+   or pay to expedite. */
+const FIXES: Record<string, Fix[]> = {
+  "ERP-2288": [
+    {
+      id: "transfer",
+      label: "Transfer the Blue Ridge spare",
+      detail: "One set held at Blue Ridge stores, unallocated. Internal transfer clears in 4 days.",
+      outcome: { supplier: "Blue Ridge stores", stock: "Transfer (1)", stockKind: "in", lead: "4d" },
+    },
+    {
+      id: "substitute",
+      label: "Substitute ERP-2290",
+      detail: "Hitachi-approved equivalent, 6 in stock. Needs reliability sign-off on the gasket spec.",
+      outcome: { supplier: "Hitachi factory", stock: "In stock (6)", stockKind: "in", lead: "Ready" },
+    },
+    {
+      id: "expedite",
+      label: "Expedite the factory order",
+      detail: "Air freight instead of sea. Cuts the lead time to 12 days for about €8.4k.",
+      outcome: { supplier: "Special order - air freight", stock: "On order", stockKind: "low", lead: "12d" },
+    },
+  ],
+  "ERP-7783": [
+    {
+      id: "depot",
+      label: "Source from the Nexans Milan depot",
+      detail: "6 available locally. Depot transfer lands in 5 days instead of 14.",
+      outcome: { supplier: "Nexans Milan depot", stock: "In stock (6)", stockKind: "in", lead: "5d" },
+    },
+    {
+      id: "split",
+      label: "Split the delivery",
+      detail: "Take the 2 on hand for the first outage; the balance arrives on the original lead time.",
+      outcome: { supplier: "Nexans", stock: "Part-shipped (2)", stockKind: "low", lead: "14d" },
+    },
+  ],
+};
 
 function StockBadge({ kind, label }: { kind: StockKind; label: string }) {
   const cls =
     kind === "out"
-      ? "bg-gray-900 text-white"
+      ? "bg-status-critical text-white font-bold"
       : kind === "low"
-      ? "bg-gray-200 text-gray-700"
+      ? "border border-status-warning text-amber-600 font-bold"
       : "bg-gray-100 text-gray-600";
   return <span className={`text-xs px-2 py-1 rounded-md whitespace-nowrap ${cls}`}>{label}</span>;
 }
@@ -437,10 +489,29 @@ const INITIAL_PARTS: Part[] = [
 
 function StepParts() {
   const [parts, setParts] = useState<Part[]>(INITIAL_PARTS);
+  // Which part's options are open, by code.
+  const [openFix, setOpenFix] = useState<string | null>(null);
 
   const setQty = (i: number, qty: string) =>
     setParts((prev) => prev.map((p, idx) => (idx === i ? { ...p, qty } : p)));
   const removePart = (i: number) => setParts((prev) => prev.filter((_, idx) => idx !== i));
+
+  const applyFix = (code: string, fix: Fix) => {
+    setParts((prev) => prev.map((p) => (p.code === code ? { ...p, ...fix.outcome, resolvedWith: fix.label } : p)));
+    setOpenFix(null);
+  };
+
+  // The banner and summary read off the live list, so they settle as shortages
+  // get resolved.
+  const inStock = parts.filter((p) => p.stockKind === "in").length;
+  const low = parts.filter((p) => p.stockKind === "low").length;
+  const out = parts.filter((p) => p.stockKind === "out").length;
+  const longest = parts.reduce((max, p) => {
+    const days = parseInt(p.lead, 10);
+    return Number.isNaN(days) ? max : Math.max(max, days);
+  }, 0);
+  const blocked = parts.filter((p) => p.stockKind === "out");
+  const resolved = parts.filter((p) => p.resolvedWith);
 
   return (
     <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
@@ -452,21 +523,40 @@ function StepParts() {
         </p>
       </div>
 
-      {/* Summary + warning alerts */}
+      {/* Summary + whatever is still blocking the schedule */}
       <div className="flex flex-col gap-2">
         <div className="flex gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
           <Info size={15} className="text-gray-400 shrink-0 mt-0.5" />
           <p className="text-sm text-gray-700 leading-snug">
-            4 parts in stock · 1 low stock · 1 to order · Longest lead time: 35 days
+            {inStock} parts in stock · {low} low stock · {out} to order
+            {longest > 0 && ` · Longest lead time: ${longest} days`}
           </p>
         </div>
-        <div className="flex gap-3 bg-gray-50 border border-gray-300 rounded-xl px-4 py-3">
-          <AlertTriangle size={15} className="text-gray-500 shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm text-gray-800 leading-snug">Gasket set has a 35-day lead time. Order must be placed today to meet the schedule.</p>
-            <p className="text-sm text-gray-500 leading-snug">Purchase order not yet raised.</p>
+
+        {blocked.length > 0 ? (
+          <div className="flex gap-3 bg-red-50 border border-status-critical/30 rounded-xl px-4 py-3">
+            <AlertTriangle size={15} className="text-status-critical shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-gray-800 leading-snug">
+                {blocked.map((p) => p.name).join(", ")} {blocked.length > 1 ? "are" : "is"} out of stock at a{" "}
+                {blocked[0].lead} lead time - the schedule can&apos;t hold as written.
+              </p>
+              <p className="text-sm text-gray-500 leading-snug">Open &ldquo;Resolve&rdquo; on the row for ways round it.</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          resolved.length > 0 && (
+            <div className="flex gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+              <Check size={15} className="text-status-ok shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm text-gray-800 leading-snug">Every shortage has a route round it.</p>
+                <p className="text-sm text-gray-500 leading-snug">
+                  {resolved.map((p) => `${p.name}: ${p.resolvedWith}`).join(" · ")}
+                </p>
+              </div>
+            </div>
+          )
+        )}
       </div>
 
       {/* Parts table */}
@@ -481,34 +571,79 @@ function StepParts() {
           <span className="text-[11px] text-gray-400 tracking-wider text-right">OK</span>
         </div>
         {/* Rows */}
-        {parts.map((p, i) => (
-          <div
-            key={p.code}
-            className="grid grid-cols-[1fr_auto_96px_92px_48px_28px] gap-x-3 px-1 py-3 items-center border-b border-gray-100"
-          >
-            <div className="min-w-0">
-              <p className="text-sm text-gray-800 truncate">{p.name}</p>
-              <p className="text-xs text-gray-400">{p.code}</p>
+        {parts.map((p, i) => {
+          const fixes = FIXES[p.code] ?? [];
+          const needsFix = p.stockKind !== "in" && fixes.length > 0;
+          const open = openFix === p.code;
+          return (
+            <div key={p.code} className="border-b border-gray-100">
+              <div className="grid grid-cols-[1fr_auto_96px_92px_48px_28px] gap-x-3 px-1 py-3 items-center">
+                <div className="min-w-0">
+                  <p className="text-sm text-gray-800 truncate">{p.name}</p>
+                  <p className="text-xs text-gray-400">{p.code}</p>
+                </div>
+                <input
+                  value={p.qty}
+                  onChange={(e) => setQty(i, e.target.value)}
+                  className="w-9 h-8 text-center text-sm text-gray-800 border border-gray-200 rounded-full outline-none focus:border-gray-400"
+                />
+                <span className="text-xs text-gray-500 truncate">{p.supplier}</span>
+                <StockBadge kind={p.stockKind} label={p.stock} />
+                <span className={`text-xs ${p.stockKind === "out" ? "text-status-critical font-bold" : p.stockKind === "low" ? "text-gray-600" : "text-gray-400"}`}>
+                  {p.lead}
+                </span>
+                <button
+                  onClick={() => removePart(i)}
+                  className="w-6 h-6 flex items-center justify-center text-gray-300 hover:text-gray-600 transition-colors cursor-pointer justify-self-end"
+                  aria-label={`Remove ${p.name}`}
+                >
+                  <X size={15} strokeWidth={1.5} />
+                </button>
+              </div>
+
+              {/* A shortage is never a dead end - offer the ways round it */}
+              {needsFix && (
+                <div className="px-1 pb-3 -mt-1">
+                  <button
+                    onClick={() => setOpenFix(open ? null : p.code)}
+                    aria-expanded={open}
+                    className="flex items-center gap-1.5 text-xs font-bold text-gray-700 border border-gray-200 rounded-full px-3 py-1 hover:border-gray-400 transition-colors cursor-pointer"
+                  >
+                    <Lightbulb size={12} strokeWidth={1.5} className="text-gray-400" />
+                    {open ? "Hide options" : `Resolve · ${fixes.length} options`}
+                  </button>
+
+                  {open && (
+                    <div className="mt-2 flex flex-col gap-1.5">
+                      {fixes.map((f) => (
+                        <button
+                          key={f.id}
+                          onClick={() => applyFix(p.code, f)}
+                          className="text-left bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg px-3 py-2.5 transition-colors cursor-pointer"
+                        >
+                          <span className="flex items-center justify-between gap-3">
+                            <span className="text-sm font-bold text-gray-900 leading-snug">{f.label}</span>
+                            <span className="text-xs text-gray-500 shrink-0 whitespace-nowrap">
+                              {f.outcome.lead === "Ready" ? "Ready now" : f.outcome.lead}
+                            </span>
+                          </span>
+                          <span className="block text-xs text-gray-500 leading-relaxed mt-0.5">{f.detail}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {p.resolvedWith && (
+                <p className="flex items-center gap-1.5 px-1 pb-3 -mt-1 text-xs text-gray-500">
+                  <Check size={12} strokeWidth={2} className="text-status-ok shrink-0" />
+                  {p.resolvedWith}
+                </p>
+              )}
             </div>
-            <input
-              value={p.qty}
-              onChange={(e) => setQty(i, e.target.value)}
-              className="w-9 h-8 text-center text-sm text-gray-800 border border-gray-200 rounded-full outline-none focus:border-gray-400"
-            />
-            <span className="text-xs text-gray-500 truncate">{p.supplier}</span>
-            <StockBadge kind={p.stockKind} label={p.stock} />
-            <span className={`text-xs ${p.stockKind === "out" ? "text-gray-900 font-medium" : p.stockKind === "low" ? "text-gray-600" : "text-gray-400"}`}>
-              {p.lead}
-            </span>
-            <button
-              onClick={() => removePart(i)}
-              className="w-6 h-6 flex items-center justify-center text-gray-300 hover:text-gray-600 transition-colors cursor-pointer justify-self-end"
-              aria-label={`Remove ${p.name}`}
-            >
-              <X size={15} strokeWidth={1.5} />
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Add part */}
@@ -1117,13 +1252,15 @@ export interface AssignedTask {
 export interface ChatMsg {
   id: number;
   role: "user" | "ai";
-  kind?: "text" | "wizard" | "opp-wizard" | "flow" | "panel" | "event" | "task";
+  kind?: "text" | "wizard" | "opp-wizard" | "flow" | "panel" | "event" | "task" | "suggest-person";
   /** For kind === "flow": which guided flow to render. */
   flowId?: string;
   /** For kind === "panel": the interactive alert-playbook panel. */
   panel?: PlaybookPanel;
   /** For kind === "task": the assignment card. */
   task?: AssignedTask;
+  /** For kind === "suggest-person": who to bring in, and why. */
+  suggestion?: { personId: string; reason: string };
   text?: string;
   suggestions?: Suggestions;
   visual?: CustomWidgetConfig;
@@ -1183,7 +1320,7 @@ function SuggestionBlock({ suggestions, onSend }: { suggestions: Suggestions; on
 }
 
 /* ── Alert-playbook interactive panel ────────────────────────────── */
-function PanelBlock({ panel, onSend, onOpenDoc }: { panel: PlaybookPanel; onSend?: (t: string) => void; onOpenDoc?: (doc: ViewDoc) => void }) {
+function PanelBlock({ panel, onSend, onOpenDoc, onUpdate }: { panel: PlaybookPanel; onSend?: (t: string) => void; onOpenDoc?: (doc: ViewDoc) => void; onUpdate?: (panel: PlaybookPanel) => void }) {
   if (panel.kind === "options") {
     return (
       <div className="bg-white border border-gray-100 rounded-2xl p-4">
@@ -1224,32 +1361,7 @@ function PanelBlock({ panel, onSend, onOpenDoc }: { panel: PlaybookPanel; onSend
   }
 
   if (panel.kind === "recap") {
-    return (
-      <div className="bg-white border border-gray-100 rounded-2xl p-4">
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <p className="text-sm text-gray-900">{panel.heading}</p>
-          {panel.doc && onOpenDoc && (
-            <button onClick={() => onOpenDoc(panel.doc!)} className="text-xs text-gray-600 underline underline-offset-2 decoration-gray-300 hover:decoration-gray-700 cursor-pointer shrink-0">
-              Open full document
-            </button>
-          )}
-        </div>
-        {panel.doc ? (
-          // Show the document content inline in the conversation.
-          <DocContent doc={panel.doc} />
-        ) : (
-          <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
-            {panel.rows.map((r, i) => (
-              <div key={r.label} className={`flex items-start gap-4 px-4 py-2.5 ${i < panel.rows.length - 1 ? "border-b border-gray-100" : ""}`}>
-                <span className="text-xs text-gray-400 w-32 shrink-0 pt-0.5">{r.label}</span>
-                <span className="text-sm text-gray-800 flex-1">{r.value}</span>
-              </div>
-            ))}
-          </div>
-        )}
-        {panel.note && <p className="text-xs text-gray-500 mt-2.5">{panel.note}</p>}
-      </div>
-    );
+    return <RecapPanel panel={panel} onOpenDoc={onOpenDoc} onUpdate={onUpdate} />;
   }
 
   if (panel.kind === "draft") {
@@ -1291,6 +1403,89 @@ function PanelBlock({ panel, onSend, onOpenDoc }: { panel: PlaybookPanel; onSend
       <Button onClick={() => onSend?.(panel.submitPrompt)} className="mt-3 rounded-full h-auto px-5 py-2 text-sm cursor-pointer">
         {panel.submitLabel}
       </Button>
+    </div>
+  );
+}
+
+/* A reviewed document, shown inline. Editable ones (e.g. a scope
+   feasibility review) can be revised in place before sign-off. */
+function RecapPanel({ panel, onOpenDoc, onUpdate }: { panel: Extract<PlaybookPanel, { kind: "recap" }>; onOpenDoc?: (doc: ViewDoc) => void; onUpdate?: (panel: PlaybookPanel) => void }) {
+  const [editing, setEditing] = useState(false);
+  const canEdit = !!panel.doc && !!panel.editable && !!onUpdate;
+  return (
+    <div className="bg-white border border-gray-100 rounded-2xl p-4">
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <p className="text-sm text-gray-900">{panel.heading}</p>
+        {panel.doc && !editing && (
+          <div className="flex items-center gap-3 shrink-0">
+            {canEdit && (
+              <button onClick={() => setEditing(true)} className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">
+                <Pencil size={12} strokeWidth={1.5} />
+                Edit
+              </button>
+            )}
+            {onOpenDoc && (
+              <button onClick={() => onOpenDoc(panel.doc!)} className="text-xs text-gray-600 underline underline-offset-2 decoration-gray-300 hover:decoration-gray-700 cursor-pointer">
+                Open full document
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+      {panel.doc && editing ? (
+        <DocEditor
+          doc={panel.doc}
+          onCancel={() => setEditing(false)}
+          onSave={(doc) => {
+            setEditing(false);
+            onUpdate?.({ ...panel, doc, rows: doc.fields });
+          }}
+        />
+      ) : panel.doc ? (
+        // Show the document content inline in the conversation.
+        <DocContent doc={panel.doc} />
+      ) : (
+        <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
+          {panel.rows.map((r, i) => (
+            <div key={r.label} className={`flex items-start gap-4 px-4 py-2.5 ${i < panel.rows.length - 1 ? "border-b border-gray-100" : ""}`}>
+              <span className="text-xs text-gray-400 w-32 shrink-0 pt-0.5">{r.label}</span>
+              <span className="text-sm text-gray-800 flex-1">{r.value}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {panel.note && <p className="text-xs text-gray-500 mt-2.5">{panel.note}</p>}
+    </div>
+  );
+}
+
+/* ── A coworker the assistant suggests bringing in ───────────────── */
+function PersonSuggestionCard({ suggestion, added, onAdd }: { suggestion: { personId: string; reason: string }; added: boolean; onAdd?: (personId: string) => void }) {
+  const person = ALL_PEOPLE.find((p) => p.id === suggestion.personId);
+  if (!person) return null;
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-gray-100 flex items-center gap-2">
+        <UserRoundPlus size={14} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+        <p className="text-xs text-gray-500">Suggested teammate</p>
+      </div>
+      <div className="px-4 py-3 flex items-center gap-3">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={person.avatar} alt="" aria-hidden className="w-9 h-9 rounded-full object-cover bg-gray-200 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm text-gray-900 truncate">{person.name} · {person.role}</p>
+          <p className="text-xs text-gray-500 leading-relaxed">{suggestion.reason}</p>
+        </div>
+        {added ? (
+          <span className="shrink-0 flex items-center gap-1 text-xs text-gray-400">
+            <Check size={13} strokeWidth={1.5} /> Added
+          </span>
+        ) : (
+          <Button onClick={() => onAdd?.(person.id)} className="rounded-full h-auto px-4 py-1.5 text-xs cursor-pointer shrink-0">
+            Add to conversation
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
@@ -1349,10 +1544,17 @@ interface ThreadProps {
   onFlowComplete?: (flowId: string) => void;
   onOpenDoc?: (doc: ViewDoc) => void;
   onSend?: (text: string) => void;
+  /** Replace a playbook panel in place (e.g. after editing its document). */
+  onUpdatePanel?: (messageId: number, panel: PlaybookPanel) => void;
+  /** Who is already in the conversation, and how to add someone. */
+  participantIds?: string[];
+  onAddPerson?: (personId: string) => void;
 }
 
-export function ChatThread({ messages, typing, context, wizardStep, onWizardStep, onGenerate, onOppCreate, onFlowComplete, onOpenDoc, onSend }: ThreadProps) {
-  const lastId = messages[messages.length - 1]?.id;
+export function ChatThread({ messages, typing, context, wizardStep, onWizardStep, onGenerate, onOppCreate, onFlowComplete, onOpenDoc, onSend, onUpdatePanel, participantIds = [], onAddPerson }: ThreadProps) {
+  // Next-step buttons sit under the newest reply; thread notices and teammate
+  // suggestions that follow it shouldn't take them away.
+  const lastId = messages.filter((m) => m.kind !== "event" && m.kind !== "suggest-person").at(-1)?.id;
   return (
     <>
       {/* Widget context pinned to the top */}
@@ -1361,6 +1563,17 @@ export function ChatThread({ messages, typing, context, wizardStep, onWizardStep
       {messages.map((m) =>
         m.kind === "event" ? (
           <EventLine key={m.id} text={m.text ?? ""} />
+        ) : m.kind === "suggest-person" && m.suggestion ? (
+          <div key={m.id} className="flex items-start gap-3 mb-5 animate-message-in">
+            <AiAvatar />
+            <div className="flex-1 min-w-0">
+              <PersonSuggestionCard
+                suggestion={m.suggestion}
+                added={participantIds.includes(m.suggestion.personId)}
+                onAdd={onAddPerson}
+              />
+            </div>
+          </div>
         ) : m.kind === "task" && m.task ? (
           <div key={m.id} className="flex items-start gap-3 mb-5 animate-message-in">
             <AiAvatar />
@@ -1443,7 +1656,7 @@ export function ChatThread({ messages, typing, context, wizardStep, onWizardStep
           <div key={m.id} className="flex items-start gap-3 mb-5 animate-message-in">
             <AiAvatar />
             <div className="flex-1 min-w-0">
-              <PanelBlock panel={m.panel} onSend={onSend} onOpenDoc={onOpenDoc} />
+              <PanelBlock panel={m.panel} onSend={onSend} onOpenDoc={onOpenDoc} onUpdate={onUpdatePanel ? (p) => onUpdatePanel(m.id, p) : undefined} />
             </div>
           </div>
         ) : (
