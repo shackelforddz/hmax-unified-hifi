@@ -636,7 +636,7 @@ export const DELIVERY_TREND: {
 } = {
   metric: "On-time delivery",
   current: "60%",
-  delta: "-5% vs last month",
+  delta: "5% vs last month",
   target: 85,
   min: 50,
   max: 90,

@@ -62,7 +62,7 @@ export default function RevenueAtRisk() {
   const max = Math.max(...rows.map((b) => b.amount));
 
   const tab = (active: boolean) =>
-    `h-full flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
+    `h-full flex-1 flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
       active ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
     }`;
 
@@ -81,7 +81,7 @@ export default function RevenueAtRisk() {
       </div>
 
       {/* Same total, two cuts */}
-      <div role="tablist" aria-label="Revenue at risk breakdown" className="bg-gray-100 h-8 flex items-center p-[3px] rounded-full mt-3 self-start">
+      <div role="tablist" aria-label="Revenue at risk breakdown" className="bg-gray-100 h-8 flex items-center p-[3px] rounded-full mt-3">
         {(Object.keys(VIEWS) as View[]).map((v) => (
           <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)} className={tab(view === v)}>
             {v}

@@ -24,7 +24,10 @@ export default function ResponseTime() {
         </span>
       </div>
 
-      <div className="h-[130px]">
+      {/* Grows to fill the tile; the absolute box gives ResponsiveContainer
+          a definite height to measure against. */}
+      <div className="relative flex-1 min-h-[130px]">
+        <div className="absolute inset-0">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={R.points} margin={{ top: 12, right: 14, bottom: 0, left: 14 }}>
             <defs>
@@ -51,24 +54,7 @@ export default function ResponseTime() {
             />
           </AreaChart>
         </ResponsiveContainer>
-      </div>
-
-      {/* Response against SLA, by case priority */}
-      <div className="flex flex-col gap-2 mt-3">
-        {R.byPriority.map((p) => (
-          <div key={p.label} className="flex items-center gap-3">
-            <span className="text-xs text-gray-500 w-16 shrink-0">{p.label}</span>
-            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full ${p.within >= 90 ? "bg-chart-line" : "bg-status-warning"}`}
-                style={{ width: `${p.within}%` }}
-              />
-            </div>
-            <span className="text-xs text-gray-400 shrink-0 w-24 text-right whitespace-nowrap">
-              {p.value} · {p.within}% in SLA
-            </span>
-          </div>
-        ))}
+        </div>
       </div>
     </div>
   );

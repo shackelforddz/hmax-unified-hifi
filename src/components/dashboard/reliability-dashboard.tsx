@@ -43,10 +43,11 @@ export default function ReliabilityDashboard() {
           </div>
         ),
       },
-      // ── Bento: where the fleet is and how it scores, then the estate ──
-      { id: "fleet-map", span: 8, tile: true, node: <FleetMap /> },
+      // ── Bento: the map leads, with fleet health and coverage stacked
+      //    beside it, then the review queues ──
+      { id: "fleet-map", span: 8, rows: 2, tile: true, node: <FleetMap mode="alerts" alerts={ASSET_REVIEW_ALERTS} categoryOptions={REVIEW_CATEGORY_OPTIONS} /> },
       { id: "fleet-health", span: 4, tile: true, node: <FleetHealth /> },
-      { id: "assets-monitored", span: 12, tile: true, node: <AssetsMonitored /> },
+      { id: "assets-monitored", span: 4, tile: true, node: <AssetsMonitored /> },
       {
         id: "assets-to-review",
         span: 12,

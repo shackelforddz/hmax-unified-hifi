@@ -28,7 +28,7 @@ export default function ReportTurnaround() {
           </div>
           <p className="flex items-center gap-1 text-xs text-gray-500 mt-1.5">
             {overTarget > 0 && <ArrowUp size={11} strokeWidth={2} className="shrink-0" />}
-            <span className="text-gray-700">{overTarget > 0 ? `+${overTarget} days` : "on target"}</span>
+            <span className="text-gray-700">{overTarget > 0 ? `${overTarget} days` : "on target"}</span>
             <span className="text-gray-400">vs {T.targetDays}-day target</span>
           </p>
           <div className="w-full h-8 mt-2">

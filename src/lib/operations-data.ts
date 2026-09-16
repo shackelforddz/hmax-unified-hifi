@@ -10,10 +10,10 @@ export const PORTFOLIO_HEALTH = {
   // Headline KPIs
   executedMargin: "18.6%",
   asSoldMargin: "19.4%",
-  marginDelta: "-0.8pp",
+  marginDelta: "0.8pp",
   revenue: "€18.4m",
   revenueForecast: "€18.9m",
-  revenueDelta: "-€0.5m",
+  revenueDelta: "€0.5m",
   outstandingPayments: "€2.3m",
   outstandingNote: "4 invoices overdue",
   resourceNote: "3 roles to fill",
@@ -430,7 +430,7 @@ export const FINANCIALS: {
    against the 6-hour SLA commitment. */
 export const RESPONSE_TIME = {
   current: "4.2h",
-  delta: "-0.8h vs last month",
+  delta: "0.8h vs last month",
   target: 6,
   min: 0,
   max: 9,
@@ -441,11 +441,6 @@ export const RESPONSE_TIME = {
     { label: "Jun", value: 5.4 },
     { label: "Jul", value: 5.0 },
     { label: "Aug", value: 4.2 },
-  ],
-  byPriority: [
-    { label: "Critical", value: "1.6h", within: 96 },
-    { label: "High", value: "3.4h", within: 91 },
-    { label: "Medium", value: "7.8h", within: 78 },
   ],
 };
 
@@ -476,7 +471,7 @@ export const REVENUE_TIMING = {
    Installed base under active condition monitoring across the portfolio. */
 export const ASSETS_MONITORED = {
   total: 248,
-  delta: "+12 vs last month",
+  delta: "12 vs last month",
   breakdown: [
     { label: "Healthy", value: 224 },
     { label: "At risk", value: 18 },

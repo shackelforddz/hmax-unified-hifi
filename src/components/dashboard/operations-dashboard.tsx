@@ -68,16 +68,16 @@ export default function OperationsDashboard() {
           </div>
         ),
       },
-      // ── Bento: each row answers one question - the money, the fleet, how
-      //    operations is running, then what is due next ──
-      { id: "financial", span: 8, tile: true, node: <FinancialPerformance /> },
-      { id: "revenue-timing", span: 4, tile: true, node: <RevenueTiming /> },
-      { id: "fleet-map", span: 8, tile: true, node: <FleetMap mode="ops" /> },
+      // ── Bento: where the work is and what's due next, then the money and
+      //    delivery performance, then the contracts to act on ──
+      { id: "fleet-map", span: 8, rows: 2, tile: true, node: <FleetMap mode="ops" /> },
       { id: "assets-monitored", span: 4, tile: true, node: <AssetsMonitored /> },
-      { id: "delivery-trend", span: 6, tile: true, node: <DeliveryTrend /> },
-      { id: "response-time", span: 6, tile: true, node: <ResponseTime /> },
-      { id: "resource-capacity", span: 6, tile: true, node: <ResourceCapacity /> },
-      { id: "upcoming-servicing", span: 6, tile: true, node: <UpcomingServicing /> },
+      { id: "upcoming-servicing", span: 4, tile: true, node: <UpcomingServicing /> },
+      { id: "financial", span: 6, tile: true, node: <FinancialPerformance /> },
+      { id: "revenue-timing", span: 6, tile: true, node: <RevenueTiming /> },
+      { id: "delivery-trend", span: 4, tile: true, node: <DeliveryTrend /> },
+      { id: "response-time", span: 4, tile: true, node: <ResponseTime /> },
+      { id: "resource-capacity", span: 4, tile: true, node: <ResourceCapacity /> },
       { id: "contracts-attention", span: 12, node: <ContractsAttention /> },
       { id: "field-engineers", span: 12, node: <PeopleWidget people={FIELD_ENGINEERS} title="Field engineers" /> },
     ],

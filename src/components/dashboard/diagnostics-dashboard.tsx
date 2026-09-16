@@ -43,10 +43,11 @@ export default function DiagnosticsDashboard() {
           </div>
         ),
       },
-      // ── Bento: where the fleet is and how it's doing ──
-      { id: "fleet-map", span: 8, tile: true, node: <FleetMap /> },
+      // ── Bento: the map leads, with fleet health and coverage stacked
+      //    beside it, then the reports to interpret ──
+      { id: "fleet-map", span: 8, rows: 2, tile: true, node: <FleetMap mode="alerts" alerts={ASSET_REPORT_ALERTS} categoryOptions={REPORT_CATEGORY_OPTIONS} /> },
       { id: "fleet-health", span: 4, tile: true, node: <FleetHealth /> },
-      { id: "assets-monitored", span: 12, tile: true, node: <AssetsMonitored /> },
+      { id: "assets-monitored", span: 4, tile: true, node: <AssetsMonitored /> },
       {
         id: "reports-to-review",
         span: 12,

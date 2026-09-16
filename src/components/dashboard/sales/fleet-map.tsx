@@ -6,6 +6,7 @@ import WidgetChat from "@/components/dashboard/widget-chat";
 import { TabGroup, Select, ALL } from "@/components/dashboard/filter-controls";
 import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
 import { ALL_PEOPLE } from "@/lib/people-data";
+import type { AssetAlert, AssetCategory } from "@/lib/sales-data";
 import {
   FLEET_SITES,
   RISK_TYPES,
@@ -19,12 +20,16 @@ import AssetDrawer from "./asset-drawer";
 import GoogleFleetMap from "./google-fleet-map";
 
 /** "sales" filters by region, project manager, contracts and leads; "ops"
- *  filters by contract risk type and shows contract detail on each pin. */
-export type FleetMapMode = "sales" | "ops";
+ *  filters by contract risk type and shows contract detail on each pin;
+ *  "alerts" filters by the role's own asset alert categories. */
+export type FleetMapMode = "sales" | "ops" | "alerts";
 
 interface Props {
   /** Omit for the plain map with no filters. */
   mode?: FleetMapMode;
+  /** For "alerts": the role's asset alerts and their category labels. */
+  alerts?: AssetAlert[];
+  categoryOptions?: { label: string; value: AssetCategory | "all" }[];
 }
 
 const SALES_VIEWS = ["Active contracts", "Potential leads"];
@@ -33,7 +38,7 @@ const PROJECT_MANAGERS = [...new Set(FLEET_SITES.flatMap((s) => (s.projectManage
 // The ops map is about delivery, so it only shows assets under a delivery contract.
 const OPS_SITES = FLEET_SITES.filter((s) => s.contract);
 
-export default function FleetMap({ mode }: Props) {
+export default function FleetMap({ mode, alerts = [], categoryOptions = [] }: Props) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const [region, setRegion] = useState(ALL);
   const [pm, setPm] = useState(ALL);
@@ -48,15 +53,26 @@ export default function FleetMap({ mode }: Props) {
     (v === "all" || (v === "Active contracts" ? hasActiveContract(s) : hasLeads(s)));
   const riskKey = (label: string) => RISK_TYPES.find((r) => r.label === label)?.key;
 
+  // Alerts view: each pin's alert, and the category tabs that filter them.
+  const [category, setCategory] = useState("all");
+  const alertFor = (s: FleetSite) => alerts.find((a) => a.id === s.assetId && a.alert);
+  const categoryLabel = (c: AssetCategory) => categoryOptions.find((o) => o.value === c)?.label ?? c;
+  const alertCategories = categoryOptions.filter((o) => o.value !== "all").map((o) => o.label);
+  const inCategory = (s: FleetSite, label: string) => {
+    const a = alertFor(s);
+    return !!a && categoryLabel(a.category) === label;
+  };
+
   const sites = useMemo(() => {
     if (mode === "ops") {
       const key = riskKey(risk);
       return key ? OPS_SITES.filter((s) => carriesRisk(s, key)) : OPS_SITES;
     }
     if (mode === "sales") return FLEET_SITES.filter((s) => salesMatch(s, view));
+    if (mode === "alerts" && category !== "all") return FLEET_SITES.filter((s) => inCategory(s, category));
     return FLEET_SITES;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, region, pm, view, risk]);
+  }, [mode, region, pm, view, risk, category, alerts]);
 
   const filters =
     mode === "sales" ? (
@@ -79,6 +95,14 @@ export default function FleetMap({ mode }: Props) {
         countFor={(label) => OPS_SITES.filter((s) => carriesRisk(s, riskKey(label)!)).length}
         label="Risk type"
       />
+    ) : mode === "alerts" ? (
+      <TabGroup
+        value={category}
+        onChange={setCategory}
+        options={alertCategories}
+        countFor={(label) => FLEET_SITES.filter((s) => inCategory(s, label)).length}
+        label="Risk category"
+      />
     ) : null;
 
   const tip = (site: FleetSite) => (
@@ -86,6 +110,8 @@ export default function FleetMap({ mode }: Props) {
       site={site}
       mode={mode}
       activeRisk={riskKey(risk)}
+      alert={mode === "alerts" ? alertFor(site) : undefined}
+      alertLabel={categoryLabel}
       onViewAsset={() => setAssetId(site.assetId)}
       onViewContract={() => site.contract && setContractId(site.contract.id)}
     />
@@ -113,7 +139,7 @@ export default function FleetMap({ mode }: Props) {
       {apiKey ? (
         <GoogleFleetMap apiKey={apiKey} sites={sites} renderTip={tip} overlay={overlay} />
       ) : (
-        <StaticFleetMap sites={sites} renderTip={tip} overlay={overlay} tipWidth={mode === "ops" ? 288 : 224} tipHeight={mode === "ops" ? 330 : mode === "sales" ? 200 : 140} />
+        <StaticFleetMap sites={sites} renderTip={tip} overlay={overlay} tipWidth={mode === "ops" ? 288 : 224} tipHeight={mode === "ops" ? 330 : mode === "sales" || mode === "alerts" ? 210 : 140} />
       )}
     </>
   );
@@ -151,12 +177,16 @@ export function SiteTip({
   site,
   mode,
   activeRisk,
+  alert,
+  alertLabel,
   onViewAsset,
   onViewContract,
 }: {
   site: FleetSite;
   mode?: FleetMapMode;
   activeRisk?: string;
+  alert?: AssetAlert;
+  alertLabel?: (c: AssetCategory) => string;
   onViewAsset: () => void;
   onViewContract: () => void;
 }) {
@@ -228,6 +258,13 @@ export function SiteTip({
       <div className="mt-2">
         <HealthBar pct={site.health} />
       </div>
+      {alert?.alert && (
+        <div className="mt-2 pt-2 border-t border-gray-100">
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">{alertLabel?.(alert.category) ?? alert.category}</span>
+          <p className="text-xs text-gray-800 leading-snug mt-1.5">{alert.alert.title}</p>
+          {alert.alert.impact && <p className="text-xs text-gray-400 mt-0.5">{alert.alert.impact}</p>}
+        </div>
+      )}
       {mode === "sales" && (
         <div className="flex flex-col gap-0.5 mt-2">
           {site.projectManager && <p className="text-xs text-gray-500">PM: {site.projectManager}</p>}
