@@ -2,14 +2,15 @@
 
 import { useState, useEffect, useRef } from "react";
 import {
-  Calendar, Key, ShoppingCart, Heart, BarChart2, FileText,
-  Library, ArrowUp, UserRoundPlus, X,
+  Calendar, Heart, FileText, NotepadText, Bolt,
+  UserRoundPlus, X,
   TrendingUp, RefreshCw, ClipboardList, Wrench, Stethoscope, Search, Activity,
 } from "lucide-react";
 import ContextPanel from "./context-panel";
 import EntityContextPanel from "./context-panel-entity";
 import DocPanel from "./doc-panel";
 import ConversationPeople from "./conversation-people";
+import PromptBar from "./prompt-bar";
 import { ChatThread, type AssignedTask, type ChatMsg, type StoredConversation } from "./chat-panel";
 import { ALL_PEOPLE, type Person } from "@/lib/people-data";
 import { answerQuery, detectCustomer, suggestNext, visualFor } from "@/lib/knowledge-base";
@@ -18,112 +19,86 @@ import { type Playbook, type PlaybookPanel } from "@/lib/alert-playbooks";
 import DocumentViewer, { type ViewDoc } from "@/components/dashboard/sales/document-viewer";
 import { type ContextEntity } from "@/components/dashboard/conversation-launcher";
 import { useAppSelector } from "@/store/hooks";
-import { Button } from "@/components/ui/button";
 
 interface WelcomeSet {
-  suggestions: { icon: React.ElementType; label: string }[];
-  starters: string[];
-  defaultPrompt: string;
+  /** The four starting points shown under the prompt. `prompt` is what's
+   *  sent when the card is picked; it defaults to the title. */
+  suggestions: { icon: React.ElementType; title: string; sub: string; prompt?: string }[];
 }
 
 // New-conversation content, tailored to the active persona.
 const WELCOME_BY_ROLE: Record<string, WelcomeSet> = {
   "Project Manager": {
     suggestions: [
-      { icon: Calendar, label: "Create a new mobilization plan" },
-      { icon: Key, label: "Mobilize Xcel Next" },
-      { icon: ShoppingCart, label: "Order a part?" },
-      { icon: Heart, label: "Evaluate asset risk/health" },
-      { icon: BarChart2, label: "Create an impact report" },
-      { icon: FileText, label: "Create an invoice" },
+      { icon: NotepadText, title: "New mobilization plan", sub: "Set up new mobilization workflow", prompt: "Create a new mobilization plan" },
+      { icon: Wrench, title: "Schedule field work", sub: "Plan and assign field operations", prompt: "Schedule a field engineer" },
+      { icon: Bolt, title: "Order a part", sub: "Request replacement component" },
+      { icon: Heart, title: "Evaluate asset risk/health", sub: "Assess asset condition and risk" },
     ],
-    starters: [
-      "What needs my attention today?",
-      "Show the portfolio overview",
-      "Which contracts are at risk?",
-      "Why is on-time delivery falling?",
-      "What's driving revenue at risk?",
-      "Show vendor concentration",
-    ],
-    defaultPrompt: "Create a mobilization plan for Xcel Energy",
   },
   Sales: {
     suggestions: [
-      { icon: TrendingUp, label: "Build a new lead" },
-      { icon: RefreshCw, label: "Prepare an SLA renewal" },
-      { icon: FileText, label: "Draft a service offer" },
-      { icon: Heart, label: "Evaluate asset risk/health" },
-      { icon: BarChart2, label: "Create an impact report" },
-      { icon: Search, label: "Summarize an account" },
+      { icon: TrendingUp, title: "Build a new lead", sub: "Start a lead and pre-fill what's known" },
+      { icon: RefreshCw, title: "Prepare an SLA renewal", sub: "Draft the renewal for an expiring SLA" },
+      { icon: FileText, title: "Draft a service offer", sub: "Put together scope and pricing" },
+      { icon: Heart, title: "Evaluate asset risk/health", sub: "Assess asset condition and risk" },
     ],
-    starters: [
-      "What's my pipeline value?",
-      "Which leads need attention?",
-      "Which SLAs renew soon?",
-      "What's the weighted forecast?",
-      "Which assets are critical?",
-      "Show fleet health",
-    ],
-    defaultPrompt: "Summarize my lead pipeline",
   },
   Operations: {
     suggestions: [
-      { icon: ClipboardList, label: "Raise a change order" },
-      { icon: RefreshCw, label: "Rebalance the crew" },
-      { icon: Calendar, label: "Adjust a contract schedule" },
-      { icon: Wrench, label: "Create a contract" },
-      { icon: BarChart2, label: "Create an impact report" },
-      { icon: FileText, label: "Create an invoice" },
+      { icon: ClipboardList, title: "Raise a change order", sub: "Log scope changes for signature" },
+      { icon: RefreshCw, title: "Rebalance the crew", sub: "Move work off over-allocated engineers" },
+      { icon: Calendar, title: "Adjust a contract schedule", sub: "Recover a slipping delivery date" },
+      { icon: FileText, title: "Create an invoice", sub: "Bill a completed milestone" },
     ],
-    starters: [
-      "What needs my attention today?",
-      "Which contracts are critical?",
-      "What change orders are unsigned?",
-      "How is margin vs plan?",
-      "Where are we short on resources?",
-      "Which HSE complaints are open?",
-    ],
-    defaultPrompt: "Show contracts needing attention",
   },
   "Reliability Engineer": {
     suggestions: [
-      { icon: Search, label: "Review a service scope" },
-      { icon: FileText, label: "Check design drawings" },
-      { icon: Activity, label: "Assess asset feasibility" },
-      { icon: Wrench, label: "Draft a maintenance procedure" },
-      { icon: ClipboardList, label: "Log a site constraint" },
-      { icon: BarChart2, label: "Create an impact report" },
+      { icon: Search, title: "Review a service scope", sub: "Check feasibility against the asset" },
+      { icon: FileText, title: "Check design drawings", sub: "Compare as-built with the design" },
+      { icon: Activity, title: "Assess asset feasibility", sub: "Weigh condition against proposed work" },
+      { icon: ClipboardList, title: "Log a site constraint", sub: "Record access or outage limits" },
     ],
-    starters: [
-      "What needs my review today?",
-      "Which scopes are not feasible?",
-      "Which assets need design review?",
-      "What new standards apply?",
-      "Where do handover and site conflict?",
-      "Show fleet health",
-    ],
-    defaultPrompt: "Review the Xcel Energy service scope",
   },
   Diagnostics: {
     suggestions: [
-      { icon: Stethoscope, label: "Interpret a field report" },
-      { icon: Activity, label: "Review a DGA trend" },
-      { icon: Search, label: "Assess a fault signature" },
-      { icon: UserRoundPlus, label: "Dispatch a field engineer" },
-      { icon: Wrench, label: "Draft a diagnostic procedure" },
-      { icon: BarChart2, label: "Create an impact report" },
+      { icon: Stethoscope, title: "Interpret a field report", sub: "Read findings from the field" },
+      { icon: Activity, title: "Review a DGA trend", sub: "Spot developing gas faults" },
+      { icon: Search, title: "Assess a fault signature", sub: "Diagnose what the data points to" },
+      { icon: UserRoundPlus, title: "Dispatch a field engineer", sub: "Send someone to inspect" },
     ],
-    starters: [
-      "Which reports await interpretation?",
-      "Which assets have a fault signature?",
-      "How long do field reports take?",
-      "Which DGA trends are concerning?",
-      "Who is available to inspect?",
-      "Show fleet health",
-    ],
-    defaultPrompt: "Interpret the AST-001 thermal report",
   },
 };
+
+/* Progressive blur: stacked backdrop blurs, each masked to a shorter band
+   from the top, so content is heavily blurred at the top edge and comes
+   back into focus by the bottom of the header. */
+const BLUR_LAYERS = [
+  { blur: 1, mask: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)" },
+  { blur: 2, mask: "linear-gradient(to bottom, black 0%, black 55%, transparent 80%)" },
+  { blur: 4, mask: "linear-gradient(to bottom, black 0%, black 40%, transparent 65%)" },
+  { blur: 8, mask: "linear-gradient(to bottom, black 0%, black 25%, transparent 50%)" },
+  { blur: 16, mask: "linear-gradient(to bottom, black 0%, black 10%, transparent 35%)" },
+];
+
+function ProgressiveBlur() {
+  return (
+    <div aria-hidden className="absolute inset-0 pointer-events-none">
+      {BLUR_LAYERS.map(({ blur, mask }) => (
+        <div
+          key={blur}
+          className="absolute inset-0"
+          style={{
+            backdropFilter: `blur(${blur}px)`,
+            WebkitBackdropFilter: `blur(${blur}px)`,
+            maskImage: mask,
+            WebkitMaskImage: mask,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 function welcomeFor(role: string): WelcomeSet {
   return WELCOME_BY_ROLE[role] ?? WELCOME_BY_ROLE["Project Manager"];
@@ -293,7 +268,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
         const recommendation: Omit<ChatMsg, "id"> = {
           role: "ai",
           kind: "text",
-          text: `Recommendation - ${pb.recommendation}`,
+          text: `Recommended by HMAX - ${pb.recommendation}`,
           suggestions: { prompts: [], actions: pb.steps },
         };
         // For a recap (e.g. a reviewed document) the flow reads best as
@@ -413,8 +388,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
 
   const handleSend = () => {
     const t = input.trim();
-    if (!t && !started) send(welcome.defaultPrompt);
-    else if (t) send(t);
+    if (t) send(t);
   };
 
   // Final step of the lead wizard - confirm creation.
@@ -467,22 +441,15 @@ export default function ConversationOverlay({ visible, onClose, context, initial
   // otherwise there is no pane (no placeholder / default account).
   const showPanel = started && (!!activeEntity || !!detectedCustomer);
 
-  const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
   return (
     <div
-      className={`fixed inset-0 p-4 z-50 flex transition-opacity duration-300 ${
+      className={`fixed inset-0 p-6 z-50 flex transition-opacity duration-300 ${
         visible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       style={{
-        background: started ? "rgba(245,245,245,0.7)" : "rgba(245,245,245,0.8)",
-        backdropFilter: started ? "blur(16px)" : "blur(16px)",
-        WebkitBackdropFilter: started ? "blur(16px)" : "blur(16px)",
+        background: "#f5f5f5",
+        backdropFilter: "blur(32px)",
+        WebkitBackdropFilter: "blur(32px)",
         transition: "background 500ms ease, backdrop-filter 500ms ease, opacity 300ms ease",
       }}
     >
@@ -494,21 +461,21 @@ export default function ConversationOverlay({ visible, onClose, context, initial
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-6 right-6 z-20 w-9 h-9 rounded-full bg-white/70 backdrop-blur flex items-center justify-center text-gray-500 hover:bg-white transition-colors cursor-pointer"
+          className="absolute top-6 right-6 z-20 size-8 rounded-full flex items-center justify-center text-gray-900 hover:bg-black/5 transition-colors cursor-pointer"
         >
-          <X size={18} strokeWidth={1.5} />
+          <X size={16} />
         </button>
       )}
 
       {/* Left - customer context. For widget-launched chats it stays hidden
           until the conversation is tied to a specific customer. */}
       <div
-        className={`relative z-10 rounded-lg shrink-0 overflow-hidden transition-[width] duration-500 ease-in-out ${
-          showPanel ? "w-[420px]" : "w-0"
+        className={`relative z-10 rounded-2xl shrink-0 overflow-hidden transition-[width,margin] duration-500 ease-in-out ${
+          showPanel ? "w-[372px] mr-6" : "w-0"
         }`}
       >
         <div
-          className={`w-[420px] h-full transition-transform duration-500 ease-in-out ${
+          className={`w-[372px] h-full transition-transform duration-500 ease-in-out ${
             showPanel ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -522,17 +489,15 @@ export default function ConversationOverlay({ visible, onClose, context, initial
 
       {/* Right - welcome → conversation (prompt box is the fixed anchor) */}
       <div className="relative z-10 flex-1 min-w-0 flex flex-col">
-        {/* Header - fades in once started */}
-        <div
-          className={`relative z-20 shrink-0 transition-all duration-500 ${
-            started ? "opacity-100 max-h-20" : "opacity-0 max-h-0 overflow-hidden"
-          }`}
-        >
-          <div className="max-w-[640px] mx-auto w-full px-4 flex items-center justify-between gap-3 pt-7 pb-5">
-            <h2 className="text-xl text-gray-900 truncate min-w-0">
-              {activeContext ?? messages.find((m) => m.role === "user")?.text ?? "New conversation"}
-            </h2>
-            <div className="flex items-center gap-1 shrink-0">
+        {/* Header - floats over the thread, which blurs and fades out beneath it */}
+        {started && (
+          <div className="absolute -top-6 -inset-x-6 z-20 p-6">
+            <ProgressiveBlur />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#f5f5f5] to-[#f5f5f5]/0 pointer-events-none" />
+            <div className="relative flex items-center gap-4">
+              <h2 className="flex-1 min-w-0 text-xl leading-7 text-gray-950 truncate">
+                {activeContext ?? messages.find((m) => m.role === "user")?.text ?? "New conversation"}
+              </h2>
               <ConversationPeople
                 participants={participants}
                 suggested={suggestedPeople}
@@ -543,34 +508,43 @@ export default function ConversationOverlay({ visible, onClose, context, initial
               <button
                 onClick={onClose}
                 aria-label="Close conversation"
-                className="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:bg-black/5 transition-colors cursor-pointer"
+                className="size-8 rounded-full flex items-center justify-center text-gray-950 hover:bg-black/5 transition-colors cursor-pointer shrink-0"
               >
-                <X size={17} strokeWidth={1.5} />
+                <X size={16} />
               </button>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Content area above the prompt */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto no-scrollbar scroll-smooth flex flex-col">
-          <div className={`max-w-[640px] mx-auto w-full px-4 ${started ? "" : "flex-1 flex flex-col items-center justify-center"}`}>
+          <div className={`mx-auto w-full ${started ? "max-w-[600px] pt-14 pb-32" : "max-w-[632px] px-4 flex-1 flex flex-col items-center justify-center"}`}>
             {!started ? (
-              /* Welcome */
-              <div className="w-full animate-message-in">
-                <h1 className=" text-3xl text-gray-900 text-center mb-10">
-                  Create A New Conversation
-                </h1>
-                <div className="grid grid-cols-3 gap-3">
-                  {welcome.suggestions.map(({ icon: Icon, label }) => (
-                    <button
-                      key={label}
-                      onClick={() => send(label)}
-                      className="bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-gray-400 hover:bg-gray-50 transition-colors cursor-pointer group"
-                    >
-                      <Icon size={16} strokeWidth={1.5} className="text-gray-400 mb-2 group-hover:text-gray-700" />
-                      <p className="text-sm text-gray-600 leading-snug">{label}</p>
-                    </button>
-                  ))}
+              /* Welcome - title, the prompt, then four starting points */
+              <div className="w-full flex flex-col items-center gap-16 animate-message-in">
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <h1 className="text-4xl font-bold text-gray-950">Create A New Conversation</h1>
+                  <p className="text-xl text-gray-500">Need Help? Ask Me Anything!</p>
+                </div>
+
+                <div className="w-full flex flex-col gap-6">
+                  <PromptBar value={input} onChange={setInput} onSend={handleSend} className="shadow-xl" />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    {welcome.suggestions.map(({ icon: Icon, title, sub, prompt }) => (
+                      <button
+                        key={title}
+                        onClick={() => send(prompt ?? title)}
+                        className="min-h-[100px] bg-[#222222]/5 hover:bg-[#222222]/10 rounded-xl p-6 flex items-center gap-4 text-left transition-colors cursor-pointer"
+                      >
+                        <Icon size={24} className="text-gray-950 shrink-0" />
+                        <span className="flex-1 min-w-0">
+                          <span className="block text-sm font-bold text-gray-950">{title}</span>
+                          <span className="block text-xs text-gray-500">{sub}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -594,42 +568,17 @@ export default function ConversationOverlay({ visible, onClose, context, initial
           </div>
         </div>
 
-        {/* Persistent prompt box - the anchor that never swaps out */}
-        <div className="shrink-0 pb-6 pt-2">
-          {/* Suggested starter prompts (welcome screen only) */}
-          {!started && (
-            <div className="max-w-[640px] mx-auto w-full px-4 mb-2">
-              <div className="flex gap-2 overflow-x-auto no-scrollbar">
-                {welcome.starters.map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => send(p)}
-                    className="shrink-0 whitespace-nowrap text-xs text-gray-600 bg-white border border-gray-200 rounded-full px-3 py-1.5 hover:border-gray-400 hover:bg-gray-50 transition-colors cursor-pointer"
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          <div className="max-w-[640px] mx-auto w-full px-4">
-            <div className="bg-white border border-gray-200 rounded-2xl flex items-center gap-3 px-4 py-3 shadow-sm">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKey}
-                placeholder={started ? "Message..." : welcome.defaultPrompt}
-                className="flex-1 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
-                autoFocus
-              />
-              <Library size={16} strokeWidth={1.5} className="text-gray-400 cursor-pointer hover:text-gray-600 transition-colors shrink-0" />
-              <Button onClick={handleSend} className="rounded-full size-8 p-0 shrink-0 cursor-pointer">
-                <ArrowUp size={14} strokeWidth={2} />
-              </Button>
-            </div>
+        {/* Prompt - once a conversation starts it floats at the foot of the thread */}
+        {started && (
+          <div className="absolute bottom-0 inset-x-0 z-20 flex justify-center pointer-events-none">
+            <PromptBar
+              value={input}
+              onChange={setInput}
+              onSend={handleSend}
+              className="w-full max-w-[600px] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] pointer-events-auto"
+            />
           </div>
-        </div>
+        )}
       </div>
 
       {/* Document panel - pushes in from the right, mirroring the context panel */}

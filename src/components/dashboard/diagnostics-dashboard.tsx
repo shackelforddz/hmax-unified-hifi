@@ -43,7 +43,7 @@ export default function DiagnosticsDashboard() {
           </div>
         ),
       },
-      // ── Bento: the map leads, with fleet health and coverage stacked
+      // ── Bento: the map leads, with average asset health and coverage stacked
       //    beside it, then the reports to interpret ──
       { id: "fleet-map", span: 8, rows: 2, tile: true, node: <FleetMap mode="alerts" alerts={ASSET_REPORT_ALERTS} categoryOptions={REPORT_CATEGORY_OPTIONS} /> },
       { id: "fleet-health", span: 4, tile: true, node: <FleetHealth /> },
@@ -51,7 +51,7 @@ export default function DiagnosticsDashboard() {
       {
         id: "reports-to-review",
         span: 12,
-        node: <AssetAlerts alerts={ASSET_REPORT_ALERTS} categoryOptions={REPORT_CATEGORY_OPTIONS} title="Asset reports to review" />,
+        node: <AssetAlerts alerts={ASSET_REPORT_ALERTS} categoryOptions={REPORT_CATEGORY_OPTIONS} title="Asset reports to review" showDgaScore />,
       },
       { id: "field-engineers", span: 12, node: <PeopleWidget people={FIELD_ENGINEERS} title="Field engineers" /> },
     ],

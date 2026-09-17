@@ -168,6 +168,21 @@ export const DGA_TRENDS: Record<string, GasTrend[]> = {
   ],
 };
 
+/** DGA score out of 100 (100 = healthy oil). Each gas scores full marks up
+ *  to 30% of its limit, falling to zero at twice the limit; the result
+ *  blends the average with the worst gas, so one gas far over its limit
+ *  (e.g. acetylene from arcing) pulls the score down hard. */
+export function dgaScore(assetId: string): number | null {
+  const gases = DGA_TRENDS[assetId];
+  if (!gases?.length) return null;
+  const scores = gases.map((g) => {
+    const ratio = g.current / g.limit;
+    return ratio <= 0.3 ? 100 : Math.max(0, Math.min(100, (100 * (2 - ratio)) / 1.7));
+  });
+  const avg = scores.reduce((sum, v) => sum + v, 0) / scores.length;
+  return Math.round((avg + Math.min(...scores)) / 2);
+}
+
 /* ── Live sensor faults ──────────────────────────────────────────────
    Conditions the asset's own instrumentation is reporting right now, as
    opposed to a finding written up in a field report. */

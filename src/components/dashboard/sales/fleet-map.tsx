@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Minus } from "lucide-react";
-import WidgetChat from "@/components/dashboard/widget-chat";
+import { useMemo, useState } from "react";
+import StaticMap from "@/components/dashboard/static-map";
 import { TabGroup, Select, ALL } from "@/components/dashboard/filter-controls";
 import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
 import { ALL_PEOPLE } from "@/lib/people-data";
@@ -139,7 +138,13 @@ export default function FleetMap({ mode, alerts = [], categoryOptions = [] }: Pr
       {apiKey ? (
         <GoogleFleetMap apiKey={apiKey} sites={sites} renderTip={tip} overlay={overlay} />
       ) : (
-        <StaticFleetMap sites={sites} renderTip={tip} overlay={overlay} tipWidth={mode === "ops" ? 288 : 224} tipHeight={mode === "ops" ? 330 : mode === "sales" || mode === "alerts" ? 210 : 140} />
+        <StaticMap
+          pins={sites.map((site) => ({ id: site.assetId, x: site.x, y: site.y, ping: site.ping, label: site.code, site }))}
+          renderTip={(pin) => tip(pin.site)}
+          overlay={overlay}
+          tipWidth={mode === "ops" ? 288 : 224}
+          tipHeight={mode === "ops" ? 360 : mode === "sales" || mode === "alerts" ? 210 : 140}
+        />
       )}
     </>
   );
@@ -208,8 +213,10 @@ export function SiteTip({
         <div className="mt-3">
           <p className="text-[11px] text-gray-400 tracking-wider mb-1">Contract health</p>
           <HealthBar pct={contractHealth(c.id)} />
+          <p className="text-[11px] text-gray-400 tracking-wider mt-2 mb-1">Asset health · {site.code}</p>
+          <HealthBar pct={site.health} />
           <p className="text-xs text-gray-400 mt-1">
-            {c.progress}% of term elapsed · {openAlerts} open alert{openAlerts === 1 ? "" : "s"}
+            {openAlerts} open alert{openAlerts === 1 ? "" : "s"} on the contract
           </p>
         </div>
 
@@ -256,6 +263,7 @@ export function SiteTip({
       </div>
       <p className="text-xs text-gray-400 mt-1">{site.customer} · {site.region}</p>
       <div className="mt-2">
+        <p className="text-[11px] text-gray-400 tracking-wider mb-1">Asset health</p>
         <HealthBar pct={site.health} />
       </div>
       {alert?.alert && (
@@ -286,155 +294,8 @@ export function SiteTip({
   );
 }
 
-/* ── Static map (no Google Maps key) ─────────────────────────────── */
-const MIN_ZOOM = 1;
-const MAX_ZOOM = 4;
-
-interface View { zoom: number; panX: number; panY: number }
-
-const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
-
-function clampPan(panX: number, panY: number, zoom: number, w: number, h: number) {
-  return { x: clamp(panX, w - w * zoom, 0), y: clamp(panY, h - h * zoom, 0) };
-}
-
-// Zoom toward a viewport point (cx, cy), keeping that point fixed.
-function zoomAt(v: View, factor: number, cx: number, cy: number, w: number, h: number): View {
-  const zoom = clamp(v.zoom * factor, MIN_ZOOM, MAX_ZOOM);
-  const contentX = (cx - v.panX) / v.zoom;
-  const contentY = (cy - v.panY) / v.zoom;
-  const p = clampPan(cx - contentX * zoom, cy - contentY * zoom, zoom, w, h);
-  return { zoom, panX: p.x, panY: p.y };
-}
-
 export interface MapProps {
   sites: FleetSite[];
   renderTip: (site: FleetSite) => React.ReactNode;
   overlay?: React.ReactNode;
-}
-
-function StaticFleetMap({ sites, renderTip, overlay, tipWidth, tipHeight }: MapProps & { tipWidth: number; tipHeight: number }) {
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ w: 0, h: 0 });
-  const [view, setView] = useState<View>({ zoom: 1, panX: 0, panY: 0 });
-  const viewRef = useRef(view);
-  viewRef.current = view;
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const drag = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
-
-  // Track viewport size for tooltip positioning + pan clamping.
-  useEffect(() => {
-    const el = viewportRef.current;
-    if (!el) return;
-    const measure = () => setSize({ w: el.clientWidth, h: el.clientHeight });
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  // Native wheel listener (non-passive so we can preventDefault the page scroll).
-  useEffect(() => {
-    const el = viewportRef.current;
-    if (!el) return;
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const rect = el.getBoundingClientRect();
-      const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
-      setView((v) => zoomAt(v, factor, e.clientX - rect.left, e.clientY - rect.top, size.w, size.h));
-    };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, [size.w, size.h]);
-
-  const zoomBtn = (dir: 1 | -1) =>
-    setView((v) => zoomAt(v, dir > 0 ? 1.4 : 1 / 1.4, size.w / 2, size.h / 2, size.w, size.h));
-
-  const onPointerDown = (e: React.PointerEvent) => {
-    setSelectedId(null); // clicking the map background closes the tooltip
-    if (viewRef.current.zoom <= 1) return;
-    drag.current = { x: e.clientX, y: e.clientY, panX: view.panX, panY: view.panY };
-    viewportRef.current?.setPointerCapture(e.pointerId);
-  };
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (!drag.current) return;
-    const p = clampPan(drag.current.panX + (e.clientX - drag.current.x), drag.current.panY + (e.clientY - drag.current.y), viewRef.current.zoom, size.w, size.h);
-    setView((v) => ({ ...v, panX: p.x, panY: p.y }));
-  };
-  const onPointerUp = () => { drag.current = null; };
-
-  // A pin filtered off the map takes its tooltip with it.
-  const selected = sites.find((s) => s.assetId === selectedId) ?? null;
-  const half = tipWidth / 2 + 8;
-  const tipX = selected ? clamp((selected.x / 100) * size.w * view.zoom + view.panX, half, size.w - half) : 0;
-  const rawY = selected ? (selected.y / 100) * size.h * view.zoom + view.panY : 0;
-  // Flip below the pin when the tooltip wouldn't fit above it.
-  const tipBelow = rawY < tipHeight + 24;
-
-  return (
-    <div
-      ref={viewportRef}
-      className="relative rounded-xl overflow-hidden border border-gray-200 h-full min-h-[420px] bg-gray-100 select-none touch-none"
-      style={{ cursor: view.zoom > 1 ? (drag.current ? "grabbing" : "grab") : "default" }}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerLeave={onPointerUp}
-    >
-      {/* Transformed map layer */}
-      <div className="absolute inset-0 origin-top-left will-change-transform" style={{ transform: `translate(${view.panX}px, ${view.panY}px) scale(${view.zoom})` }}>
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url(/milan-map.png)" }} />
-        {sites.map((m) => (
-          <span key={m.assetId} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${m.x}%`, top: `${m.y}%` }}>
-            <button
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={(e) => { e.stopPropagation(); setSelectedId((s) => (s === m.assetId ? null : m.assetId)); }}
-              className="relative flex items-center justify-center origin-center cursor-pointer"
-              style={{ transform: `scale(${1 / view.zoom})` }}
-              aria-label={m.code}
-            >
-              {/* A pinging marker is one raising an alert - it reads red. */}
-              {m.ping && <span className="absolute inline-flex h-12 w-12 rounded-full bg-status-critical/30 animate-ping [animation-duration:2.5s]" />}
-              <span
-                className={`relative inline-flex w-2.5 h-2.5 rounded-full transition-all ${
-                  m.ping ? "bg-status-critical" : "bg-gray-900"
-                } ${selectedId === m.assetId ? "scale-125" : ""}`}
-              />
-            </button>
-          </span>
-        ))}
-      </div>
-
-      {overlay}
-
-      {/* Summary tooltip (screen space) */}
-      {selected && (
-        <div
-          onPointerDown={(e) => e.stopPropagation()}
-          className={`absolute z-20 -translate-x-1/2 bg-white rounded-xl shadow-xl border border-gray-100 p-3 animate-message-in ${tipBelow ? "mt-4" : "-translate-y-full -mt-4"}`}
-          style={{ left: tipX, top: rawY, width: tipWidth }}
-        >
-          {renderTip(selected)}
-        </div>
-      )}
-
-      {/* Zoom controls */}
-      <div className="absolute bottom-4 right-4 flex flex-col gap-1.5 z-10" onPointerDown={(e) => e.stopPropagation()}>
-        <button onClick={() => zoomBtn(1)} aria-label="Zoom in" className="w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-600 hover:text-gray-900 shadow cursor-pointer">
-          <Plus size={15} strokeWidth={2} />
-        </button>
-        <button onClick={() => zoomBtn(-1)} aria-label="Zoom out" className="w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-gray-600 hover:text-gray-900 shadow cursor-pointer">
-          <Minus size={15} strokeWidth={2} />
-        </button>
-      </div>
-
-      {/* Chat affordance */}
-      <div className="absolute top-4 right-4 z-10" onPointerDown={(e) => e.stopPropagation()}>
-        <WidgetChat
-          title="Fleet map"
-          triggerClassName="w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-        />
-      </div>
-    </div>
-  );
 }

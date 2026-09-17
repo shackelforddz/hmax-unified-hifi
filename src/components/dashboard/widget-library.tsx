@@ -114,8 +114,8 @@ export const WIDGET_LIBRARY: LibraryWidget[] = [
   },
   {
     id: "fleet-health",
-    title: "Fleet health",
-    description: "Fleet average against the fleet standard over 30 days.",
+    title: "Average Asset Health",
+    description: "Average asset health against the standard over 30 days.",
     category: "Assets",
     span: 4,
     render: () => <FleetHealth />,

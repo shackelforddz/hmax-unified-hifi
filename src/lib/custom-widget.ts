@@ -81,6 +81,24 @@ export function buildSeries(prompt: string): { series: WidgetPoint[]; unit?: str
   return { series: MONTHS.map((m, i) => ({ label: m, value: 20 + ((seed >> (i * 3)) & 31) })) };
 }
 
+/** The visual that best fits what the prompt is asking for: a trend reads as
+ *  a line, a share-of-whole as a donut, a single figure as a KPI, and a
+ *  comparison across things as bars. Falls back to the shape of the data. */
+export function suggestVisual(prompt: string): WidgetType {
+  const q = prompt.toLowerCase();
+  if (!q.trim()) return "line";
+  if (/\b(trends?|over time|history|monthly|by month|by week|weekly|growth|since|last \d+ (months|weeks)|over the last)\b/.test(q)) return "line";
+  if (/\b(breakdown|split|share|mix|proportion|distribution|composition|status|concentration|outcomes?)\b/.test(q)) return "donut";
+  if (/\b(how many|total|count|number of|current|today|average|kpi|overall|awaiting|outstanding)\b/.test(q)) return "kpi";
+  if (/\b(by|per|compare|comparison|top|rank|ranking|versus|vs)\b/.test(q)) return "bar";
+
+  // Nothing explicit - let the data decide.
+  const { series } = buildSeries(prompt);
+  const overTime = series.every((p) => MONTHS.includes(p.label));
+  if (overTime) return "line";
+  return series.length <= 3 ? "donut" : "bar";
+}
+
 function titleFrom(prompt: string): string {
   const t = prompt.trim();
   if (!t) return "Custom widget";

@@ -8,6 +8,7 @@ import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract, type OpsContract
 import { SCOPE_REVIEWS } from "@/lib/reliability-data";
 import ContractSections from "./contract-sections";
 import { drawerLayer } from "@/components/dashboard/detail-drawers";
+import ContextSummary from "@/components/dashboard/context-summary";
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">{children}</div>;
@@ -83,6 +84,20 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
 function DrawerBody({ c, d, onAction }: { c: OpsContract; d: OpsContractDetail; onAction: (p: string) => void }) {
   return (
     <div className="flex flex-col gap-4">
+      {/* Context summary + recommended actions */}
+      <ContextSummary summary={d.summary} critical={c.status === "critical"}>
+        {d.recommendedActions.length > 0 && (
+          <div className="mt-4">
+            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
+            <div className="flex flex-wrap gap-2">
+              {d.recommendedActions.map((a) => (
+                <Button key={a} onClick={() => onAction(a)} className="rounded-full h-auto px-4 py-1.5 text-xs cursor-pointer">{a}</Button>
+              ))}
+            </div>
+          </div>
+        )}
+      </ContextSummary>
+
       {/* Progress */}
       <Card>
         <div className="flex items-center justify-between mb-2">
@@ -93,22 +108,6 @@ function DrawerBody({ c, d, onAction }: { c: OpsContract; d: OpsContractDetail; 
           <div className="h-full bg-chart-line rounded-full" style={{ width: `${c.progress}%` }} />
         </div>
         <p className="text-xs text-gray-400 mt-2">Contract term {c.start} → {c.end}</p>
-      </Card>
-
-      {/* Context summary + recommended actions */}
-      <Card>
-        <SectionTitle>Context summary</SectionTitle>
-        <p className="text-sm text-gray-500 leading-relaxed">{d.summary}</p>
-        {d.recommendedActions.length > 0 && (
-          <div className="mt-4">
-            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended actions</p>
-            <div className="flex flex-wrap gap-2">
-              {d.recommendedActions.map((a) => (
-                <Button key={a} onClick={() => onAction(a)} className="rounded-full h-auto px-4 py-1.5 text-xs cursor-pointer">{a}</Button>
-              ))}
-            </div>
-          </div>
-        )}
       </Card>
 
       {/* Risk profile */}

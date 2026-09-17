@@ -23,6 +23,11 @@ export interface GridItem {
 
 const KEY = (k: string) => `hmax:layout:${k}`;
 
+/* Dashboards whose widget suggestion has been seen this session - once the
+   "Add widget" dialog has been opened and closed, its badge stays gone even
+   as the user switches roles and dashboards remount. */
+const seenSuggestion = new Set<string>();
+
 function readOrder(key: string): string[] | null {
   try {
     const raw = localStorage.getItem(KEY(key));
@@ -63,6 +68,12 @@ export default function DashboardGrid({
 }) {
   // Widgets the user added here - from the library, or built to order.
   const [adding, setAdding] = useState(false);
+  const [suggestionSeen, setSuggestionSeen] = useState(() => seenSuggestion.has(storageKey));
+  const closeAdding = () => {
+    setAdding(false);
+    seenSuggestion.add(storageKey);
+    setSuggestionSeen(true);
+  };
   const [libraryIds, setLibraryIds] = useState<string[]>([]);
   const [customWidgets, setCustomWidgets] = useState<CustomWidgetConfig[]>([]);
 
@@ -178,9 +189,16 @@ export default function DashboardGrid({
               <LayoutGrid size={13} strokeWidth={1.5} />
               Reorganize
             </button>
-            <button onClick={() => setAdding(true)} className="ml-auto flex items-center gap-1.5 h-8 px-3 rounded-full bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:border-gray-400 transition-colors cursor-pointer shrink-0">
+            <button
+              onClick={() => setAdding(true)}
+              aria-label={suggestionSeen ? "Add widget" : "Add widget - 1 suggestion"}
+              className="ml-auto flex items-center gap-1.5 h-8 px-3 rounded-full bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:border-gray-400 transition-colors cursor-pointer shrink-0"
+            >
               <Plus size={13} strokeWidth={1.5} />
               Add widget
+              {!suggestionSeen && (
+                <span className="min-w-4 h-4 px-1 rounded-full bg-status-critical text-white text-[10px] leading-4 text-center">1</span>
+              )}
             </button>
           </>
         )}
@@ -194,9 +212,9 @@ export default function DashboardGrid({
           }}
           onAddCustom={(config) => {
             setCustomWidgets((ws) => [...ws, config]);
-            setAdding(false);
+            closeAdding();
           }}
-          onClose={() => setAdding(false)}
+          onClose={closeAdding}
         />
       )}
 

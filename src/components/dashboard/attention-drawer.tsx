@@ -6,6 +6,7 @@ import {
   TriangleAlert, RefreshCw, UserPlus, ExternalLink,
 } from "lucide-react";
 import {
+  ATTENTION_ITEMS,
   CUSTOMER_DETAILS,
   type CustomerDetail,
   type DocState,
@@ -15,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "./conversation-launcher";
 import { AssetLink, ContractLink } from "@/components/dashboard/detail-drawers";
+import ContextSummary from "@/components/dashboard/context-summary";
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
@@ -66,17 +68,14 @@ function SectionTitle({ children, action }: { children: React.ReactNode; action?
   );
 }
 
-function DrawerBody({ d, onAction }: { d: CustomerDetail; onAction: (prompt: string) => void }) {
+function DrawerBody({ d, critical, onAction }: { d: CustomerDetail; critical: boolean; onAction: (prompt: string) => void }) {
   return (
     <div className="flex flex-col gap-4">
       {/* Context summary */}
-      <Card>
-        <SectionTitle>Context summary</SectionTitle>
-        <p className="text-sm text-gray-500 leading-relaxed">{d.contextSummary}</p>
-
+      <ContextSummary summary={d.contextSummary} critical={critical}>
         {d.recommendedActions && d.recommendedActions.length > 0 && (
           <div className="mt-4">
-            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended actions</p>
+            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
             <div className="flex flex-wrap gap-2">
               {d.recommendedActions.map((a) => (
                 <Button
@@ -90,7 +89,7 @@ function DrawerBody({ d, onAction }: { d: CustomerDetail; onAction: (prompt: str
             </div>
           </div>
         )}
-      </Card>
+      </ContextSummary>
 
       {/* Delivery & commercial status */}
       <Card>
@@ -418,7 +417,7 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
 
             {/* Scrollable body */}
             <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-5 bg-white">
-              <DrawerBody d={detail} onAction={runAction} />
+              <DrawerBody d={detail} critical={ATTENTION_ITEMS.find((a) => a.id === itemId)?.status === "critical"} onAction={runAction} />
             </div>
 
             {/* Footer */}

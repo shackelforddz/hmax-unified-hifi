@@ -194,9 +194,9 @@ export default function ConversationPeople({ participants, suggested = [], onAdd
           onClick={() => setOpen((o) => !o)}
           aria-label="Add people to this conversation"
           aria-expanded={open}
-          className="w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:bg-black/5 transition-colors cursor-pointer"
+          className="size-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-950 hover:bg-black/5 transition-colors cursor-pointer"
         >
-          <UserRoundPlus size={17} strokeWidth={1.5} />
+          <UserRoundPlus size={16} />
         </button>
 
         {open && (
@@ -272,10 +272,10 @@ export default function ConversationPeople({ participants, suggested = [], onAdd
                       <span className="block text-xs text-gray-400 truncate">
                         {p.role} · {p.allocation}% allocated
                       </span>
+                      {isSuggested(p) && (
+                        <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full bg-gray-900 text-white">Recommended by HMAX</span>
+                      )}
                     </span>
-                    {isSuggested(p) && (
-                      <span className="shrink-0 text-[10px] px-2 py-0.5 rounded-full bg-gray-900 text-white">Suggested</span>
-                    )}
                     <span className="shrink-0 text-xs text-gray-400">Add</span>
                   </button>
                 ))

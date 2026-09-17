@@ -771,7 +771,7 @@ function legalPanel(): PlaybookPanel {
 function scopeDraftPanel(): PlaybookPanel {
   return {
     kind: "draft",
-    heading: "Recommended scope",
+    heading: "Scope recommended by HMAX",
     note: "Drafted from the on-site agreement and prior change orders. Edit before you log it as a change order.",
     value:
       "Additional protection-relay works agreed verbally on site: supply and install 3× protection-relay modules on the North Sea platform cluster, including commissioning and updated protection settings. Estimated value €680k. To be raised as a change order for signature before invoicing.",

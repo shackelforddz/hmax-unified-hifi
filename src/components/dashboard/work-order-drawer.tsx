@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { WORK_ORDERS, WORK_ORDER_DETAILS, type WorkOrder, type WorkOrderDetail, type WoStatus, type WoPriority } from "@/lib/work-orders-data";
 import { AssetLink, ContractLink } from "@/components/dashboard/detail-drawers";
+import ContextSummary from "@/components/dashboard/context-summary";
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">{children}</div>;
@@ -83,6 +84,20 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
 function DrawerBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDetail; onAction: (p: string) => void }) {
   return (
     <div className="flex flex-col gap-4">
+      {/* Summary + actions */}
+      <ContextSummary summary={d.summary} critical={w.priority === "critical"}>
+        {d.recommendedActions.length > 0 && (
+          <div className="mt-4">
+            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
+            <div className="flex flex-wrap gap-2">
+              {d.recommendedActions.map((a) => (
+                <Button key={a} onClick={() => onAction(a)} className="rounded-full h-auto px-4 py-1.5 text-xs cursor-pointer">{a}</Button>
+              ))}
+            </div>
+          </div>
+        )}
+      </ContextSummary>
+
       {/* Progress */}
       <Card>
         <div className="flex items-center justify-between mb-2">
@@ -92,22 +107,6 @@ function DrawerBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDetail; onAc
         <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
           <div className="h-full bg-chart-line rounded-full" style={{ width: `${w.progress}%` }} />
         </div>
-      </Card>
-
-      {/* Summary + actions */}
-      <Card>
-        <SectionTitle>Context summary</SectionTitle>
-        <p className="text-sm text-gray-500 leading-relaxed">{d.summary}</p>
-        {d.recommendedActions.length > 0 && (
-          <div className="mt-4">
-            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended actions</p>
-            <div className="flex flex-wrap gap-2">
-              {d.recommendedActions.map((a) => (
-                <Button key={a} onClick={() => onAction(a)} className="rounded-full h-auto px-4 py-1.5 text-xs cursor-pointer">{a}</Button>
-              ))}
-            </div>
-          </div>
-        )}
       </Card>
 
       {/* Checklist */}

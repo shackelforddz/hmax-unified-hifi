@@ -7,6 +7,7 @@ import { useConversationLauncher } from "@/components/dashboard/conversation-lau
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract } from "@/lib/operations-data";
 import { CUSTOMER_DETAILS } from "@/lib/dashboard-data";
 import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
+import ContextSummary from "@/components/dashboard/context-summary";
 
 /** "Baltic Wind NL" -> "baltic-wind-nl", the CUSTOMER_DETAILS key. */
 function slug(name: string): string {
@@ -164,10 +165,7 @@ export default function CustomerDrawer({ customer, onClose }: Props) {
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-5 bg-white flex flex-col gap-4">
-              <Card>
-                <SectionTitle>Summary</SectionTitle>
-                <p className="text-sm text-gray-500 leading-relaxed">{summary}</p>
-              </Card>
+              <ContextSummary summary={summary} critical={worst === "critical"} />
 
               {contacts.length > 0 && (
                 <Card>

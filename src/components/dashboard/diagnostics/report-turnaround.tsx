@@ -23,7 +23,7 @@ export default function ReportTurnaround() {
         {/* Headline: actual vs target + trend */}
         <div className="shrink-0 w-40">
           <div className="flex items-end gap-1">
-            <p className="text-3xl font-bold text-gray-900 leading-none">{T.actualDays}</p>
+            <p className="text-2xl font-bold text-gray-900 leading-none">{T.actualDays}</p>
             <p className="text-sm text-gray-400 mb-0.5">days</p>
           </div>
           <p className="flex items-center gap-1 text-xs text-gray-500 mt-1.5">

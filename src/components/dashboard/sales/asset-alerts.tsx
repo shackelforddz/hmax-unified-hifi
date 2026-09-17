@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import AlertsWidget from "@/components/dashboard/alerts-widget";
 import AssetDrawer from "./asset-drawer";
-import { ASSET_ALERTS, ASSET_DETAILS, sensorFaultsFor, type AssetAlert, type AssetCategory } from "@/lib/sales-data";
+import { ASSET_ALERTS, ASSET_DETAILS, dgaScore, sensorFaultsFor, type AssetAlert, type AssetCategory } from "@/lib/sales-data";
 import { buildPlaybook } from "@/lib/alert-playbooks";
 import { withImpact, type AlertItem, type AlertUrgency } from "@/lib/alerts";
 
@@ -19,6 +19,14 @@ interface AssetAlertsProps {
   alerts?: AssetAlert[];
   categoryOptions?: { label: string; value: AssetCategory | "all" }[];
   title?: string;
+  /** Add each asset's DGA score to the alert meta (Diagnostics). */
+  showDgaScore?: boolean;
+}
+
+/* The asset's DGA score as a meta entry, when it has DGA data. */
+function dgaMeta(assetId: string) {
+  const score = dgaScore(assetId);
+  return score === null ? [] : [{ label: "DGA score", value: `${score}/100` }];
 }
 
 /* Faults the asset's own sensors are reporting right now, folded into the
@@ -29,6 +37,7 @@ export default function AssetAlerts({
   alerts = ASSET_ALERTS,
   categoryOptions = CATEGORY_OPTIONS,
   title = "Asset Alerts",
+  showDgaScore = false,
 }: AssetAlertsProps = {}) {
   const [drawerId, setDrawerId] = useState<string | null>(null);
 
@@ -58,6 +67,7 @@ export default function AssetAlerts({
             { label: "Asset", value: a.code },
             { label: "Sensor", value: f.sensor },
             { label: "Reading", value: `${f.value} / ${f.limit}` },
+            ...(showDgaScore ? dgaMeta(a.id) : []),
             { label: "Active", value: f.active },
           ],
           action: "Schedule inspection",
@@ -69,7 +79,7 @@ export default function AssetAlerts({
           detailId: a.id,
         }))
       ),
-    [alerts]
+    [alerts, showDgaScore]
   );
 
   const items = useMemo<AlertItem[]>(
@@ -92,6 +102,7 @@ export default function AssetAlerts({
                 { label: "Asset", value: a.code },
                 { label: "Location", value: a.location },
                 { label: "Health", value: `${a.health}%` },
+                ...(showDgaScore ? dgaMeta(a.id) : []),
               ],
               a.alert!.impact
             ),
@@ -104,7 +115,7 @@ export default function AssetAlerts({
             detailId: a.id,
           };
         }),
-    [alerts, labelFor]
+    [alerts, labelFor, showDgaScore]
   );
 
   // Sensor faults lead - they are happening now.

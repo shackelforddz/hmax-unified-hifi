@@ -16,6 +16,7 @@ import { SITE_CONSTRAINTS } from "@/lib/reliability-data";
 import { Aging, ScoreCalculation, RiskMatrix, ConditionTrend, ParameterTrend, Diagnostics } from "./asset-condition";
 import DocumentViewer, { type ViewDoc } from "./document-viewer";
 import { drawerLayer, ContractLink } from "@/components/dashboard/detail-drawers";
+import ContextSummary from "@/components/dashboard/context-summary";
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -153,12 +154,10 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
   return (
     <div className="flex flex-col gap-4">
       {/* Context summary */}
-      <Card>
-        <SectionTitle>Context summary</SectionTitle>
-        <p className="text-sm text-gray-500 leading-relaxed">{d.contextSummary}</p>
+      <ContextSummary summary={d.contextSummary} critical={d.stats.status === "Critical"}>
         {d.recommendedActions.length > 0 && (
           <div className="mt-4">
-            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended actions</p>
+            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
             <div className="flex flex-wrap gap-2">
               {d.recommendedActions.map((a) => (
                 <Button key={a} onClick={() => onAction(a)} className="rounded-full h-auto px-4 py-1.5 text-xs cursor-pointer">
@@ -168,7 +167,7 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
             </div>
           </div>
         )}
-      </Card>
+      </ContextSummary>
 
       {/* Nameplate - factory specifications */}
       {nameplate && (

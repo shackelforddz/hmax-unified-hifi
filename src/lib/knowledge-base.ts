@@ -103,7 +103,7 @@ function formatContract(c: KBContract): string {
     ``,
     c.note,
     ``,
-    `Recommended: ${CONTRACT_NEXT[c.status] ?? "Review with the account owner."}`,
+    `Recommended by HMAX: ${CONTRACT_NEXT[c.status] ?? "Review with the account owner."}`,
   ].join("\n");
 }
 
@@ -121,7 +121,7 @@ function formatAsset(a: KBAsset): string {
     ``,
     a.note,
     ``,
-    `Recommended: ${rec}`,
+    `Recommended by HMAX: ${rec}`,
   ].join("\n");
 }
 
@@ -133,7 +133,7 @@ function vendorAnswer(): string {
     ...lines,
     ``,
     `Delta Coils Inc. alone carries €4.8M across 6 projects - 68% of the exposure. That's a concentration problem, not six independent delays: one vendor slip cascades across the portfolio, and it's already the reason Xcel is 18 days late.`,
-    `Recommended: lock a secondary source for winding sets before the next PO cycle, and put Delta Coils on a weekly delivery check-in. A single qualified backup would cut the concentration from ${((4.8 / total) * 100).toFixed(0)}% to under 40%.`,
+    `Recommended by HMAX: lock a secondary source for winding sets before the next PO cycle, and put Delta Coils on a weekly delivery check-in. A single qualified backup would cut the concentration from ${((4.8 / total) * 100).toFixed(0)}% to under 40%.`,
   ].join("\n");
 }
 
@@ -146,7 +146,7 @@ function slaAnswer(): string {
     ...pipeline.map((c) => `• ${c.customer} - ${c.value} · due ${c.due} · ${c.status}`),
     ``,
     `${open.length} of these need attention before they renew. AEP Ohio (€6.2M) is the largest and its asset health is declining; ComEd (€4.8M) has open service issues and is due first, in 22 days.`,
-    `Recommended: sequence the renewal work by due date and risk - start AEP Ohio and ComEd this week so service health is defensible at the negotiation.`,
+    `Recommended by HMAX: sequence the renewal work by due date and risk - start AEP Ohio and ComEd this week so service health is defensible at the negotiation.`,
   ].join("\n");
 }
 
@@ -155,7 +155,7 @@ function deliveryAnswer(): string {
     `On-time delivery is ${PORTFOLIO.onTimeDelivery} - down 5pp on last month and 25pp under the 85% target, the fourth consecutive monthly decline (78 → 74 → 70 → 68 → 64 → 60).`,
     ``,
     `The single biggest drag is Xcel Energy: 18 days late, pushing the work out of the autumn outage window into February. Every week of slip moves ~€0.3M of invoicing into the next quarter, and 60% is the exact number Xcel will quote back during the SLA renewal.`,
-    `Recommended: escalate the Xcel schedule now and protect the outage window - recovering that one project lifts portfolio on-time delivery ~6pp on its own.`,
+    `Recommended by HMAX: escalate the Xcel schedule now and protect the outage window - recovering that one project lifts portfolio on-time delivery ~6pp on its own.`,
   ].join("\n");
 }
 
@@ -167,7 +167,7 @@ function marginAnswer(): string {
     ...worst.map((c) => `• ${c.customer} - ${c.margin} (${c.status})`),
     ``,
     `Siemens is the biggest distortion: reported margin sits ~14pts under baseline purely because change order CO-118 is unbooked. It's an accounting artefact, not a real loss - booking the CO recovers most of the gap.`,
-    `Recommended: book CO-118 to release the €680k invoice and restore Siemens margin; that alone lifts the portfolio ~0.5pp back toward plan.`,
+    `Recommended by HMAX: book CO-118 to release the €680k invoice and restore Siemens margin; that alone lifts the portfolio ~0.5pp back toward plan.`,
   ].join("\n");
 }
 
@@ -180,7 +180,7 @@ function revenueAnswer(): string {
     `• Scope creep - €0.4M`,
     ``,
     `Two of these are one action away from clearing: raising the gasket-set PO unblocks the Xcel path, and signing CO-118 releases the Siemens invoice - together ~€1.9M recoverable this quarter.`,
-    `Recommended: raise the transformer gasket-set PO today - it's the longest lead item (35 days) and the largest single blocker.`,
+    `Recommended by HMAX: raise the transformer gasket-set PO today - it's the longest lead item (35 days) and the largest single blocker.`,
   ].join("\n");
 }
 
@@ -192,7 +192,7 @@ function fleetAnswer(): string {
     `• AST-003 & AST-004 - At Risk, scores below 60`,
     ``,
     `The decline is driven by the Zone A transformer cluster; AST-002 is a repeat-repair asset (three interventions in six months), which usually signals an end-of-life pattern rather than isolated faults.`,
-    `Recommended: prioritise a diagnostic on AST-001 and AST-002 this cycle and open a condition assessment on the At-Risk pair before scores drop further.`,
+    `Recommended by HMAX: prioritise a diagnostic on AST-001 and AST-002 this cycle and open a condition assessment on the At-Risk pair before scores drop further.`,
   ].join("\n");
 }
 
@@ -202,7 +202,7 @@ function milestoneAnswer(): string {
     ...MILESTONES.map((m) => `• ${m}`),
     ``,
     `Xcel's field mobilization is 2 days late and blocks everything downstream; Pacific Gas site access (in 3 days) is still verbal-only and needs a written agreement before the crew can mobilise.`,
-    `Recommended: clear the Xcel mobilization and confirm Pacific Gas access in writing first - the other three are on track.`,
+    `Recommended by HMAX: clear the Xcel mobilization and confirm Pacific Gas access in writing first - the other three are on track.`,
   ].join("\n");
 }
 
@@ -213,7 +213,7 @@ function riskAnswer(): string {
     ...risky.map((c) => `• ${c.customer} - ${c.status} · ${c.value} (${c.owner})`),
     ``,
     `Xcel (delivery) and Siemens (invoice) carry the most exposure and both have a clear unblock. ${PORTFOLIO.revenueAtRisk} of revenue sits behind these flags this quarter.`,
-    `Recommended: work Xcel and Siemens first - each is a single decision away from moving out of the risk column.`,
+    `Recommended by HMAX: work Xcel and Siemens first - each is a single decision away from moving out of the risk column.`,
   ].join("\n");
 }
 
@@ -225,7 +225,7 @@ function portfolioAnswer(): string {
     `• ${PORTFOLIO.revenueAtRisk} of revenue at risk this quarter`,
     ``,
     `Biggest exposures are Xcel Energy (delivery at risk, €4.2M) and Siemens (invoice blocked, €2.4M) - together the bulk of the at-risk revenue. Both have a defined next action.`,
-    `Recommended: focus this week on the two decisions that move the most - escalate Xcel's schedule and book Siemens CO-118.`,
+    `Recommended by HMAX: focus this week on the two decisions that move the most - escalate Xcel's schedule and book Siemens CO-118.`,
   ].join("\n");
 }
 

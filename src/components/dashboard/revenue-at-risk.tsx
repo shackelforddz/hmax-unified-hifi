@@ -76,7 +76,7 @@ export default function RevenueAtRisk() {
 
       {/* Total */}
       <div className="flex items-end gap-2">
-        <span className="text-3xl font-bold text-gray-900 leading-none">{R.total}</span>
+        <span className="text-2xl font-bold text-gray-900 leading-none">{R.total}</span>
         <span className="text-xs text-gray-400 mb-0.5">{R.caption}</span>
       </div>
 

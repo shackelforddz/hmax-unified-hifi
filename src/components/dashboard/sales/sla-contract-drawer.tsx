@@ -7,6 +7,7 @@ import { useConversationLauncher } from "@/components/dashboard/conversation-lau
 import { SLA_CONTRACTS, type SlaContractDetail, type SlaBadge } from "@/lib/sales-data";
 import ContractSections from "@/components/dashboard/operations/contract-sections";
 import { AssetLink, drawerLayer } from "@/components/dashboard/detail-drawers";
+import ContextSummary from "@/components/dashboard/context-summary";
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">{children}</div>;
@@ -67,6 +68,9 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
 function DrawerBody({ d, onAction }: { d: SlaContractDetail; onAction: (p: string) => void }) {
   return (
     <div className="flex flex-col gap-4">
+      {/* Summary */}
+      <ContextSummary summary={d.summary} critical={d.risk.label === "Critical"} />
+
       {/* Status */}
       <Card>
         <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
@@ -83,12 +87,6 @@ function DrawerBody({ d, onAction }: { d: SlaContractDetail; onAction: (p: strin
             <p className="text-sm text-gray-800 mt-0.5">{d.slaActual} / {d.slaTarget}</p>
           </div>
         </div>
-      </Card>
-
-      {/* Summary */}
-      <Card>
-        <SectionTitle>Context summary</SectionTitle>
-        <p className="text-sm text-gray-500 leading-relaxed">{d.summary}</p>
       </Card>
 
       {/* SLA metrics */}

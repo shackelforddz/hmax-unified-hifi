@@ -10,23 +10,23 @@ export default function FleetHealth() {
     <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
-        <h3 className="text-base text-gray-900">Fleet health</h3>
-        <WidgetChat title="Fleet health" />
+        <h3 className="text-base text-gray-900">Average Asset Health</h3>
+        <WidgetChat title="Average Asset Health" />
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2 mb-2">
         <div>
           <p className="text-xs text-gray-400">30 days ago</p>
-          <p className="text-4xl font-bold text-gray-900 leading-tight">{F.past}</p>
+          <p className="text-2xl font-bold text-gray-900 leading-tight">{F.past}</p>
         </div>
         <div>
           <p className="text-xs text-gray-400">Today</p>
-          <p className="text-4xl font-bold text-gray-900 leading-tight">{F.today}</p>
+          <p className="text-2xl font-bold text-gray-900 leading-tight">{F.today}</p>
         </div>
         <div>
           <p className="text-xs text-gray-400">Change</p>
-          <p className="text-4xl font-bold text-gray-900 leading-tight">{F.change}</p>
+          <p className="text-2xl font-bold text-gray-900 leading-tight">{F.change}</p>
         </div>
       </div>
 
@@ -48,10 +48,10 @@ export default function FleetHealth() {
       {/* Legend */}
       <div className="flex gap-4 mt-2">
         <span className="flex items-center gap-1.5 text-xs text-gray-500">
-          <span className="w-3 h-0.5 inline-block" style={{ backgroundColor: CHART.line }} /> Fleet Avg
+          <span className="w-3 h-0.5 inline-block" style={{ backgroundColor: CHART.line }} /> Average Asset Health
         </span>
         <span className="flex items-center gap-1.5 text-xs text-gray-500">
-          <span className="w-3 h-0.5 bg-gray-400 inline-block" style={{ backgroundImage: "repeating-linear-gradient(90deg,#A3A3A3 0 3px,transparent 3px 6px)" }} /> Fleet Standard
+          <span className="w-3 h-0.5 bg-gray-400 inline-block" style={{ backgroundImage: "repeating-linear-gradient(90deg,#A3A3A3 0 3px,transparent 3px 6px)" }} /> Asset Health Standard
         </span>
       </div>
     </div>

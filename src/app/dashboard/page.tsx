@@ -66,6 +66,7 @@ export default function DashboardPage() {
           onNewConversation={() => openConversation()}
           onSelect={openStored}
           onStartPrompt={(prompt) => openConversation({ prompt })}
+          onDelete={(rec) => setConversations((prev) => prev.filter((c) => c.id !== rec.id))}
         />
       </aside>
 

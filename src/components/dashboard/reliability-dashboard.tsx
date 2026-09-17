@@ -43,7 +43,7 @@ export default function ReliabilityDashboard() {
           </div>
         ),
       },
-      // ── Bento: the map leads, with fleet health and coverage stacked
+      // ── Bento: the map leads, with average asset health and coverage stacked
       //    beside it, then the review queues ──
       { id: "fleet-map", span: 8, rows: 2, tile: true, node: <FleetMap mode="alerts" alerts={ASSET_REVIEW_ALERTS} categoryOptions={REVIEW_CATEGORY_OPTIONS} /> },
       { id: "fleet-health", span: 4, tile: true, node: <FleetHealth /> },

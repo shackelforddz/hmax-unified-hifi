@@ -3,16 +3,12 @@
 import { useState } from "react";
 import { ChevronRight, MapPin } from "lucide-react";
 import WidgetChat from "@/components/dashboard/widget-chat";
-import { ALL, Select, TabGroup } from "@/components/dashboard/filter-controls";
+import { ALL, Select } from "@/components/dashboard/filter-controls";
 import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
 import OpportunityDrawer from "@/components/dashboard/sales/opportunity-drawer";
 import { DELIVERY_TEAM, type Person } from "@/lib/people-data";
 import { OPS_CONTRACTS, type OpsContract } from "@/lib/operations-data";
 import { OPPORTUNITIES, leadDetail, type Opportunity } from "@/lib/sales-data";
-
-/* ── Risk model ──────────────────────────────────────────────────── */
-const HIGH_LOAD = 90; // near capacity
-const OVER_ALLOCATED = 95; // over capacity
 
 function contractsFor(person: Person): OpsContract[] {
   return person.contractIds
@@ -26,13 +22,6 @@ function leadsFor(person: Person): Opportunity[] {
     .filter((o): o is Opportunity => !!o);
 }
 
-/** Allocation is the only thing flagged on a person - contract and lead
- *  trouble is alerted on the contract and lead widgets, not here. */
-function riskReasons(person: Person): string[] {
-  if (person.allocation >= OVER_ALLOCATED) return ["Over-allocated"];
-  if (person.allocation >= HIGH_LOAD) return ["High allocation"];
-  return [];
-}
 
 /* A contract or lead the person is on - its own tappable row so the list
    reads as distinct items rather than running text. */
@@ -158,18 +147,11 @@ function PersonCard({
   );
 }
 
-/** The one priority tab beside "All". */
-const AT_RISK = "At risk";
-
 export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" }: { people?: Person[]; title?: string }) {
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [leadDrawer, setLeadDrawer] = useState<Opportunity | null>(null);
-  const [filter, setFilter] = useState("all");
   const [comp, setComp] = useState(ALL);
   const [cert, setCert] = useState(ALL);
-
-  const isAtRisk = (p: Person) => riskReasons(p).length > 0;
-  const atRiskCount = people.filter(isAtRisk).length;
 
   // Filter options derived from the current team.
   const competencyOptions = Array.from(new Set(people.flatMap((p) => p.competencies))).sort();
@@ -177,17 +159,11 @@ export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" 
 
   const visible = people.filter(
     (p) =>
-      (filter === "all" || isAtRisk(p)) &&
       (comp === ALL || p.competencies.includes(comp)) &&
       (cert === ALL || p.certifications.some((c) => c.name === cert))
   );
-  // Surface at-risk people first, then by allocation (busiest first).
-  const sorted = [...visible].sort((a, b) => {
-    const ra = isAtRisk(a) ? 1 : 0;
-    const rb = isAtRisk(b) ? 1 : 0;
-    if (ra !== rb) return rb - ra;
-    return b.allocation - a.allocation;
-  });
+  // Busiest first.
+  const sorted = [...visible].sort((a, b) => b.allocation - a.allocation);
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -197,26 +173,16 @@ export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" 
         detail={leadDrawer ? leadDetail(leadDrawer) : null}
         onClose={() => setLeadDrawer(null)}
       />
-      <div className="px-5 pt-5 pb-4">
-        <div className="flex items-start justify-between mb-4">
+      <div className="px-5 pt-5 pb-4 flex flex-col gap-4">
+        <div className="flex items-start justify-between">
           <div>
             <h3 className="text-base text-gray-900">{title}</h3>
           </div>
           <WidgetChat title={title} />
         </div>
-        {/* Filters - priority tabs on the left, selects on the right */}
-        <div className="flex items-start justify-between gap-4 w-full">
-          <div className="flex items-start gap-2 min-w-0 overflow-x-auto no-scrollbar">
-            <TabGroup
-              value={filter}
-              onChange={setFilter}
-              options={[AT_RISK]}
-              countFor={() => atRiskCount}
-              label="Filter by priority"
-            />
-          </div>
-
-          <div className="flex items-start gap-2 shrink-0">
+        {/* Filters - competency and certification, when the team has any */}
+        {(competencyOptions.length > 0 || certOptions.length > 0) && (
+          <div className="flex items-start justify-end gap-2 w-full">
             {competencyOptions.length > 0 && (
               <Select
                 value={comp}
@@ -236,7 +202,7 @@ export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" 
               />
             )}
           </div>
-        </div>
+        )}
       </div>
 
       {sorted.length > 0 ? (

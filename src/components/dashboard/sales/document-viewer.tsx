@@ -154,7 +154,7 @@ export function DocContent({ doc }: { doc: ViewDoc }) {
       {/* Document header band */}
       <div className="flex items-start justify-between border-b border-gray-100 pb-4">
         <div>
-          <p className="text-sm text-gray-900">HITACHI ENERGY</p>
+          <p className="text-sm text-gray-900">Hitachi Energy</p>
           <p className="text-xs text-gray-400 mt-0.5">{doc.docType}</p>
         </div>
         <div className="text-right">
@@ -223,7 +223,7 @@ export function DocEditor({ doc, onSave, onCancel }: { doc: ViewDoc; onSave: (do
     <div className="bg-white border border-gray-300 rounded-lg p-5 flex flex-col gap-5">
       <div className="flex items-start justify-between border-b border-gray-100 pb-4">
         <div>
-          <p className="text-sm text-gray-900">HITACHI ENERGY</p>
+          <p className="text-sm text-gray-900">Hitachi Energy</p>
           <p className="text-xs text-gray-400 mt-0.5">{draft.docType} · editing</p>
         </div>
         <div className="text-right">

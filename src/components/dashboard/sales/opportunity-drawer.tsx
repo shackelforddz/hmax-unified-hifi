@@ -8,6 +8,7 @@ import { OPP_STAGES, OPPORTUNITIES, leadMeta, type Opportunity, type Opportunity
 import OwnerBadge from "./owner-badge";
 import DocumentViewer, { type ViewDoc } from "./document-viewer";
 import { AssetLink, ContractLink } from "@/components/dashboard/detail-drawers";
+import ContextSummary from "@/components/dashboard/context-summary";
 
 // The lead rendered as a full brief document.
 function opportunityDoc(opp: Opportunity, detail: OpportunityDetail): ViewDoc {
@@ -114,6 +115,24 @@ function DrawerBody({ opp, detail, onAction }: { opp: Opportunity; detail: Oppor
   const readyCount = opp.requirements.filter((r) => r.done).length;
   return (
     <div className="flex flex-col gap-4">
+      {/* Summary + recommendations */}
+      {/* A stalled lead is critical - the same call the lead cards make */}
+      <ContextSummary summary={detail.summary} critical={opp.status === "stalled"}>
+        {detail.recommendations.length > 0 && (
+          <div className="mt-4">
+            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
+            <div className="flex flex-col gap-2">
+              {detail.recommendations.map((r, i) => (
+                <div key={i} className="flex gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0 mt-1.5" />
+                  <p className="text-sm text-gray-600 leading-snug">{r}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </ContextSummary>
+
       {/* Stage progress */}
       <Card>
         <SectionTitle>Pipeline stage</SectionTitle>
@@ -131,25 +150,6 @@ function DrawerBody({ opp, detail, onAction }: { opp: Opportunity; detail: Oppor
             </div>
           ))}
         </div>
-      </Card>
-
-      {/* Summary + recommendations */}
-      <Card>
-        <SectionTitle>Context summary</SectionTitle>
-        <p className="text-sm text-gray-500 leading-relaxed">{detail.summary}</p>
-        {detail.recommendations.length > 0 && (
-          <div className="mt-4">
-            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommendations</p>
-            <div className="flex flex-col gap-2">
-              {detail.recommendations.map((r, i) => (
-                <div key={i} className="flex gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0 mt-1.5" />
-                  <p className="text-sm text-gray-600 leading-snug">{r}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </Card>
 
       {/* Offer readiness checklist */}

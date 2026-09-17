@@ -36,7 +36,7 @@ export default function RevenueTiming() {
         ].map((k) => (
           <div key={k.label}>
             <p className="text-xs text-gray-400">{k.label}</p>
-            <p className="text-xl font-bold text-gray-900 leading-tight">{k.value}</p>
+            <p className="text-2xl font-bold text-gray-900 leading-tight">{k.value}</p>
           </div>
         ))}
       </div>
@@ -57,7 +57,7 @@ export default function RevenueTiming() {
         </div>
       </div>
 
-      <div className="flex gap-4 mt-1 mb-4">
+      <div className="flex gap-4 mt-1">
         <span className="flex items-center gap-1.5 text-xs text-gray-500">
           <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ backgroundColor: CHART.line }} /> Collected
         </span>

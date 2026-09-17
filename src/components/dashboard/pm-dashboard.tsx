@@ -7,6 +7,7 @@ import DeliveryTrend from "@/components/dashboard/delivery-trend";
 import RevenueAtRisk from "@/components/dashboard/revenue-at-risk";
 import UpcomingServicing from "@/components/dashboard/upcoming-servicing";
 import WaitingOn from "@/components/dashboard/waiting-on";
+import PmRiskMap from "@/components/dashboard/pm-risk-map";
 import { KPI_DATA } from "@/lib/dashboard-data";
 import DashboardTabs from "@/components/dashboard/dashboard-tabs";
 import ContractsTable from "@/components/dashboard/tables/contracts-table";
@@ -35,11 +36,13 @@ export default function PmDashboard() {
           </div>
         ),
       },
-      // ── Bento, two even rows: how delivery is going, then what to chase ──
-      { id: "delivery-trend", span: 8, tile: true, node: <DeliveryTrend /> },
+      // ── Bento: where delivery is at risk and what's due, then how delivery
+      //    is trending and who we're waiting on ──
+      { id: "delivery-map", span: 8, rows: 2, tile: true, node: <PmRiskMap /> },
       { id: "revenue-at-risk", span: 4, tile: true, node: <RevenueAtRisk /> },
+      { id: "servicing", span: 4, tile: true, node: <UpcomingServicing /> },
+      { id: "delivery-trend", span: 6, tile: true, node: <DeliveryTrend /> },
       { id: "waiting-on", span: 6, tile: true, node: <WaitingOn /> },
-      { id: "servicing", span: 6, tile: true, node: <UpcomingServicing /> },
       { id: "attention", span: 12, node: <AttentionList /> },
       { id: "people", span: 12, node: <PeopleWidget /> },
     ],

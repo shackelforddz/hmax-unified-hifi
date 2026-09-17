@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Asterisk, Info, Check, AlertTriangle, ChevronLeft, ChevronRight, X, Plus, GripVertical, BarChart2, ClipboardCheck, CalendarClock, Send, Lightbulb, Pencil, UserRoundPlus } from "lucide-react";
+import { Info, Check, AlertTriangle, ChevronLeft, ChevronRight, X, Plus, GripVertical, BarChart2, ClipboardCheck, CalendarClock, Send, Lightbulb, Pencil, UserRoundPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type Suggestions } from "@/lib/knowledge-base";
 import { type CustomWidgetConfig } from "@/lib/custom-widget";
@@ -16,11 +16,9 @@ import { OPS_CONTRACT_DETAILS } from "@/lib/operations-data";
 /* ── Typing indicator ────────────────────────────────────────────── */
 function TypingBubble() {
   return (
-    <div className="flex items-start gap-3 mb-5 animate-message-in">
-      <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center shrink-0 mt-0.5">
-        <Asterisk size={14} strokeWidth={1.5} className="text-gray-600" />
-      </div>
-      <div className="bg-white border border-gray-100 rounded-2xl px-4 py-3.5 flex items-center gap-1.5">
+    <div className="flex items-start gap-2.5 pr-8 mb-6 animate-message-in">
+      <AiAvatar />
+      <div className="bg-[#222222]/5 rounded-xl px-4 py-3.5 flex items-center gap-1.5">
         <span className="typing-dot w-1.5 h-1.5 rounded-full bg-gray-400" style={{ animationDelay: "0ms" }} />
         <span className="typing-dot w-1.5 h-1.5 rounded-full bg-gray-400" style={{ animationDelay: "150ms" }} />
         <span className="typing-dot w-1.5 h-1.5 rounded-full bg-gray-400" style={{ animationDelay: "300ms" }} />
@@ -40,28 +38,20 @@ const STEP_DEFS = [
 
 function StepTabs({ current, steps = STEP_DEFS }: { current: number; steps?: { num: number; label: string }[] }) {
   return (
-    <div className="flex border-b border-gray-100">
+    <div className="flex items-center justify-between gap-3 p-6 border-b border-[#e5e5e5]/20 overflow-x-auto no-scrollbar">
       {steps.map(({ num, label }) => {
         const active = num === current;
         const done = num < current;
         return (
-          <div key={num} className="flex-1 flex items-center gap-2 px-3 py-3">
+          <div key={num} className="flex items-center gap-2 shrink-0">
             <div
-              className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 transition-colors ${
-                active
-                  ? "bg-black text-white"
-                  : done
-                  ? "bg-gray-200 text-gray-500"
-                  : "border border-gray-200 text-gray-300"
+              className={`size-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${
+                active ? "bg-[#222222] text-white" : done ? "bg-[#222222]/20 text-gray-950" : "border border-[#222222]/20 text-gray-500"
               }`}
             >
               {done ? <Check size={10} strokeWidth={2.5} /> : num}
             </div>
-            <span
-              className={`text-sm whitespace-nowrap transition-colors ${
-                active ? "text-gray-900" : done ? "text-gray-400" : "text-gray-300"
-              }`}
-            >
+            <span className={`text-sm whitespace-nowrap transition-colors ${active ? "font-bold text-gray-950" : "text-gray-500"}`}>
               {label}
             </span>
           </div>
@@ -85,60 +75,52 @@ function InfoBanner({ title, sub }: { title: string; sub: string }) {
 }
 
 /* ── Step 1: Case Details ────────────────────────────────────────── */
+const CASE_TYPES = ["Corrective", "Preventive", "Mobilisation"];
+
 function StepCase() {
   const [caseType, setCaseType] = useState("Corrective");
+  const field = "w-full h-8 px-2.5 text-sm text-gray-950 border border-gray-200 rounded-full outline-none focus:border-gray-400 bg-white";
   return (
-    <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
-      <div>
-        <p className="text-xs text-gray-400 tracking-widest mb-1">Step 1 of 5</p>
-        <h3 className="text-2xl text-gray-900 mb-1">Case details</h3>
-        <p className="text-sm text-gray-500 leading-relaxed">
-          Confirm or update the case basics. The system has pre-filled from the linked lead OPP-441.
+    <div className="flex flex-col gap-6 p-6">
+      <div className="flex flex-col gap-1">
+        <h3 className="text-[28px] leading-[normal] text-gray-950">Case details</h3>
+        <p className="text-sm text-gray-500 leading-[1.4]">
+          Confirm or update the case basics. The system has pre-filled from the linked opportunity OPP-441.
         </p>
       </div>
-      <InfoBanner
-        title="Pre-filled from OPP-441"
-        sub="Xcel Energy · signed 14 Aug 2026. Confirm or edit any field."
-      />
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-xs text-gray-500 mb-1.5 block">Customer</label>
-          <input
-            type="text"
-            defaultValue="Xcel Energy"
-            className="w-full h-9 px-3 text-sm border border-gray-200 rounded-full outline-none focus:border-gray-400 bg-white"
-          />
+      <div className="flex gap-4">
+        <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+          <label className="text-xs text-gray-500">Customer</label>
+          <input type="text" defaultValue="Xcel Energy" className={field} />
         </div>
-        <div>
-          <label className="text-xs text-gray-500 mb-1.5 block">Asset / units in scope *</label>
-          <input
-            type="text"
-            defaultValue="HVDC Units S-12, S-14, S-19"
-            className="w-full h-9 px-3 text-sm border border-gray-200 rounded-full outline-none focus:border-gray-400 bg-white"
-          />
+        <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+          <label className="text-xs text-gray-500">Asset / units in scope *</label>
+          <input type="text" defaultValue="HVDC Units S-12, S-14, S-19" className={field} />
         </div>
       </div>
-      <div>
-        <label className="text-xs text-gray-500 mb-2 block">Case type</label>
-        <div className="flex gap-2">
-          {["Corrective", "Preventive"].map((t) => (
+      <div className="flex flex-col gap-2">
+        <label className="text-xs text-gray-500">Case type</label>
+        {/* Toggle group - one segmented control, the picked option filled */}
+        <div className="flex self-start">
+          {CASE_TYPES.map((t, i) => (
             <button
               key={t}
               onClick={() => setCaseType(t)}
-              className={`px-4 py-2 rounded-full text-sm cursor-pointer transition-colors ${
-                caseType === t ? "bg-black text-white" : "border border-gray-200 text-gray-600 hover:border-gray-400"
-              }`}
+              aria-pressed={caseType === t}
+              className={`h-8 px-2 text-sm text-gray-950 border-y border-r border-gray-200 transition-colors cursor-pointer ${
+                i === 0 ? "border-l rounded-l-full" : ""
+              } ${i === CASE_TYPES.length - 1 ? "rounded-r-full" : ""} ${caseType === t ? "bg-[#f5f5f5]" : "bg-white hover:bg-gray-50"}`}
             >
               {t}
             </button>
           ))}
         </div>
       </div>
-      <div>
-        <label className="text-xs text-gray-500 mb-1.5 block">What needs to happen?</label>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs text-gray-500">What needs to happen?</label>
         <textarea
           placeholder="Brief description of the fault or scope..."
-          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
+          className="w-full h-16 px-2.5 py-2 text-sm text-gray-950 border border-gray-200 rounded-[10px] outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-500"
         />
       </div>
     </div>
@@ -158,10 +140,9 @@ function StepScope() {
   const outageOpts = ["Yes - planned outage", "No - live working", "Partial outage"];
 
   return (
-    <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
+    <div className="flex flex-col gap-6 p-6">
       <div>
-        <p className="text-xs text-gray-400 tracking-widest mb-1">Step 2 of 5</p>
-        <h3 className="text-2xl text-gray-900 mb-1">Scope & access</h3>
+        <h3 className="text-[28px] leading-[normal] text-gray-950 mb-1">Scope & access</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
           What work is needed and what site constraints apply? The system has suggested scope based on the open field signals on this account.
         </p>
@@ -367,10 +348,9 @@ function StepStaffing() {
     ));
 
   return (
-    <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
+    <div className="flex flex-col gap-6 p-6">
       <div>
-        <p className="text-xs text-gray-400 tracking-widest mb-1">Step 3 of 5</p>
-        <h3 className="text-2xl text-gray-900 mb-1">Staffing</h3>
+        <h3 className="text-[28px] leading-[normal] text-gray-950 mb-1">Staffing</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
           The system has checked availability and suggested the best-fit crew for this case type, scope, and site requirements. Confirm, swap, or add.
         </p>
@@ -514,10 +494,9 @@ function StepParts() {
   const resolved = parts.filter((p) => p.resolvedWith);
 
   return (
-    <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
+    <div className="flex flex-col gap-6 p-6">
       <div>
-        <p className="text-xs text-gray-400 tracking-widest mb-1">Step 4 of 5</p>
-        <h3 className="text-2xl text-gray-900 mb-1">Parts & materials</h3>
+        <h3 className="text-[28px] leading-[normal] text-gray-950 mb-1">Parts & materials</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
           The system has checked ERP inventory for parts required based on the asset type and scope. Review stock status, override quantities, or add items.
         </p>
@@ -708,7 +687,7 @@ const CALENDAR_CELLS: Cell[] = [
   ...[1, 2, 3, 4, 5, 6].map((d) => ({ label: d, inMonth: false })),
 ];
 
-const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 /* The mobilization demo runs against the Sherco contract, so its customer-side
    contact is who the schedule goes to for confirmation. */
@@ -733,10 +712,9 @@ function StepSchedule() {
   };
 
   return (
-    <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
+    <div className="flex flex-col gap-6 p-6">
       <div>
-        <p className="text-xs text-gray-400 tracking-widest mb-1">Step 5 of 5</p>
-        <h3 className="text-2xl text-gray-900 mb-1">Schedule</h3>
+        <h3 className="text-[28px] leading-[normal] text-gray-950 mb-1">Schedule</h3>
         <p className="text-sm text-gray-500 leading-relaxed">
           Milestones auto-placed from parts lead times and crew availability. Drag any event to change its date. Conflicts flagged in real time.
         </p>
@@ -869,7 +847,7 @@ function WizardCard({
   const isFirst = step === 1;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="bg-[#222222]/5 rounded-xl overflow-hidden">
       <StepTabs current={step} />
 
       {/* Step content - cross-fades when the step changes */}
@@ -883,9 +861,9 @@ function WizardCard({
 
       {/* Footer - Back (left) once past the first step, Continue (right) until the last */}
       {(!isFirst || !isLast) && (
-        <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100">
+        <div className="flex items-center justify-between p-6 border-t border-[#e5e5e5]/20">
           {!isFirst ? (
-            <Button variant="outline" onClick={onBack} className="gap-1.5 rounded-full h-auto px-5 py-2 text-sm text-gray-600 cursor-pointer">
+            <Button variant="outline" onClick={onBack} className="gap-1.5 rounded-full h-8 px-4 text-sm text-gray-700 cursor-pointer">
               <ChevronLeft size={14} />
               Back
             </Button>
@@ -893,11 +871,11 @@ function WizardCard({
             <span />
           )}
           {isLast ? (
-            <Button onClick={onGenerate} className="rounded-full h-auto px-6 py-2 text-sm cursor-pointer">
+            <Button onClick={onGenerate} className="rounded-full h-8 px-4 text-sm font-bold cursor-pointer">
               Generate
             </Button>
           ) : (
-            <Button onClick={onContinue} className="rounded-full h-auto px-6 py-2 text-sm cursor-pointer">
+            <Button onClick={onContinue} className="rounded-full h-8 px-4 text-sm font-bold cursor-pointer">
               Continue
             </Button>
           )}
@@ -916,14 +894,13 @@ const OPP_STEP_DEFS = [
 ];
 
 function OppFieldGroup({ children }: { children: React.ReactNode }) {
-  return <div className="flex flex-col gap-4 px-5 pt-4 pb-1">{children}</div>;
+  return <div className="flex flex-col gap-6 p-6">{children}</div>;
 }
-function OppHeader({ n, title, sub }: { n: number; title: string; sub: string }) {
+function OppHeader({ title, sub }: { title: string; sub: string }) {
   return (
     <div>
-      <p className="text-xs text-gray-400 tracking-widest mb-1">Step {n} of 4</p>
-      <h3 className="text-2xl text-gray-900 mb-1">{title}</h3>
-      <p className="text-sm text-gray-500 leading-relaxed">{sub}</p>
+      <h3 className="text-[28px] leading-[normal] text-gray-950 mb-1">{title}</h3>
+      <p className="text-sm text-gray-500 leading-[1.4]">{sub}</p>
     </div>
   );
 }
@@ -966,7 +943,7 @@ function OppChips({ label, options, initial }: { label: string; options: string[
 function OppStepAccount() {
   return (
     <OppFieldGroup>
-      <OppHeader n={1} title="Account & lead" sub="Start with who the lead is for. The system has suggested details from portfolio signals." />
+      <OppHeader title="Account & lead" sub="Start with who the lead is for. The system has suggested details from portfolio signals." />
       <InfoBanner title="Suggested from portfolio signals" sub="Duke Energy fleet health is declining - a strong reliability-program candidate." />
       <div className="grid grid-cols-2 gap-3">
         <OppInput label="Customer" value="Duke Energy" star />
@@ -980,7 +957,7 @@ function OppStepAccount() {
 function OppStepScope() {
   return (
     <OppFieldGroup>
-      <OppHeader n={2} title="Scope & assets" sub="Define what the lead covers and which assets are involved." />
+      <OppHeader title="Scope & assets" sub="Define what the lead covers and which assets are involved." />
       <OppChips label="Lead type" options={["Service agreement", "Replacement", "Upgrade", "Retrofit"]} initial="Service agreement" />
       <OppInput label="Assets in scope" value="Fleet-wide · 12 converter stations" />
       <div>
@@ -997,7 +974,7 @@ function OppStepScope() {
 function OppStepCommercials() {
   return (
     <OppFieldGroup>
-      <OppHeader n={3} title="Commercials" sub="Set the pricing approach and terms for the offer." />
+      <OppHeader title="Commercials" sub="Set the pricing approach and terms for the offer." />
       <OppChips label="Costing model" options={["Standard", "Premium", "Custom"]} initial="Premium" />
       <div className="grid grid-cols-2 gap-3">
         <OppInput label="Target margin" value="18%" />
@@ -1017,7 +994,7 @@ function OppStepReview() {
   ];
   return (
     <OppFieldGroup>
-      <OppHeader n={4} title="Review & create" sub="Confirm the details - the lead will enter your pipeline at Discovery." />
+      <OppHeader title="Review & create" sub="Confirm the details - the lead will enter your pipeline at Discovery." />
       <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
         {rows.map((r, i) => (
           <div key={r.label} className={`flex items-start gap-4 px-4 py-3 ${i < rows.length - 1 ? "border-b border-gray-100" : ""}`}>
@@ -1045,7 +1022,7 @@ function OppWizardCard({
   const isFirst = step === 1;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="bg-[#222222]/5 rounded-xl overflow-hidden">
       <StepTabs current={step} steps={OPP_STEP_DEFS} />
       <div key={step} className="animate-step-in">
         {step === 1 && <OppStepAccount />}
@@ -1053,9 +1030,9 @@ function OppWizardCard({
         {step === 3 && <OppStepCommercials />}
         {step === 4 && <OppStepReview />}
       </div>
-      <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100">
+      <div className="flex items-center justify-between p-6 border-t border-[#e5e5e5]/20">
         {!isFirst ? (
-          <Button variant="outline" onClick={onBack} className="gap-1.5 rounded-full h-auto px-5 py-2 text-sm text-gray-600 cursor-pointer">
+          <Button variant="outline" onClick={onBack} className="gap-1.5 rounded-full h-8 px-4 text-sm text-gray-700 cursor-pointer">
             <ChevronLeft size={14} />
             Back
           </Button>
@@ -1063,11 +1040,11 @@ function OppWizardCard({
           <span />
         )}
         {isLast ? (
-          <Button onClick={onCreate} className="rounded-full h-auto px-6 py-2 text-sm cursor-pointer">
+          <Button onClick={onCreate} className="rounded-full h-8 px-4 text-sm font-bold cursor-pointer">
             Create lead
           </Button>
         ) : (
-          <Button onClick={onContinue} className="rounded-full h-auto px-6 py-2 text-sm cursor-pointer">
+          <Button onClick={onContinue} className="rounded-full h-8 px-4 text-sm font-bold cursor-pointer">
             Continue
           </Button>
         )}
@@ -1109,12 +1086,11 @@ function FlowFieldControl({ f }: { f: FlowField }) {
   );
 }
 
-function FlowHeader({ n, total, title, sub }: { n: number; total: number; title: string; sub: string }) {
+function FlowHeader({ title, sub }: { title: string; sub: string }) {
   return (
     <div>
-      <p className="text-xs text-gray-400 tracking-widest mb-1">Step {n} of {total}</p>
-      <h3 className="text-2xl text-gray-900 mb-1">{title}</h3>
-      <p className="text-sm text-gray-500 leading-relaxed">{sub}</p>
+      <h3 className="text-[28px] leading-[normal] text-gray-950 mb-1">{title}</h3>
+      <p className="text-sm text-gray-500 leading-[1.4]">{sub}</p>
     </div>
   );
 }
@@ -1145,13 +1121,13 @@ function FlowWizardCard({
   );
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="bg-[#222222]/5 rounded-xl overflow-hidden">
       <StepTabs current={step} steps={stepDefs} />
 
       <div key={step} className="animate-step-in">
         {!isLast && current ? (
-          <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
-            <FlowHeader n={step} total={total} title={current.title} sub={current.sub} />
+          <div className="flex flex-col gap-6 p-6">
+            <FlowHeader title={current.title} sub={current.sub} />
             {current.banner && <InfoBanner title={current.banner.title} sub={current.banner.sub} />}
             <div className="grid grid-cols-2 gap-3">
               {current.fields.map((f) => (
@@ -1162,8 +1138,8 @@ function FlowWizardCard({
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-4 px-5 pt-4 pb-1">
-            <FlowHeader n={total} total={total} title="Review & confirm" sub={`Confirm the details before you ${flow.cta.toLowerCase()}.`} />
+          <div className="flex flex-col gap-6 p-6">
+            <FlowHeader title="Review & confirm" sub={`Confirm the details before you ${flow.cta.toLowerCase()}.`} />
             <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
               {reviewRows.map((r, i) => (
                 <div key={`${r.label}-${i}`} className={`flex items-start gap-4 px-4 py-3 ${i < reviewRows.length - 1 ? "border-b border-gray-100" : ""}`}>
@@ -1176,9 +1152,9 @@ function FlowWizardCard({
         )}
       </div>
 
-      <div className="flex items-center justify-between px-5 py-4 border-t border-gray-100">
+      <div className="flex items-center justify-between p-6 border-t border-[#e5e5e5]/20">
         {!isFirst ? (
-          <Button variant="outline" onClick={onBack} className="gap-1.5 rounded-full h-auto px-5 py-2 text-sm text-gray-600 cursor-pointer">
+          <Button variant="outline" onClick={onBack} className="gap-1.5 rounded-full h-8 px-4 text-sm text-gray-700 cursor-pointer">
             <ChevronLeft size={14} />
             Back
           </Button>
@@ -1186,11 +1162,11 @@ function FlowWizardCard({
           <span />
         )}
         {isLast ? (
-          <Button onClick={onComplete} className="rounded-full h-auto px-6 py-2 text-sm cursor-pointer">
+          <Button onClick={onComplete} className="rounded-full h-8 px-4 text-sm font-bold cursor-pointer">
             {flow.cta}
           </Button>
         ) : (
-          <Button onClick={onContinue} className="rounded-full h-auto px-6 py-2 text-sm cursor-pointer">
+          <Button onClick={onContinue} className="rounded-full h-8 px-4 text-sm font-bold cursor-pointer">
             Continue
           </Button>
         )}
@@ -1217,22 +1193,13 @@ function ContextCard({ context }: { context: string }) {
 /* ── AI avatar ───────────────────────────────────────────────────── */
 function AiAvatar() {
   return (
-    <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center shrink-0 mt-0.5">
-      <Asterisk size={14} strokeWidth={1.5} className="text-gray-600" />
+    <div className="size-8 rounded-full bg-[#222222]/5 flex items-center justify-center shrink-0">
+      {/* The HMAX mark ships upright; turned a quarter it reads as the "H". */}
+      <span className="flex items-center justify-center w-[14.856px] h-[13.193px]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/hmax-mark.svg" alt="" aria-hidden className="block max-w-none w-[13.193px] h-[14.856px] -rotate-90" />
+      </span>
     </div>
-  );
-}
-
-function SourcesLine() {
-  return (
-    <p className="text-xs text-gray-400">
-      Sources:{" "}
-      <span className="underline cursor-pointer hover:text-gray-600 transition-colors">APM</span>
-      {", "}
-      <span className="underline cursor-pointer hover:text-gray-600 transition-colors">Relcare</span>
-      {", "}
-      <span className="underline cursor-pointer hover:text-gray-600 transition-colors">Data Hub</span>
-    </p>
   );
 }
 
@@ -1303,7 +1270,7 @@ function SuggestionBlock({ suggestions, onSend }: { suggestions: Suggestions; on
       )}
       {actions.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11px] text-gray-400 tracking-wider">Next steps</span>
+          <span className="text-[11px] text-gray-400 tracking-wider">Recommended by HMAX</span>
           {actions.map((a) => (
             <Button
               key={a.label}
@@ -1336,7 +1303,7 @@ function PanelBlock({ panel, onSend, onOpenDoc, onUpdate }: { panel: PlaybookPan
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-900 truncate">{o.title}</p>
-                  {o.recommended && <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-900 text-white shrink-0">Best fit</span>}
+                  {o.recommended && <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-900 text-white shrink-0">Recommended by HMAX</span>}
                 </div>
                 {o.subtitle && <p className="text-xs text-gray-400 truncate">{o.subtitle}</p>}
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
@@ -1467,7 +1434,7 @@ function PersonSuggestionCard({ suggestion, added, onAdd }: { suggestion: { pers
     <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
       <div className="px-4 py-2.5 border-b border-gray-100 flex items-center gap-2">
         <UserRoundPlus size={14} strokeWidth={1.5} className="text-gray-400 shrink-0" />
-        <p className="text-xs text-gray-500">Suggested teammate</p>
+        <p className="text-xs text-gray-500">Teammate recommended by HMAX</p>
       </div>
       <div className="px-4 py-3 flex items-center gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1555,6 +1522,16 @@ export function ChatThread({ messages, typing, context, wizardStep, onWizardStep
   // Next-step buttons sit under the newest reply; thread notices and teammate
   // suggestions that follow it shouldn't take them away.
   const lastId = messages.filter((m) => m.kind !== "event" && m.kind !== "suggest-person").at(-1)?.id;
+
+  // Assistant turns: the HMAX avatar, then the content, kept clear of the
+  // right edge so they read as the other side of the conversation.
+  const aiRow = (key: number, children: React.ReactNode) => (
+    <div key={key} className="flex items-start gap-2.5 pr-8 mb-6 animate-message-in">
+      <AiAvatar />
+      <div className="flex-1 min-w-0">{children}</div>
+    </div>
+  );
+
   return (
     <>
       {/* Widget context pinned to the top */}
@@ -1564,123 +1541,85 @@ export function ChatThread({ messages, typing, context, wizardStep, onWizardStep
         m.kind === "event" ? (
           <EventLine key={m.id} text={m.text ?? ""} />
         ) : m.kind === "suggest-person" && m.suggestion ? (
-          <div key={m.id} className="flex items-start gap-3 mb-5 animate-message-in">
-            <AiAvatar />
-            <div className="flex-1 min-w-0">
-              <PersonSuggestionCard
-                suggestion={m.suggestion}
-                added={participantIds.includes(m.suggestion.personId)}
-                onAdd={onAddPerson}
-              />
-            </div>
-          </div>
+          aiRow(
+            m.id,
+            <PersonSuggestionCard
+              suggestion={m.suggestion}
+              added={participantIds.includes(m.suggestion.personId)}
+              onAdd={onAddPerson}
+            />
+          )
         ) : m.kind === "task" && m.task ? (
-          <div key={m.id} className="flex items-start gap-3 mb-5 animate-message-in">
-            <AiAvatar />
-            <div className="flex-1 min-w-0">
-              <TaskCard task={m.task} />
-            </div>
-          </div>
+          aiRow(m.id, <TaskCard task={m.task} />)
         ) : m.role === "user" ? (
-          <div key={m.id} className="flex items-start gap-3 mb-5 animate-message-in">
-            <div className="flex-1 bg-white border border-gray-100 rounded-2xl px-4 py-3">
-              <p className="text-sm text-gray-800 whitespace-pre-line">{m.text}</p>
+          <div key={m.id} className="flex items-start justify-end gap-2.5 pl-10 mb-6 animate-message-in">
+            <div className="flex-1 min-w-0 bg-[#222222]/5 rounded-xl p-4">
+              <p className="text-sm leading-5 text-gray-950 whitespace-pre-line">{m.text}</p>
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/avatars/68.jpg"
-              alt="Jan V."
-              className="w-8 h-8 rounded-full object-cover bg-gray-200 shrink-0 mt-0.5"
-            />
+            <img src="/avatars/68.jpg" alt="Jan V." className="size-8 rounded-full object-cover bg-[#f5f5f5] shrink-0" />
           </div>
         ) : m.kind === "wizard" ? (
-          <div key={m.id} className="mb-8">
-            <div className="flex items-start gap-3 mb-2 animate-message-in">
-              <AiAvatar />
-              <div className="flex-1 min-w-0">
-                <WizardCard
-                  step={wizardStep}
-                  onContinue={() => onWizardStep(Math.min(5, wizardStep + 1))}
-                  onBack={() => onWizardStep(Math.max(1, wizardStep - 1))}
-                  onGenerate={onGenerate}
-                />
-              </div>
-            </div>
-            <div className="ml-11">
-              <SourcesLine />
-            </div>
-          </div>
+          aiRow(
+            m.id,
+            <WizardCard
+              step={wizardStep}
+              onContinue={() => onWizardStep(Math.min(5, wizardStep + 1))}
+              onBack={() => onWizardStep(Math.max(1, wizardStep - 1))}
+              onGenerate={onGenerate}
+            />
+          )
         ) : m.kind === "opp-wizard" ? (
-          <div key={m.id} className="mb-8">
-            <div className="flex items-start gap-3 mb-2 animate-message-in">
-              <AiAvatar />
-              <div className="flex-1 min-w-0">
-                <OppWizardCard
-                  step={wizardStep}
-                  onContinue={() => onWizardStep(Math.min(4, wizardStep + 1))}
-                  onBack={() => onWizardStep(Math.max(1, wizardStep - 1))}
-                  onCreate={() => onOppCreate?.()}
-                />
-              </div>
-            </div>
-            <div className="ml-11">
-              <SourcesLine />
-            </div>
-          </div>
+          aiRow(
+            m.id,
+            <OppWizardCard
+              step={wizardStep}
+              onContinue={() => onWizardStep(Math.min(4, wizardStep + 1))}
+              onBack={() => onWizardStep(Math.max(1, wizardStep - 1))}
+              onCreate={() => onOppCreate?.()}
+            />
+          )
         ) : m.kind === "flow" ? (
           (() => {
             const flow = flowById(m.flowId);
             if (!flow) return null;
             const total = flow.steps.length + 1;
-            return (
-              <div key={m.id} className="mb-8">
-                <div className="flex items-start gap-3 mb-2 animate-message-in">
-                  <AiAvatar />
-                  <div className="flex-1 min-w-0">
-                    <FlowWizardCard
-                      flow={flow}
-                      step={wizardStep}
-                      onContinue={() => onWizardStep(Math.min(total, wizardStep + 1))}
-                      onBack={() => onWizardStep(Math.max(1, wizardStep - 1))}
-                      onComplete={() => onFlowComplete?.(flow.id)}
-                    />
-                  </div>
-                </div>
-                <div className="ml-11">
-                  <SourcesLine />
-                </div>
-              </div>
+            return aiRow(
+              m.id,
+              <FlowWizardCard
+                flow={flow}
+                step={wizardStep}
+                onContinue={() => onWizardStep(Math.min(total, wizardStep + 1))}
+                onBack={() => onWizardStep(Math.max(1, wizardStep - 1))}
+                onComplete={() => onFlowComplete?.(flow.id)}
+              />
             );
           })()
         ) : m.kind === "panel" && m.panel ? (
-          <div key={m.id} className="flex items-start gap-3 mb-5 animate-message-in">
-            <AiAvatar />
-            <div className="flex-1 min-w-0">
-              <PanelBlock panel={m.panel} onSend={onSend} onOpenDoc={onOpenDoc} onUpdate={onUpdatePanel ? (p) => onUpdatePanel(m.id, p) : undefined} />
-            </div>
-          </div>
+          aiRow(
+            m.id,
+            <PanelBlock panel={m.panel} onSend={onSend} onOpenDoc={onOpenDoc} onUpdate={onUpdatePanel ? (p) => onUpdatePanel(m.id, p) : undefined} />
+          )
         ) : (
-          <div key={m.id} className="flex items-start gap-3 mb-5 animate-message-in">
-            <AiAvatar />
-            <div className="flex-1 min-w-0">
-              <div className="bg-white border border-gray-100 rounded-2xl px-4 py-3">
-                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{m.text}</p>
-              </div>
-              {m.visual && (
-                <div className="mt-2 bg-white border border-gray-100 rounded-2xl p-4">
-                  <p className="text-xs text-gray-400 mb-3">{m.visual.title}</p>
-                  <ChartBody config={m.visual} />
-                </div>
-              )}
-              <div className="mt-2 ml-1">
-                <SourcesLine />
+          aiRow(
+            m.id,
+            <>
+              <div className="bg-[#222222]/5 rounded-xl p-4 flex flex-col gap-4">
+                <p className="text-sm leading-5 text-gray-950 whitespace-pre-line">{m.text}</p>
+                {/* A chart answer sits in its own white card inside the reply */}
+                {m.visual && (
+                  <div className="bg-white border border-gray-200 rounded-[10px] p-6 flex flex-col gap-4">
+                    <p className="text-sm font-bold leading-5 text-gray-950">{m.visual.title}</p>
+                    <ChartBody config={m.visual} />
+                  </div>
+                )}
               </div>
               {/* Proactive suggestions - only under the newest reply, once it has streamed in */}
               {m.id === lastId && !typing && m.suggestions && (
                 <SuggestionBlock suggestions={m.suggestions} onSend={onSend} />
               )}
-            </div>
-          </div>
+            </>
+          )
         )
       )}
 

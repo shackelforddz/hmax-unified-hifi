@@ -117,7 +117,7 @@ export default function DeliveryTrend() {
 
       {/* Big value */}
       <div className="flex items-end gap-2 mb-1">
-        <span className="text-3xl font-bold text-gray-900 leading-none">{D.current}</span>
+        <span className="text-2xl font-bold text-gray-900 leading-none">{D.current}</span>
         <span className="flex items-center gap-0.5 text-xs text-gray-400 mb-0.5">
           <ArrowDown size={11} strokeWidth={2} />
           {D.delta}
