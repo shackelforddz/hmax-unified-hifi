@@ -3,8 +3,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
+import { Search as SearchIcon } from "lucide-react";
 import WidgetChat from "@/components/dashboard/widget-chat";
+import ProgressiveBlur from "@/components/progressive-blur";
 import type { MapProps } from "./fleet-map";
+import type { MapSearch } from "@/components/dashboard/static-map";
 
 const MILAN = { lat: 45.4642, lng: 9.19 };
 
@@ -34,7 +37,7 @@ function loadGoogleMaps(key: string): Promise<void> {
   return scriptPromise;
 }
 
-export default function GoogleFleetMap({ apiKey, sites, renderTip, overlay }: MapProps & { apiKey: string }) {
+export default function GoogleFleetMap({ apiKey, sites, renderTip, overlay, title = "Risk Map", search }: MapProps & { apiKey: string; title?: string; search?: MapSearch }) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const infoRef = useRef<any>(null);
@@ -118,14 +121,34 @@ export default function GoogleFleetMap({ apiKey, sites, renderTip, overlay }: Ma
         </div>
       )}
 
+      {/* Search sits on the map itself, beside the filters */}
+      {search && (
+        <div className="absolute top-14 right-4 z-10 flex items-center gap-1.5 h-8 w-[200px] px-2.5 bg-white border border-gray-200 rounded-full shadow-sm">
+          <input
+            value={search.value}
+            onChange={(e) => search.onChange(e.target.value)}
+            placeholder={search.placeholder}
+            aria-label={`Search the ${title.toLowerCase()}`}
+            className="flex-1 min-w-0 text-sm text-gray-700 placeholder-gray-500 outline-none bg-transparent"
+          />
+          <SearchIcon size={15} strokeWidth={1.5} className="text-gray-500 shrink-0" />
+        </div>
+      )}
+
       {overlay}
 
-      {/* Chat affordance */}
-      <div className="absolute top-4 right-4 z-10">
-        <WidgetChat
-          title="Fleet map"
-          triggerClassName="w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-        />
+      {/* Title band - the map blurs and fades out beneath it */}
+      <div className="absolute top-0 inset-x-0 z-10 px-4 py-3.5">
+        <ProgressiveBlur className="rounded-t-xl" />
+        <div className="absolute inset-0 rounded-t-xl bg-gradient-to-b from-[#faf5ed] to-[#faf5ed]/0 pointer-events-none" />
+        <div className="relative flex items-start justify-between gap-3">
+          <h3 className="text-base text-gray-900 shrink-0">{title}</h3>
+          <span className="flex-1" />
+          <WidgetChat
+            title={title}
+            triggerClassName="w-8 h-8 -mt-1 -mr-1 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer shrink-0"
+          />
+        </div>
       </div>
     </div>
   );

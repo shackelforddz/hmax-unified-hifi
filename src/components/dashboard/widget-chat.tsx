@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { MessageCircle, ArrowUp } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { useConversationLauncher } from "./conversation-launcher";
 import { Button } from "@/components/ui/button";
 import { widgetStarters } from "@/lib/knowledge-base";
@@ -134,7 +134,6 @@ export default function WidgetChat({ title, triggerClassName }: Props) {
 
             <Button onClick={submit} className="w-full mt-3 rounded-full h-auto py-2 text-sm cursor-pointer">
               Start conversation
-              <ArrowUp size={13} strokeWidth={2} />
             </Button>
           </div>,
           document.body

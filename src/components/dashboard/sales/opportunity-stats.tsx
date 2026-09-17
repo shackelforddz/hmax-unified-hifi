@@ -1,17 +1,10 @@
 "use client";
 
 import KpiCard from "@/components/dashboard/kpi-card";
-import { OPPORTUNITIES, type OppStage } from "@/lib/sales-data";
+import { OPPORTUNITIES, STAGE_PROB, oppValue as parseVal, type OppStage } from "@/lib/sales-data";
 
-const parseVal = (v: string) => parseFloat(v.replace(/[^0-9.]/g, "")) || 0; // "€8.2M" → 8.2
 const fmt = (n: number) => `€${n.toFixed(1)}M`;
 
-// Win probability by stage - drives the weighted forecast.
-const STAGE_PROB: Record<OppStage, number> = {
-  Prospects: 0.2,
-  Bidding: 0.6,
-  Negotiation: 0.9,
-};
 const OFFER_PLUS: OppStage[] = ["Bidding", "Negotiation"];
 
 /** Where the pipeline stood last month, for the "vs last month" delta. */

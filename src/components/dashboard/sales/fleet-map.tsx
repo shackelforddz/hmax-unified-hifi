@@ -5,17 +5,19 @@ import StaticMap from "@/components/dashboard/static-map";
 import { TabGroup, Select, ALL } from "@/components/dashboard/filter-controls";
 import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
 import { ALL_PEOPLE } from "@/lib/people-data";
-import type { AssetAlert, AssetCategory } from "@/lib/sales-data";
+import { ASSET_ALERTS, ASSET_CATEGORY_LABELS, OPPORTUNITIES, leadDetail, type AssetAlert, type AssetCategory } from "@/lib/sales-data";
 import {
   FLEET_SITES,
+  UNCOVERED_SITES,
+  LEAD_SITES,
   RISK_TYPES,
   carriesRisk,
   contractHealth,
-  hasActiveContract,
-  hasLeads,
+  type LeadSite,
   type FleetSite,
 } from "@/lib/fleet-map-data";
 import AssetDrawer from "./asset-drawer";
+import OpportunityDrawer from "./opportunity-drawer";
 import GoogleFleetMap from "./google-fleet-map";
 
 /** "sales" filters by region, project manager, contracts and leads; "ops"
@@ -31,59 +33,114 @@ interface Props {
   categoryOptions?: { label: string; value: AssetCategory | "all" }[];
 }
 
-const SALES_VIEWS = ["Active contracts", "Potential leads"];
+/** The sales map shows the assets, the agreements covering them, or the
+ *  open leads against them. */
+const SALES_LAYERS = ["Renewals", "Leads", "Assets"];
+const LEAD_REGIONS = [...new Set(LEAD_SITES.map((l) => l.region))].sort();
+/* The three layers mirror the sales dashboard's alert lists: renewals that
+   need attention, new leads that need attention, and the asset alerts. */
+const RENEWAL_SITES = LEAD_SITES.filter((l) => l.category === "Renewal");
+const NEW_LEAD_SITES = LEAD_SITES.filter((l) => l.category === "New lead");
+const ALERT_SITES = FLEET_SITES.filter((s) => ASSET_ALERTS.some((a) => a.id === s.assetId && a.alert));
+const UNCOVERED_IDS = new Set(UNCOVERED_SITES.map((s) => s.assetId));
+
 const REGIONS = [...new Set(FLEET_SITES.map((s) => s.region))].sort();
-const PROJECT_MANAGERS = [...new Set(FLEET_SITES.flatMap((s) => (s.projectManager ? [s.projectManager] : [])))].sort();
 // The ops map is about delivery, so it only shows assets under a delivery contract.
 const OPS_SITES = FLEET_SITES.filter((s) => s.contract);
 
 export default function FleetMap({ mode, alerts = [], categoryOptions = [] }: Props) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const [region, setRegion] = useState(ALL);
-  const [pm, setPm] = useState(ALL);
-  const [view, setView] = useState("all");
   const [risk, setRisk] = useState("all");
+  const [query, setQuery] = useState("");
   const [assetId, setAssetId] = useState<string | null>(null);
   const [contractId, setContractId] = useState<string | null>(null);
+  const [layer, setLayer] = useState("Renewals");
+  const [lead, setLead] = useState<LeadSite | null>(null);
+  const showingRenewals = mode === "sales" && layer === "Renewals";
+  const showingLeads = mode === "sales" && layer === "Leads";
 
-  const salesMatch = (s: FleetSite, v: string) =>
-    (region === ALL || s.region === region) &&
-    (pm === ALL || s.projectManager === pm) &&
-    (v === "all" || (v === "Active contracts" ? hasActiveContract(s) : hasLeads(s)));
   const riskKey = (label: string) => RISK_TYPES.find((r) => r.label === label)?.key;
 
   // Alerts view: each pin's alert, and the category tabs that filter them.
   const [category, setCategory] = useState("all");
   const alertFor = (s: FleetSite) => alerts.find((a) => a.id === s.assetId && a.alert);
-  const categoryLabel = (c: AssetCategory) => categoryOptions.find((o) => o.value === c)?.label ?? c;
+  const categoryLabel = (c: AssetCategory) => categoryOptions.find((o) => o.value === c)?.label ?? ASSET_CATEGORY_LABELS[c] ?? c;
   const alertCategories = categoryOptions.filter((o) => o.value !== "all").map((o) => o.label);
   const inCategory = (s: FleetSite, label: string) => {
     const a = alertFor(s);
     return !!a && categoryLabel(a.category) === label;
   };
 
+  const matchesQuery = (s: FleetSite) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return [s.code, s.type, s.customer, s.region, s.contract?.name, s.projectManager]
+      .some((v) => v?.toLowerCase().includes(q));
+  };
+
+  // Contracts view: one pin per agreement, plus the assets none of them cover.
+  // Renewals and new leads are the same shape - only the list differs.
+  const leads = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const list = showingRenewals ? RENEWAL_SITES : NEW_LEAD_SITES;
+    return list.filter(
+      (l) =>
+        (region === ALL || l.region === region) &&
+        (!q || [l.title, l.account, l.owner, l.stage, ...l.assets].some((v) => v.toLowerCase().includes(q)))
+    );
+  }, [region, query, showingRenewals]);
+
+  // Assets view: the same alerting assets the Asset Alerts list carries.
+  const alerting = useMemo(
+    () => ALERT_SITES.filter((s) => (region === ALL || s.region === region) && matchesQuery(s)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [region, query]
+  );
+
   const sites = useMemo(() => {
+    const search = (list: FleetSite[]) => list.filter(matchesQuery);
     if (mode === "ops") {
       const key = riskKey(risk);
-      return key ? OPS_SITES.filter((s) => carriesRisk(s, key)) : OPS_SITES;
+      return search(key ? OPS_SITES.filter((s) => carriesRisk(s, key)) : OPS_SITES);
     }
-    if (mode === "sales") return FLEET_SITES.filter((s) => salesMatch(s, view));
-    if (mode === "alerts" && category !== "all") return FLEET_SITES.filter((s) => inCategory(s, category));
-    return FLEET_SITES;
+    if (mode === "sales") return layer === "Assets" ? alerting : [];
+    if (mode === "alerts" && category !== "all") return search(FLEET_SITES.filter((s) => inCategory(s, category)));
+    return search(FLEET_SITES);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, region, pm, view, risk, category, alerts]);
+  }, [mode, region, risk, category, alerts, query, layer, alerting]);
+
+  const layerTabs = mode === "sales" && (
+    <div role="tablist" aria-label="Map layer" className="bg-gray-100 h-8 flex items-center p-[3px] rounded-full shrink-0">
+      {SALES_LAYERS.map((l) => (
+        <button
+          key={l}
+          role="tab"
+          aria-selected={layer === l}
+          onClick={() => {
+            setLayer(l);
+            setRegion(ALL);
+          }}
+          className={`h-full px-3 rounded-full text-sm font-bold whitespace-nowrap transition-colors cursor-pointer ${
+            layer === l ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          {l}
+        </button>
+      ))}
+    </div>
+  );
 
   const filters =
     mode === "sales" ? (
       <>
-        <Select value={region} onChange={setRegion} allLabel="All regions" options={REGIONS} label="Region" />
-        <Select value={pm} onChange={setPm} allLabel="All PMs" options={PROJECT_MANAGERS} label="Project manager" />
-        <TabGroup
-          value={view}
-          onChange={setView}
-          options={SALES_VIEWS}
-          countFor={(v) => FLEET_SITES.filter((s) => salesMatch(s, v)).length}
-          label="Contracts and leads"
+        {layerTabs}
+        <Select
+          value={region}
+          onChange={setRegion}
+          allLabel="All regions"
+          options={layer === "Assets" ? REGIONS : LEAD_REGIONS}
+          label="Region"
         />
       </>
     ) : mode === "ops" ? (
@@ -109,21 +166,30 @@ export default function FleetMap({ mode, alerts = [], categoryOptions = [] }: Pr
       site={site}
       mode={mode}
       activeRisk={riskKey(risk)}
-      alert={mode === "alerts" ? alertFor(site) : undefined}
+      alert={mode === "alerts" ? alertFor(site) : mode === "sales" ? ASSET_ALERTS.find((a) => a.id === site.assetId) : undefined}
       alertLabel={categoryLabel}
+      uncovered={mode === "sales" && UNCOVERED_IDS.has(site.assetId)}
       onViewAsset={() => setAssetId(site.assetId)}
       onViewContract={() => site.contract && setContractId(site.contract.id)}
     />
   );
 
+  const leadTip = (l: LeadSite) => <LeadTip lead={l} onViewDetails={() => setLead(l)} />;
+
   const overlay = filters && (
     <>
-      <div className="absolute top-4 left-4 right-16 z-10 flex flex-wrap items-center gap-2" onPointerDown={(e) => e.stopPropagation()}>
+      <div className="absolute top-14 left-4 right-[224px] z-10 flex flex-wrap items-center gap-2" onPointerDown={(e) => e.stopPropagation()}>
         {filters}
       </div>
-      {sites.length === 0 && (
+      {sites.length === 0 && (mode === "sales" && layer !== "Assets" ? leads.length === 0 : true) && (
         <div className="absolute inset-0 z-[5] flex items-center justify-center pointer-events-none">
-          <p className="text-sm text-gray-500 bg-white/90 rounded-full px-4 py-2 shadow">No assets match these filters.</p>
+          <p className="text-sm text-gray-500 bg-white/90 rounded-full px-4 py-2 shadow">
+            {showingRenewals
+              ? "No renewals need attention here."
+              : showingLeads
+              ? "No new leads need attention here."
+              : "No asset alerts match this search or region."}
+          </p>
         </div>
       )}
     </>
@@ -135,12 +201,58 @@ export default function FleetMap({ mode, alerts = [], categoryOptions = [] }: Pr
           handlers don't intercept scrolling inside them. */}
       <AssetDrawer assetId={assetId} onClose={() => setAssetId(null)} />
       <ContractDrawer contractId={contractId} onClose={() => setContractId(null)} />
+      <OpportunityDrawer
+        opp={lead ? OPPORTUNITIES.find((o) => o.id === lead.id) ?? null : null}
+        detail={lead ? leadDetail(OPPORTUNITIES.find((o) => o.id === lead.id)!) : null}
+        onClose={() => setLead(null)}
+      />
       {apiKey ? (
-        <GoogleFleetMap apiKey={apiKey} sites={sites} renderTip={tip} overlay={overlay} />
+        <GoogleFleetMap
+          apiKey={apiKey}
+          sites={sites}
+          renderTip={tip}
+          overlay={overlay}
+          title="Risk Map"
+          search={{ value: query, onChange: setQuery, placeholder: "Search assets" }}
+        />
       ) : (
         <StaticMap
-          pins={sites.map((site) => ({ id: site.assetId, x: site.x, y: site.y, ping: site.ping, label: site.code, site }))}
-          renderTip={(pin) => tip(pin.site)}
+          title="Risk Map"
+          search={{
+            value: query,
+            onChange: setQuery,
+            placeholder: showingRenewals ? "Search renewals" : showingLeads ? "Search leads" : "Search assets",
+          }}
+          pins={[
+            ...(mode === "sales" && layer !== "Assets"
+              ? leads.map((l) => ({ id: `lead:${l.id}`, x: l.x, y: l.y, label: l.title, lead: l, site: undefined }))
+              : []),
+            ...sites.map((site) => ({ id: site.assetId, x: site.x, y: site.y, ping: site.ping, label: site.code, site, lead: undefined })),
+          ]}
+          renderTip={(pin) => (pin.lead ? leadTip(pin.lead) : pin.site ? tip(pin.site) : null)}
+          renderPin={(pin, selected) => {
+            if (pin.lead) {
+              return (
+                <span
+                  className={`relative size-3.5 rotate-45 bg-chart-line border-2 border-white shadow transition-transform ${selected ? "scale-125" : ""}`}
+                />
+              );
+            }
+            // On the assets layer every pin is an alert - critical ones pulse.
+            const alert = mode === "sales" && pin.site ? ASSET_ALERTS.find((a) => a.id === pin.site!.assetId) : undefined;
+            if (!alert) return undefined;
+            const critical = alert.status === "critical";
+            return (
+              <>
+                {critical && <span className="absolute inline-flex h-12 w-12 rounded-full bg-status-critical/30 animate-ping [animation-duration:2.5s]" />}
+                <span
+                  className={`relative inline-flex size-3 rounded-full border-2 border-white shadow transition-transform ${
+                    critical ? "bg-status-critical" : "bg-status-warning"
+                  } ${selected ? "scale-125" : ""}`}
+                />
+              </>
+            );
+          }}
           overlay={overlay}
           tipWidth={mode === "ops" ? 288 : 224}
           tipHeight={mode === "ops" ? 360 : mode === "sales" || mode === "alerts" ? 210 : 140}
@@ -184,6 +296,7 @@ export function SiteTip({
   activeRisk,
   alert,
   alertLabel,
+  uncovered,
   onViewAsset,
   onViewContract,
 }: {
@@ -192,6 +305,8 @@ export function SiteTip({
   activeRisk?: string;
   alert?: AssetAlert;
   alertLabel?: (c: AssetCategory) => string;
+  /** Shown in the contracts view: no agreement covers this asset. */
+  uncovered?: boolean;
   onViewAsset: () => void;
   onViewContract: () => void;
 }) {
@@ -204,7 +319,7 @@ export function SiteTip({
       <div>
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-sm text-gray-900 leading-snug">{c.name}</p>
+            <p className="text-sm font-bold text-gray-900 leading-snug">{c.name}</p>
             <p className="text-xs text-gray-400 truncate">{c.customer} · {c.value}</p>
           </div>
           <StatusBadge critical={c.status === "critical"} label={c.status === "critical" ? "Critical" : "At risk"} />
@@ -256,12 +371,13 @@ export function SiteTip({
     <div>
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-sm text-gray-900">{site.code}</p>
+          <p className="text-sm font-bold text-gray-900">{site.code}</p>
           <p className="text-xs text-gray-400 truncate">{site.type}</p>
         </div>
         <StatusBadge critical={site.status === "Critical"} label={site.status} />
       </div>
       <p className="text-xs text-gray-400 mt-1">{site.customer} · {site.region}</p>
+      {uncovered && <p className="mt-2 text-xs text-status-critical font-bold">No service agreement covers this asset</p>}
       <div className="mt-2">
         <p className="text-[11px] text-gray-400 tracking-wider mb-1">Asset health</p>
         <HealthBar pct={site.health} />
@@ -286,6 +402,46 @@ export function SiteTip({
       )}
       <button
         onClick={onViewAsset}
+        className="mt-3 w-full text-xs text-gray-700 border border-gray-200 rounded-full py-1.5 hover:border-gray-400 transition-colors cursor-pointer"
+      >
+        View details
+      </button>
+    </div>
+  );
+}
+
+/* ── Lead tooltip (leads view) ───────────────────────────────────── */
+export function LeadTip({ lead, onViewDetails }: { lead: LeadSite; onViewDetails: () => void }) {
+  const label = lead.status === "stalled" ? "Stalled" : lead.status === "at-risk" ? "At risk" : "On track";
+  return (
+    <div>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-gray-900 leading-snug">{lead.title}</p>
+          <p className="text-xs text-gray-400 truncate">
+            {lead.account} · {lead.value}
+          </p>
+        </div>
+        <StatusBadge critical={lead.status === "stalled"} label={label} />
+      </div>
+      <div className="flex flex-col gap-0.5 mt-2">
+        <p className="text-xs text-gray-500">
+          {lead.stage} · {lead.winConfidence}% win confidence
+        </p>
+        <p className="text-xs text-gray-500">
+          {lead.owner} · {lead.region}
+        </p>
+        <p className="text-xs text-gray-500 truncate">
+          {lead.assets.length > 0 ? `Assets in scope: ${lead.assets.join(", ")}` : "No assets scoped yet"}
+        </p>
+        {lead.attention.length > 0 && (
+          <p className="text-xs text-status-critical font-bold">
+            {lead.attention.length} needing attention: {lead.attention.join(", ")}
+          </p>
+        )}
+      </div>
+      <button
+        onClick={onViewDetails}
         className="mt-3 w-full text-xs text-gray-700 border border-gray-200 rounded-full py-1.5 hover:border-gray-400 transition-colors cursor-pointer"
       >
         View details

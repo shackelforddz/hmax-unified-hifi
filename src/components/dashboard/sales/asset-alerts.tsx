@@ -21,6 +21,9 @@ interface AssetAlertsProps {
   title?: string;
   /** Add each asset's DGA score to the alert meta (Diagnostics). */
   showDgaScore?: boolean;
+  /** Put the live sensor faults first. Off for a list that is about the
+   *  written reports, where the faults are supporting evidence. */
+  faultsLead?: boolean;
 }
 
 /* The asset's DGA score as a meta entry, when it has DGA data. */
@@ -38,6 +41,7 @@ export default function AssetAlerts({
   categoryOptions = CATEGORY_OPTIONS,
   title = "Asset Alerts",
   showDgaScore = false,
+  faultsLead = true,
 }: AssetAlertsProps = {}) {
   const [drawerId, setDrawerId] = useState<string | null>(null);
 
@@ -118,12 +122,16 @@ export default function AssetAlerts({
     [alerts, labelFor, showDgaScore]
   );
 
-  // Sensor faults lead - they are happening now.
-  const allAlerts = useMemo(() => [...faultItems, ...items], [faultItems, items]);
-  const allTypes = useMemo(
-    () => (faultItems.length > 0 ? [SENSOR_TYPE, ...typeOptions] : typeOptions),
-    [faultItems, typeOptions]
+  // Sensor faults lead by default - they are happening now. A reports list
+  // leads with the reports instead, so the cap keeps one per asset.
+  const allAlerts = useMemo(
+    () => (faultsLead ? [...faultItems, ...items] : [...items, ...faultItems]),
+    [faultItems, items, faultsLead]
   );
+  const allTypes = useMemo(() => {
+    if (faultItems.length === 0) return typeOptions;
+    return faultsLead ? [SENSOR_TYPE, ...typeOptions] : [...typeOptions, SENSOR_TYPE];
+  }, [faultItems, typeOptions, faultsLead]);
 
   return (
     <AlertsWidget

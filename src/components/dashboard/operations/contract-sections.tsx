@@ -15,6 +15,8 @@ export interface ContractSectionsData {
   parts: { label: string; qty: number; status: PartStatus }[];
   maintenance: { task: string; due: string; interval: string; status: MaintStatus }[];
   fieldService: { visit: string; engineer: string; date: string; status: string }[];
+  /** Supplier / warehouse / site hand-offs, when the contract tracks them. */
+  readiness?: { supplier: string[]; warehouse: string[]; site: string[] };
   finance: { revenue: string; netMargin: string; asSoldMargin: string; invoiced: string; outstanding: string };
   invoices: { code: string; milestone: string; amount: string; status: InvoiceStatus; due: string }[];
   payments: { date: string; event: string; amount: string }[];
@@ -43,6 +45,25 @@ export default function ContractSections({ d }: { d: ContractSectionsData }) {
           })}
         </div>
       </Card>
+
+      {/* Readiness - the three hand-offs, in the order work moves through them */}
+      {d.readiness && (
+        <Card>
+          <SectionTitle>Readiness</SectionTitle>
+          <div className="flex flex-col">
+            {[
+              { label: "Supplier", items: d.readiness.supplier },
+              { label: "Warehouse", items: d.readiness.warehouse },
+              { label: "Site", items: d.readiness.site },
+            ].map((row) => (
+              <div key={row.label} className="flex items-start gap-4 py-2.5 border-b border-gray-100 last:border-0">
+                <span className="text-sm font-bold text-gray-900 w-24 shrink-0">{row.label}</span>
+                <span className="text-sm text-gray-500 flex-1 min-w-0">{row.items.join(" / ")}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* Parts & materials */}
       <Card>

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { KeyRound, ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 import AuthHeader from "@/components/auth/auth-header";
 import { Button } from "@/components/ui/button";
 import { useAppDispatch } from "@/store/hooks";
@@ -50,7 +50,6 @@ export default function LoginForm({ role }: { role?: Role }) {
             onClick={() => router.push("/loading-profile")}
             className="w-full rounded-full h-auto py-3 gap-2 text-sm cursor-pointer"
           >
-            <KeyRound size={15} strokeWidth={2} />
             Sign in with Single Sign-On
           </Button>
 

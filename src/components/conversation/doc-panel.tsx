@@ -153,10 +153,10 @@ export default function DocPanel({ onClose }: Props) {
         {/* Action buttons */}
         <div className="flex gap-2 pb-2">
           <Button className="flex-1 gap-2 rounded-full h-auto py-2.5 text-sm cursor-pointer">
-            <Download size={14} /> Download
+Download
           </Button>
           <Button variant="outline" className="flex-1 gap-2 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer">
-            <Share2 size={14} /> Share
+Share
           </Button>
         </div>
       </div>

@@ -102,6 +102,36 @@ export const ASSET_ALERTS: AssetAlert[] = [
       impact: "20% over commissioning baseline",
     },
   },
+  {
+    id: "ast-051",
+    code: "AST-051",
+    location: "Zone C • Substation 7",
+    health: 38,
+    status: "critical",
+    category: "offer-readiness",
+    alert: {
+      title: "Critical unit with no service agreement",
+      detail:
+        "AST-051 is the largest uncovered transformer on the estate - health 38%, moisture rising and no scheduled maintenance behind it. Out-of-hours failure has no contracted response, which is the opening for an agreement.",
+      action: "Create contract",
+      impact: "No contracted response",
+    },
+  },
+  {
+    id: "ast-052",
+    code: "AST-052",
+    location: "Zone C • Substation 7",
+    health: 54,
+    status: "at-risk",
+    category: "missing-info",
+    alert: {
+      title: "Relay firmware two releases behind, uncovered",
+      detail:
+        "AST-052's relay bank sits outside every agreement and its firmware is two releases behind the supported baseline. An upgrade visit closes the gap and opens the account to a wider retrofit.",
+      action: "Draft a service offer",
+      impact: "Unsupported firmware",
+    },
+  },
 ];
 
 /* ── Asset detail drawer ─────────────────────────────────────────── */
@@ -182,6 +212,40 @@ export function dgaScore(assetId: string): number | null {
   const avg = scores.reduce((sum, v) => sum + v, 0) / scores.length;
   return Math.round((avg + Math.min(...scores)) / 2);
 }
+
+/** "€8.2M" -> 8.2, so pipeline values can be summed. */
+export const oppValue = (v: string) => parseFloat(v.replace(/[^0-9.]/g, "")) || 0;
+
+/** Win probability by stage - drives the weighted forecast. */
+export const STAGE_PROB: Record<OppStage, number> = {
+  Prospects: 0.2,
+  Bidding: 0.6,
+  Negotiation: 0.9,
+};
+
+/** Assets whose oil is scoring below `threshold` on DGA, worst first. */
+export const LOW_DGA_THRESHOLD = 60;
+export function lowDgaAssets(threshold = LOW_DGA_THRESHOLD): { assetId: string; score: number }[] {
+  return Object.keys(DGA_TRENDS)
+    .map((assetId) => ({ assetId, score: dgaScore(assetId) ?? 100 }))
+    .filter((a) => a.score < threshold)
+    .sort((a, b) => a.score - b.score);
+}
+
+/* Labels for the asset alert categories, so nothing ever shows a raw slug. */
+export const ASSET_CATEGORY_LABELS: Record<string, string> = {
+  "asset-health": "Asset health",
+  "risk-building": "Risk building",
+  "offer-readiness": "Offer readiness",
+  "missing-info": "Missing info",
+  dga: "DGA",
+  electrical: "Electrical",
+  physical: "Physical inspection",
+  "scope-feasibility": "Feasibility",
+  design: "Design",
+  site: "Site",
+  standards: "Standards",
+};
 
 /* ── Live sensor faults ──────────────────────────────────────────────
    Conditions the asset's own instrumentation is reporting right now, as
@@ -304,6 +368,49 @@ export const ASSET_DETAILS: Record<string, AssetDetail> = {
       { title: "Cooling capacity shortfall", detail: "One fan degraded; a second failure would push temperatures into the alert band.", level: "Medium" },
     ],
     related: { customer: "NV Energy", contract: "NV Energy - Service Agreement", station: "Pump Station 3, Zone B" },
+  },
+  /* ── Monitored but not under any contract ──────────────────────────
+     Assets the fleet watches with no agreement or delivery contract behind
+     them - the coverage gaps sales chases. */
+  "ast-051": {
+    code: "AST-051",
+    type: "Power transformer · 40 MVA",
+    location: "Zone C · Substation 7",
+    stats: { healthPct: 38, status: "Critical", commissioned: "2008", lastService: "03 Feb 2026" },
+    contextSummary:
+      "AST-051 is monitored but sits outside every service agreement. Health is 38% with a rising moisture trend and no scheduled maintenance behind it - the largest uncovered unit on the estate.",
+    recommendedActions: ["Propose a service agreement", "Schedule inspection", "Add to watch list"],
+    readings: [
+      { label: "Moisture in oil", value: "32 ppm (rising)", state: "alert" },
+      { label: "Top-oil temperature", value: "84°C", state: "watch" },
+      { label: "Load factor", value: "0.77", state: "watch" },
+      { label: "Last maintenance", value: "7 months ago", state: "alert" },
+    ],
+    maintenance: [{ label: "Oil sample / DGA", date: "2026-02-03" }],
+    risks: [
+      { title: "No coverage on a critical unit", detail: "Out-of-hours failure has no contracted response; repairs would be quoted case by case.", level: "Critical" },
+      { title: "Moisture ingress", detail: "Moisture has climbed for two quarters with no drying scheduled.", level: "High" },
+    ],
+    related: { customer: "Midwest Power Co-op", contract: "Not under contract", station: "Substation 7, Zone C" },
+  },
+  "ast-052": {
+    code: "AST-052",
+    type: "Protection relay bank · Feeder 12",
+    location: "Zone C · Substation 7",
+    stats: { healthPct: 54, status: "At Risk", commissioned: "2016", lastService: "19 Apr 2026" },
+    contextSummary:
+      "AST-052's relay firmware is two releases behind and the bank is not covered by an agreement. Health is 54% - an upgrade visit would close the gap and open the account to a wider retrofit.",
+    recommendedActions: ["Propose a service agreement", "Draft a service offer", "Add to watch list"],
+    readings: [
+      { label: "Firmware version", value: "2 releases behind", state: "watch" },
+      { label: "Trip-coil health", value: "Within limits", state: "ok" },
+      { label: "Self-test errors", value: "3 this quarter", state: "watch" },
+    ],
+    maintenance: [{ label: "Relay function test", date: "2026-04-19" }],
+    risks: [
+      { title: "Unsupported firmware", detail: "Two releases behind the supported baseline; known timing defect unpatched.", level: "High" },
+    ],
+    related: { customer: "Midwest Power Co-op", contract: "Not under contract", station: "Substation 7, Zone C" },
   },
   "ast-004": {
     code: "AST-004",
@@ -911,7 +1018,7 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
     finance: { revenue: "€6.2M", netMargin: "17.0%", asSoldMargin: "18.5%", invoiced: "€4.1M", outstanding: "€0.3M" },
     invoices: [
       { code: "INV-A-21", milestone: "Q2 service fee", amount: "€1.55M", status: "Paid", due: "2026-04-01" },
-      { code: "INV-A-22", milestone: "Q3 service fee", amount: "€1.55M", status: "Sent", due: "2026-07-01" },
+      { code: "INV-A-22", milestone: "Q3 service fee", amount: "€1.55M", status: "Overdue", due: "2026-07-01" },
       { code: "INV-A-23", milestone: "Condition-monitoring add-on", amount: "€0.3M", status: "Draft", due: "2026-10-01" },
     ],
     payments: [
@@ -1035,7 +1142,7 @@ export const SLA_CONTRACTS: Record<string, SlaContractDetail> = {
     finance: { revenue: "€5.4M", netMargin: "17.8%", asSoldMargin: "18.4%", invoiced: "€3.2M", outstanding: "€0.2M" },
     invoices: [
       { code: "INV-D-11", milestone: "Q2 service fee", amount: "€1.35M", status: "Paid", due: "2026-04-01" },
-      { code: "INV-D-12", milestone: "Q3 service fee", amount: "€1.35M", status: "Sent", due: "2026-07-01" },
+      { code: "INV-D-12", milestone: "Q3 service fee", amount: "€1.35M", status: "Overdue", due: "2026-07-01" },
       { code: "INV-D-13", milestone: "Reliability review", amount: "€0.2M", status: "Draft", due: "2026-10-01" },
     ],
     payments: [

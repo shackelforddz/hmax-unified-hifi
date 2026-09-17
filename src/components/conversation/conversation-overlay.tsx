@@ -11,6 +11,7 @@ import EntityContextPanel from "./context-panel-entity";
 import DocPanel from "./doc-panel";
 import ConversationPeople from "./conversation-people";
 import PromptBar from "./prompt-bar";
+import ProgressiveBlur from "@/components/progressive-blur";
 import { ChatThread, type AssignedTask, type ChatMsg, type StoredConversation } from "./chat-panel";
 import { ALL_PEOPLE, type Person } from "@/lib/people-data";
 import { answerQuery, detectCustomer, suggestNext, visualFor } from "@/lib/knowledge-base";
@@ -69,36 +70,6 @@ const WELCOME_BY_ROLE: Record<string, WelcomeSet> = {
     ],
   },
 };
-
-/* Progressive blur: stacked backdrop blurs, each masked to a shorter band
-   from the top, so content is heavily blurred at the top edge and comes
-   back into focus by the bottom of the header. */
-const BLUR_LAYERS = [
-  { blur: 1, mask: "linear-gradient(to bottom, black 0%, black 75%, transparent 100%)" },
-  { blur: 2, mask: "linear-gradient(to bottom, black 0%, black 55%, transparent 80%)" },
-  { blur: 4, mask: "linear-gradient(to bottom, black 0%, black 40%, transparent 65%)" },
-  { blur: 8, mask: "linear-gradient(to bottom, black 0%, black 25%, transparent 50%)" },
-  { blur: 16, mask: "linear-gradient(to bottom, black 0%, black 10%, transparent 35%)" },
-];
-
-function ProgressiveBlur() {
-  return (
-    <div aria-hidden className="absolute inset-0 pointer-events-none">
-      {BLUR_LAYERS.map(({ blur, mask }) => (
-        <div
-          key={blur}
-          className="absolute inset-0"
-          style={{
-            backdropFilter: `blur(${blur}px)`,
-            WebkitBackdropFilter: `blur(${blur}px)`,
-            maskImage: mask,
-            WebkitMaskImage: mask,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
 
 function welcomeFor(role: string): WelcomeSet {
   return WELCOME_BY_ROLE[role] ?? WELCOME_BY_ROLE["Project Manager"];

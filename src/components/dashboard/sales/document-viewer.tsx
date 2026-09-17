@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, MessageSquareText, Download } from "lucide-react";
+import { X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CHART } from "@/lib/chart-theme";
 
@@ -329,7 +329,6 @@ export default function DocumentViewer({ doc, onClose, onAsk }: Props) {
             onClick={() => onAsk(doc)}
             className="flex-1 rounded-full h-auto py-2.5 text-sm cursor-pointer gap-2"
           >
-            <MessageSquareText size={15} strokeWidth={1.5} />
             Ask about this document
           </Button>
         </div>

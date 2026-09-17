@@ -12,6 +12,7 @@ import ContractsTable from "@/components/dashboard/tables/contracts-table";
 import PeopleWidget from "@/components/dashboard/people-widget";
 import { FIELD_ENGINEERS } from "@/lib/people-data";
 import { PORTFOLIO_HEALTH as P } from "@/lib/operations-data";
+import { OUTSTANDING } from "@/lib/kpi-detail";
 import DashboardGrid, { type GridItem } from "@/components/dashboard/dashboard-grid";
 import DeliveryTrend from "@/components/dashboard/delivery-trend";
 import ResponseTime from "@/components/dashboard/operations/response-time";
@@ -52,8 +53,8 @@ export default function OperationsDashboard() {
             <KpiCard
               id="outstanding-payments"
               label="Outstanding payments"
-              value={P.outstandingPayments}
-              trend={P.outstandingNote}
+              value={OUTSTANDING.total}
+              trend={OUTSTANDING.note}
               sparkline="contracts-at-risk"
               direction="flat"
             />

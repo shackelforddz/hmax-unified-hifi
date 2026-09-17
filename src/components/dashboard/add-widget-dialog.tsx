@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef, type ReactNode } from "react";
-import { X, LineChart, BarChart3, PieChart, Hash, Check, Plus, Search, Sparkles } from "lucide-react";
+import { X, LineChart, BarChart3, PieChart, Hash, Check, Plus, Search } from "lucide-react";
 import CustomWidgetView from "./sales/custom-widget-view";
 import { buildWidget, suggestVisual, type WidgetType, type CustomWidgetConfig } from "@/lib/custom-widget";
 import { WIDGET_LIBRARY, WIDGET_CATEGORIES, libraryWidget, type WidgetCategory } from "./widget-library";
@@ -53,6 +53,13 @@ const SUGGESTED_BY_ROLE: Record<string, { id: string; reason: string }> = {
   },
 };
 
+/* Roles whose recommendation has been dismissed this session - shared with the
+   customize bar, so dismissing it in either place dismisses it in both. */
+const dismissedRecommendations = new Set<string>();
+
+export const dismissWidgetSuggestion = (role: string) => dismissedRecommendations.add(role);
+export const isWidgetSuggestionDismissed = (role: string) => dismissedRecommendations.has(role);
+
 /** The recommended widget for a role. */
 export function suggestedWidgetFor(role: string) {
   const s = SUGGESTED_BY_ROLE[role] ?? SUGGESTED_BY_ROLE["Project Manager"];
@@ -69,7 +76,7 @@ const layoutSize = (span: number) => ({ w: LAYOUT_WIDTH[span] ?? 600, h: span >=
 /* A live, shrunk-down render of the real widget. Non-interactive: it is a
    picture of what you are about to add, not a working copy. The widget is laid
    out at its dashboard size, then scaled uniformly to fit and centred. */
-function Preview({ render, span, height = 140, className = "bg-gray-50" }: { render: () => ReactNode; span: number; height?: number; className?: string }) {
+export function WidgetPreview({ render, span, height = 140, className = "bg-gray-50" }: { render: () => ReactNode; span: number; height?: number; className?: string }) {
   const boxRef = useRef<HTMLSpanElement>(null);
   const [boxWidth, setBoxWidth] = useState(0);
   useEffect(() => {
@@ -118,7 +125,12 @@ function LibraryPane({
   const q = query.trim().toLowerCase();
   // The suggestion leads the unfiltered library; searching or picking a
   // category means the user is looking for something else.
-  const showSuggestion = !!suggestion && category === "all" && !q;
+  const [dismissed, setDismissed] = useState(() => dismissedRecommendations.has(selectedRole));
+  const dismiss = () => {
+    dismissedRecommendations.add(selectedRole);
+    setDismissed(true);
+  };
+  const showSuggestion = !!suggestion && !dismissed && category === "all" && !q;
   const matches = WIDGET_LIBRARY.filter(
     (w) =>
       (category === "all" || w.category === category) &&
@@ -130,27 +142,34 @@ function LibraryPane({
       <div className="grid grid-cols-2 gap-3 max-h-[420px] overflow-y-auto no-scrollbar pr-1">
         {showSuggestion && suggestion && (
           <div className="col-span-2 rounded-xl bg-gray-100 p-3 grid grid-cols-2 gap-4 items-center">
-            <Preview render={suggestion.widget.render} span={suggestion.widget.span} height={160} className="bg-white" />
+            <WidgetPreview render={suggestion.widget.render} span={suggestion.widget.span} height={160} className="bg-white" />
             <div className="flex flex-col gap-2 pr-1">
-              <span className="self-start inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-gray-900 text-white">
-                <Sparkles size={11} strokeWidth={1.75} />
+              <span className="self-start text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#3b82f6] text-white">
                 Recommended by HMAX
               </span>
               <span className="text-sm font-bold text-gray-900 leading-5">{suggestion.widget.title}</span>
               <span className="text-xs text-gray-500 leading-4">{suggestion.reason}</span>
-              {isOnDashboard(suggestion.widget.id) ? (
-                <span className="flex items-center gap-1 text-xs text-gray-400">
-                  <Check size={13} strokeWidth={2} /> On this dashboard
-                </span>
-              ) : (
+              <div className="flex items-center gap-2">
+                {isOnDashboard(suggestion.widget.id) ? (
+                  <span className="flex items-center gap-1 text-xs text-gray-400">
+                    <Check size={13} strokeWidth={2} /> On this dashboard
+                  </span>
+                ) : (
+                  <Button
+                    onClick={() => onPick(suggestion.widget.id)}
+                    className="rounded-full h-8 px-4 text-xs font-bold cursor-pointer"
+                  >
+                    Add to dashboard
+                  </Button>
+                )}
                 <Button
-                  onClick={() => onPick(suggestion.widget.id)}
-                  className="self-start rounded-full h-8 px-4 text-xs font-bold gap-1.5 cursor-pointer"
+                  onClick={dismiss}
+                  variant="ghost"
+                  className="rounded-full h-8 px-3 text-xs font-bold text-gray-500 hover:text-gray-900 cursor-pointer"
                 >
-                  <Plus size={13} />
-                  Add to dashboard
+                  Dismiss
                 </Button>
-              )}
+              </div>
             </div>
           </div>
         )}
@@ -175,7 +194,7 @@ function LibraryPane({
                 added ? "border-gray-200 bg-gray-50 cursor-default" : "border-gray-200 hover:border-gray-400 cursor-pointer"
               }`}
             >
-              <Preview render={w.render} span={w.span} />
+              <WidgetPreview render={w.render} span={w.span} />
               <span className="flex flex-col gap-1 px-1 pb-0.5">
                 <span className="flex items-start justify-between gap-2">
                   <span className="text-sm font-bold text-gray-900 leading-5">{w.title}</span>

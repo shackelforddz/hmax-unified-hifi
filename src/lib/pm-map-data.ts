@@ -67,6 +67,31 @@ export interface LatePart {
   suppliers: AltSupplier[];
 }
 
+/* ── Readiness ───────────────────────────────────────────────────────
+   The five things a mobilisation waits on. Blocked is what stops the work
+   starting; pending is in hand but unconfirmed. */
+export type ReadinessStatus = "ready" | "pending" | "blocked";
+export const READINESS_ITEMS = ["Material", "Site access", "Technician", "Equipment", "HSE"] as const;
+export type ReadinessItem = (typeof READINESS_ITEMS)[number];
+export type Readiness = Record<ReadinessItem, ReadinessStatus>;
+
+const READINESS: Record<string, Readiness> = {
+  "xcel-energy": { Material: "blocked", "Site access": "ready", Technician: "pending", Equipment: "ready", HSE: "ready" },
+  siemens: { Material: "pending", "Site access": "ready", Technician: "blocked", Equipment: "pending", HSE: "pending" },
+  "baltic-wind-nl": { Material: "ready", "Site access": "pending", Technician: "ready", Equipment: "ready", HSE: "blocked" },
+  "pacific-gas": { Material: "ready", "Site access": "blocked", Technician: "pending", Equipment: "ready", HSE: "ready" },
+  comed: { Material: "pending", "Site access": "ready", Technician: "ready", Equipment: "pending", HSE: "ready" },
+  "aep-ohio": { Material: "blocked", "Site access": "pending", Technician: "pending", Equipment: "ready", HSE: "ready" },
+};
+
+const DEFAULT_READINESS: Readiness = {
+  Material: "ready",
+  "Site access": "ready",
+  Technician: "ready",
+  Equipment: "ready",
+  HSE: "ready",
+};
+
 export interface PmSite {
   id: string;
   customer: string;
@@ -74,8 +99,13 @@ export interface PmSite {
   meta: string;
   status: AttentionStatus;
   risks: PmAlertType[];
-  /** The headline flag for each risk type raised on the site. */
-  flags: { type: PmAlertType; title: string }[];
+  /** The headline flag for each risk type raised on the site, with the
+   *  business consequence it carries. */
+  flags: { type: PmAlertType; title: string; impact?: string }[];
+  /** Contract value, read from the attention record's meta line. */
+  value?: string;
+  /** Where each mobilisation input stands. */
+  readiness: Readiness;
   x: number;
   y: number;
   latePart?: LatePart;
@@ -215,9 +245,13 @@ const LATE_PARTS: Record<string, LatePart> = {
 export const PM_SITES: PmSite[] = ATTENTION_ITEMS.filter((item) => PLACES[item.id]).map((item) => {
   const place = PLACES[item.id];
   const latePart = LATE_PARTS[item.id];
-  const flags = (item.flags ?? []).map((f) => ({ type: f.alertType, title: f.title }));
+  const flags = (item.flags ?? []).map((f) => ({ type: f.alertType, title: f.title, impact: f.impact }));
   if (latePart && !flags.some((f) => f.type === "Spare parts")) {
-    flags.push({ type: "Spare parts", title: `${latePart.name} will land ${hoursLabel(hoursBetween(latePart.neededBy, latePart.shipment.revisedEta))} late` });
+    flags.push({
+      type: "Spare parts",
+      title: `${latePart.name} will land ${hoursLabel(hoursBetween(latePart.neededBy, latePart.shipment.revisedEta))} late`,
+      impact: "Mobilisation slot missed",
+    });
   }
   return {
     id: item.id,
@@ -227,6 +261,8 @@ export const PM_SITES: PmSite[] = ATTENTION_ITEMS.filter((item) => PLACES[item.i
     status: item.status,
     risks: PM_ALERT_TYPES.filter((t) => flags.some((f) => f.type === t)),
     flags,
+    readiness: READINESS[item.id] ?? DEFAULT_READINESS,
+    value: item.meta.split(" · ").find((part) => part.startsWith("€")),
     x: place.x,
     y: place.y,
     latePart,

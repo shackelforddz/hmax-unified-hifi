@@ -5,21 +5,24 @@ import { createPortal } from "react-dom";
 import AssetDrawer from "@/components/dashboard/sales/asset-drawer";
 import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
 import SlaContractDrawer from "@/components/dashboard/sales/sla-contract-drawer";
+import OpportunityDrawer from "@/components/dashboard/sales/opportunity-drawer";
 import { ConversationLauncherContext, useConversationLauncher, type LaunchFn } from "@/components/dashboard/conversation-launcher";
 import { getAssetDetail, resolveAssetId } from "@/lib/asset-lookup";
+import { OPPORTUNITIES, leadDetail } from "@/lib/sales-data";
 import { resolveContract, type ContractRef } from "@/lib/contract-lookup";
 
 /* ── Stacked detail drawers ──────────────────────────────────────────
-   Drilling into an asset or contract from inside a drawer slides its
+   Drilling into an asset, contract or lead from inside a drawer slides its
    detail drawer over the current one, with no dimming. Each close (X,
    Escape or a click beside it) peels back just the top drawer. */
 
-type Detail = { kind: "asset"; id: string } | ContractRef;
+type Detail = { kind: "asset"; id: string } | { kind: "lead"; id: string } | ContractRef;
 type Layer = { key: number; detail: Detail; closing: boolean };
 
 interface DetailDrawers {
   openAsset: (assetId: string) => void;
   openContract: (ref: ContractRef) => void;
+  openLead: (oppId: string) => void;
 }
 
 const DetailDrawersContext = createContext<DetailDrawers | null>(null);
@@ -56,7 +59,11 @@ export function DetailDrawerProvider({ children }: { children: React.ReactNode }
   }, [top, close]);
 
   const api = useMemo<DetailDrawers>(
-    () => ({ openAsset: (id) => open({ kind: "asset", id }), openContract: (ref) => open(ref) }),
+    () => ({
+      openAsset: (id) => open({ kind: "asset", id }),
+      openContract: (ref) => open(ref),
+      openLead: (id) => open({ kind: "lead", id }),
+    }),
     [open]
   );
 
@@ -96,6 +103,18 @@ function StackedDrawer({ layer, depth, onClose }: { layer: Layer; depth: number;
   const hidden = !entered || layer.closing;
   const d = layer.detail;
   if (d.kind === "asset") return <AssetDrawer assetId={d.id} onClose={onClose} layer={depth} hidden={hidden} />;
+  if (d.kind === "lead") {
+    const opp = OPPORTUNITIES.find((o) => o.id === d.id) ?? null;
+    return (
+      <OpportunityDrawer
+        opp={opp}
+        detail={opp ? leadDetail(opp) : null}
+        onClose={onClose}
+        layer={depth}
+        hidden={hidden}
+      />
+    );
+  }
   if (d.kind === "ops") return <ContractDrawer contractId={d.id} onClose={onClose} layer={depth} hidden={hidden} />;
   return <SlaContractDrawer contractId={d.id} onClose={onClose} layer={depth} hidden={hidden} />;
 }

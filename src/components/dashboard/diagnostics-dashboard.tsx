@@ -10,19 +10,20 @@ import PeopleWidget from "@/components/dashboard/people-widget";
 import { FIELD_ENGINEERS } from "@/lib/people-data";
 import DashboardTabs from "@/components/dashboard/dashboard-tabs";
 import AssetsTable from "@/components/dashboard/tables/assets-table";
-import { REPORTS_AWAITING, DIAGNOSTICS_STATS, ASSET_REPORT_ALERTS, REPORT_CATEGORY_OPTIONS } from "@/lib/field-reports-data";
+import { DIAGNOSTICS_STATS, ASSET_REPORT_ALERTS, REPORT_CATEGORY_OPTIONS } from "@/lib/field-reports-data";
+import { lowDgaAssets } from "@/lib/sales-data";
 import DashboardGrid, { type GridItem } from "@/components/dashboard/dashboard-grid";
 
 const TABS = ["Overview", "Assets"];
 
-const faultSignatureAssets = new Set(
-  REPORTS_AWAITING.filter((r) => r.faultSignature).map((r) => r.assetId)
-).size;
+// Assets whose oil is scoring below the DGA threshold - the diagnostics
+// engineer's own measure, not a field-report flag.
+const lowDga = lowDgaAssets().length;
 
 const KPIS = [
   { id: "reports-awaiting", label: "Reports awaiting interpretation", value: String(ASSET_REPORT_ALERTS.length), trend: "2 vs last week", sparkline: "contracts-at-risk" as const },
   { id: "outstanding-reports", label: "Outstanding reports", value: String(DIAGNOSTICS_STATS.outstandingReports), trend: "3 vs last week", sparkline: "active-contracts" as const },
-  { id: "fault-signature", label: "Assets with a fault signature", value: String(faultSignatureAssets), trend: "1 vs last month", sparkline: "portfolio-margin" as const },
+  { id: "low-dga", label: "Assets with low DGA", value: String(lowDga), trend: "1 vs last month", sparkline: "portfolio-margin" as const },
 ];
 
 export default function DiagnosticsDashboard() {
@@ -51,7 +52,7 @@ export default function DiagnosticsDashboard() {
       {
         id: "reports-to-review",
         span: 12,
-        node: <AssetAlerts alerts={ASSET_REPORT_ALERTS} categoryOptions={REPORT_CATEGORY_OPTIONS} title="Asset reports to review" showDgaScore />,
+        node: <AssetAlerts alerts={ASSET_REPORT_ALERTS} categoryOptions={REPORT_CATEGORY_OPTIONS} title="Asset reports to review" showDgaScore faultsLead={false} />,
       },
       { id: "field-engineers", span: 12, node: <PeopleWidget people={FIELD_ENGINEERS} title="Field engineers" /> },
     ],

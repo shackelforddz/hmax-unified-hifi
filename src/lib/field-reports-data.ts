@@ -3,7 +3,7 @@ import type { AssetAlert, AssetCategory } from "@/lib/sales-data";
 /* ── Field reports (Diagnostics) ─────────────────────────────────── */
 
 // Asset alerts framed as the reports a diagnostics engineer needs to review -
-// DGA trends, electrical test results, and physical inspection packages.
+// mostly dissolved-gas analysis, plus one physical inspection package.
 export const ASSET_REPORT_ALERTS: AssetAlert[] = [
   {
     id: "ast-001", code: "AST-001", location: "Zone A • Pump Station 1", health: 24, status: "critical", category: "dga",
@@ -16,12 +16,12 @@ export const ASSET_REPORT_ALERTS: AssetAlert[] = [
     },
   },
   {
-    id: "ast-002", code: "AST-002", location: "Zone A • Pump Station 1", health: 31, status: "critical", category: "electrical",
+    id: "ast-002", code: "AST-002", location: "Zone A • Pump Station 1", health: 31, status: "critical", category: "dga",
     alert: {
-      title: "Electrical test results flag winding insulation",
+      title: "Clean DGA against a bearing fault - rule out a thermal contributor",
       detail:
-        "Latest power-factor and insulation-resistance results on AST-002 fall outside the commissioning baseline, pointing to insulation degradation. Interpret the electrical test set to confirm before the next switching operation.",
-      action: "Review electrical tests",
+        "AST-002 scores 82 on DGA with acetylene at zero, yet the vibration report finds a bearing signature matching a prior failure. Interpret the DGA trend alongside the electrical tests to confirm the fault is mechanical only, before the next switching operation.",
+      action: "Review DGA trend",
       impact: "Insulation degradation",
     },
   },
@@ -50,7 +50,6 @@ export const ASSET_REPORT_ALERTS: AssetAlert[] = [
 export const REPORT_CATEGORY_OPTIONS: { label: string; value: AssetCategory | "all" }[] = [
   { label: "All", value: "all" },
   { label: "DGA", value: "dga" },
-  { label: "Electrical", value: "electrical" },
   { label: "Physical inspection", value: "physical" },
 ];
 
@@ -100,6 +99,9 @@ export const REPORT_TURNAROUND = {
 };
 
 export const DIAGNOSTICS_STATS = {
-  // Reports not yet interpreted across all queues (awaiting + in review).
-  outstandingReports: 12,
+  // Reports not yet interpreted - counted from the queue itself, so the KPI
+  // and the list behind it are the same reports.
+  get outstandingReports() {
+    return REPORTS_AWAITING.length;
+  },
 };

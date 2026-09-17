@@ -1,4 +1,4 @@
-import { PORTFOLIO_HEALTH } from "@/lib/operations-data";
+import { CONTRACT_BOOK, CONTRACT_COUNTS } from "@/lib/operations-data";
 
 export interface Conversation {
   id: string;
@@ -28,8 +28,9 @@ export const PORTFOLIO_REVENUE = {
   monthToDate: "€2.1m",
   monthPlan: "€3.4m",
   monthPct: 62,
-  /** Total value of every active contract, not just what is recognised. */
-  contractValue: "€46.8m",
+  /** Total value of every active contract, not just what is recognised -
+   *  summed from the contracts themselves. */
+  contractValue: CONTRACT_BOOK.total,
   recognised: "€18.4m",
 };
 
@@ -455,17 +456,17 @@ export const CONVERSATIONS: Conversation[] = [
 export const KPI_DATA: KpiData[] = [
   {
     id: "active-contracts",
-    // Matches the Contract status widget below (PORTFOLIO_HEALTH.activeContracts).
+    // Counted from the contracts themselves - see CONTRACT_COUNTS.
     label: "Active contracts",
-    value: String(PORTFOLIO_HEALTH.activeContracts),
+    value: String(CONTRACT_COUNTS.active),
     trend: "2 vs last month",
     sparkline: "active-contracts",
   },
   {
     id: "contracts-at-risk",
-    // At-risk + critical from the Contract status widget below.
+    // At-risk + critical, counted the same way.
     label: "Contracts at risk",
-    value: String(PORTFOLIO_HEALTH.atRisk + PORTFOLIO_HEALTH.critical),
+    value: String(CONTRACT_COUNTS.atRisk + CONTRACT_COUNTS.critical),
     trend: "2 vs last month",
     sparkline: "contracts-at-risk",
   },

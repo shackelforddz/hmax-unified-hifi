@@ -1,11 +1,9 @@
+import { SLA_CONTRACTS } from "@/lib/sales-data";
+
 /* ── Operations persona data ─────────────────────────────────────── */
 
 /* Portfolio Health Overview */
 export const PORTFOLIO_HEALTH = {
-  activeContracts: 14,
-  onTrack: 8,
-  atRisk: 4,
-  critical: 2,
   resourceCoverage: "87%",
   // Headline KPIs
   executedMargin: "18.6%",
@@ -14,8 +12,6 @@ export const PORTFOLIO_HEALTH = {
   revenue: "€18.4m",
   revenueForecast: "€18.9m",
   revenueDelta: "€0.5m",
-  outstandingPayments: "€2.3m",
-  outstandingNote: "4 invoices overdue",
   resourceNote: "3 roles to fill",
 };
 
@@ -136,6 +132,45 @@ export const OPS_CONTRACTS: OpsContract[] = RAW_CONTRACTS.map((c) => ({
   progress: contractLengthProgress(c.start, c.end),
 }));
 
+/** "€4.2m", "€8.2M", "€440k" -> millions, so contract values can be summed. */
+export const contractValueM = (v: string) => {
+  const n = parseFloat(v.replace(/[^0-9.]/g, "")) || 0;
+  return /k/i.test(v) ? n / 1000 : n;
+};
+export const formatM = (m: number) => `€${m.toFixed(1)}m`;
+
+/* Contract counts and book value, counted from the delivery contracts and the
+   service agreements themselves - so the KPI, the widgets and the list behind
+   each KPI can never disagree. An agreement whose risk is verified is on
+   track; one flagged Critical counts as critical, anything else at risk. */
+const slaStatuses = Object.values(SLA_CONTRACTS).map((c) =>
+  c.risk.verified ? "on-track" : c.risk.label === "Critical" ? "critical" : "at-risk"
+);
+const countBoth = (status: "critical" | "at-risk") =>
+  OPS_CONTRACTS.filter((c) => c.status === status).length + slaStatuses.filter((s) => s === status).length;
+
+export const CONTRACT_COUNTS = {
+  active: OPS_CONTRACTS.length + slaStatuses.length,
+  onTrack: slaStatuses.filter((s) => s === "on-track").length,
+  atRisk: countBoth("at-risk"),
+  critical: countBoth("critical"),
+};
+
+export const CONTRACT_BOOK = {
+  /** Every active contract and agreement added up. */
+  total: formatM(
+    OPS_CONTRACTS.reduce((sum, c) => sum + contractValueM(c.value), 0) +
+      Object.values(SLA_CONTRACTS).reduce((sum, c) => sum + contractValueM(c.value), 0)
+  ),
+  /** The share of it sitting on contracts that carry an open risk. */
+  atRisk: formatM(
+    OPS_CONTRACTS.reduce((sum, c) => sum + contractValueM(c.value), 0) +
+      Object.values(SLA_CONTRACTS)
+        .filter((c) => !c.risk.verified)
+        .reduce((sum, c) => sum + contractValueM(c.value), 0)
+  ),
+};
+
 export type PartStatus = "in-stock" | "ordered" | "backordered";
 export type MaintStatus = "Scheduled" | "Overdue" | "Complete";
 export type InvoiceStatus = "Paid" | "Sent" | "Overdue" | "Draft";
@@ -153,6 +188,9 @@ export interface OpsContractDetail {
   maintenance: { task: string; due: string; interval: string; status: MaintStatus }[];
   /** Field-service visits under the contract. */
   fieldService: { visit: string; engineer: string; date: string; status: string }[];
+  /** Where the three hand-offs stand: what the supplier owes, what the
+   *  warehouse has done with it, and whether site can take the work. */
+  readiness: { supplier: string[]; warehouse: string[]; site: string[] };
   /** Customer-side contacts. */
   contacts: { name: string; role: string; email: string; phone: string }[];
   /** Commercial position - revenue and net margin. */
@@ -204,6 +242,11 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { visit: "Winding replacement - Unit S-12", engineer: "Daniel Brooks", date: "2026-09-02", status: "In progress" },
       { visit: "Site commissioning", engineer: "Liam O.", date: "2026-09-28", status: "Scheduled" },
     ],
+    readiness: {
+      supplier: ["PO delayed", "Component ready", "Lead-time risk", "6 affected projects"],
+      warehouse: ["Material received", "GR pending", "Visual check pending", "Stock issue"],
+      site: ["Access ready", "HSE clearance", "Equipment ready", "Technicians scheduled"],
+    },
     contacts: [
       { name: "Karen Ellis", role: "Asset Manager · Xcel Energy", email: "k.ellis@xcelenergy.com", phone: "+1 612 555 0142" },
       { name: "Raj Patel", role: "Procurement Lead", email: "r.patel@xcelenergy.com", phone: "+1 612 555 0177" },
@@ -257,6 +300,11 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
       { visit: "Protection-relay extension works", engineer: "Sara B.", date: "2026-09-08", status: "Blocked - CO unsigned" },
       { visit: "Platform B switchgear service", engineer: "Tom H.", date: "2026-09-18", status: "Scheduled" },
     ],
+    readiness: {
+      supplier: ["PO issued", "Component ready", "No lead-time risk", "2 affected projects"],
+      warehouse: ["Material received", "GR complete", "Visual check passed", "No stock issue"],
+      site: ["Access ready", "HSE clearance open", "Equipment ready", "Technicians over-allocated"],
+    },
     contacts: [
       { name: "Ingrid Vos", role: "Programme Manager · Siemens", email: "i.vos@siemens.com", phone: "+44 20 7946 0321" },
       { name: "Mark Reid", role: "Commercial Contact", email: "m.reid@siemens.com", phone: "+44 20 7946 0388" },
@@ -264,7 +312,7 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
     finance: { revenue: "€2.4m", netMargin: "4.6%", asSoldMargin: "18.6%", invoiced: "€1.1m", outstanding: "€0.68m" },
     invoices: [
       { code: "INV-2811", milestone: "Engineering approval", amount: "€0.5m", status: "Paid", due: "2026-05-30" },
-      { code: "INV-2818", milestone: "Material delivery", amount: "€0.6m", status: "Sent", due: "2026-07-30" },
+      { code: "INV-2818", milestone: "Material delivery", amount: "€0.6m", status: "Overdue", due: "2026-07-30" },
       { code: "INV-2825", milestone: "CO-118 progress", amount: "€0.68m", status: "Draft", due: "2026-09-05" },
     ],
     payments: [
@@ -305,6 +353,11 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
     fieldService: [
       { visit: "Array transformer maintenance", engineer: "Dev K.", date: "2026-09-08", status: "Blocked - cert lapse" },
     ],
+    readiness: {
+      supplier: ["PO issued", "Component ready", "No lead-time risk", "1 affected project"],
+      warehouse: ["Material received", "GR complete", "Visual check passed", "No stock issue"],
+      site: ["Access pending", "HSE certificates lapsing", "Equipment ready", "Technicians scheduled"],
+    },
     contacts: [
       { name: "Femke Bakker", role: "O&M Manager · Baltic Wind NL", email: "f.bakker@balticwind.nl", phone: "+31 10 555 2210" },
     ],
@@ -347,6 +400,11 @@ export const OPS_CONTRACT_DETAILS: Record<string, OpsContractDetail> = {
     fieldService: [
       { visit: "Relay upgrade - Substation West", engineer: "Priya K.", date: "2026-09-01", status: "Blocked - site access" },
     ],
+    readiness: {
+      supplier: ["PO issued", "Component ready", "Lead-time risk", "1 affected project"],
+      warehouse: ["Material part-received", "GR pending", "Visual check pending", "No stock issue"],
+      site: ["Access verbal only", "HSE clearance", "Equipment ready", "Technicians unscheduled"],
+    },
     contacts: [
       { name: "Diego Ramos", role: "Substation Manager · Pacific Gas", email: "d.ramos@pge.com", phone: "+1 415 555 0190" },
     ],

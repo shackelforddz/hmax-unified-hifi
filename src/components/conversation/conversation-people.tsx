@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { UserRoundPlus, Search, X, ClipboardCheck } from "lucide-react";
+import { UserRoundPlus, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ALL_PEOPLE, type Person } from "@/lib/people-data";
 import { type AssignedTask } from "./chat-panel";
@@ -115,7 +115,6 @@ function AssignTaskDialog({
             Cancel
           </Button>
           <Button onClick={submit} disabled={!canSubmit} className="rounded-full h-auto px-4 py-2 text-sm cursor-pointer">
-            <ClipboardCheck size={14} strokeWidth={1.5} />
             Assign task
           </Button>
         </div>
@@ -273,7 +272,7 @@ export default function ConversationPeople({ participants, suggested = [], onAdd
                         {p.role} · {p.allocation}% allocated
                       </span>
                       {isSuggested(p) && (
-                        <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full bg-gray-900 text-white">Recommended by HMAX</span>
+                        <span className="block mt-1 text-[10px] text-gray-400 tracking-wider">Recommended by HMAX</span>
                       )}
                     </span>
                     <span className="shrink-0 text-xs text-gray-400">Add</span>

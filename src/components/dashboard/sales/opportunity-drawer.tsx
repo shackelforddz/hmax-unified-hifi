@@ -7,7 +7,7 @@ import { useConversationLauncher } from "@/components/dashboard/conversation-lau
 import { OPP_STAGES, OPPORTUNITIES, leadMeta, type Opportunity, type OpportunityDetail } from "@/lib/sales-data";
 import OwnerBadge from "./owner-badge";
 import DocumentViewer, { type ViewDoc } from "./document-viewer";
-import { AssetLink, ContractLink } from "@/components/dashboard/detail-drawers";
+import { AssetLink, ContractLink, drawerLayer } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 // The lead rendered as a full brief document.
@@ -222,10 +222,16 @@ interface Props {
   opp: Opportunity | null;
   detail: OpportunityDetail | null;
   onClose: () => void;
+  /** Stack depth when opened over another drawer (see DetailDrawerProvider). */
+  layer?: number;
+  /** Keep the content mounted but slid off-screen, for enter/exit animation. */
+  hidden?: boolean;
 }
 
-export default function OpportunityDrawer({ opp, detail, onClose }: Props) {
-  const open = !!(opp && detail);
+export default function OpportunityDrawer({ opp, detail, onClose, layer, hidden }: Props) {
+  const open = !!(opp && detail) && !hidden;
+  const stacked = layer !== undefined;
+  const shell = drawerLayer(open, layer);
   const launch = useConversationLauncher();
   const [viewDoc, setViewDoc] = useState<ViewDoc | null>(null);
 
@@ -243,25 +249,17 @@ export default function OpportunityDrawer({ opp, detail, onClose }: Props) {
   }, [open]);
 
   useEffect(() => {
-    if (!open) return;
+    // Stacked drawers leave Escape to the provider, which closes the top one.
+    if (!open || stacked) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, onClose, stacked]);
 
   return (
     <>
-      <div
-        onClick={onClose}
-        className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${
-          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-      />
-      <div
-        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${
-          open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
-        }`}
-      >
+      <div onClick={onClose} {...shell.backdrop} />
+      <div {...shell.panel}>
         {opp && detail && (
           <>
             {/* Header */}
@@ -274,7 +272,6 @@ export default function OpportunityDrawer({ opp, detail, onClose }: Props) {
                     onClick={() => setViewDoc(opportunityDoc(opp, detail))}
                     className="mt-2 inline-flex items-center gap-1.5 text-xs text-gray-600 underline underline-offset-2 decoration-gray-300 hover:decoration-gray-700 cursor-pointer transition-colors"
                   >
-                    <FileText size={13} strokeWidth={1.5} />
                     View full document
                   </button>
                 </div>

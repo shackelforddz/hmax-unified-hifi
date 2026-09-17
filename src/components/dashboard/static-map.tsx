@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Search } from "lucide-react";
 import WidgetChat from "@/components/dashboard/widget-chat";
+import ProgressiveBlur from "@/components/progressive-blur";
 
 /* ── Static map ──────────────────────────────────────────────────────
    The styled city map used when no Google Maps key is configured: pan,
@@ -18,6 +19,12 @@ export interface MapPin {
   label: string;
   /** Raising an alert - the default pin pulses red. */
   ping?: boolean;
+}
+
+export interface MapSearch {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
 }
 
 const MIN_ZOOM = 1;
@@ -66,6 +73,8 @@ interface Props<P extends MapPin> {
   tipWidth: number;
   /** Rough tooltip height, used until the open tooltip has been measured. */
   tipHeight: number;
+  /** Search box in the title band, filtering the pins the caller passes. */
+  search?: MapSearch;
   /** Overrides the tooltip card's radius, border and padding for a pin. */
   tipClassName?: (pin: P) => string | undefined;
   /** Controlled selection; omit to let the map manage it. */
@@ -85,7 +94,8 @@ export default function StaticMap<P extends MapPin>({
   selectedId: controlledId,
   onSelect,
   tipClassName,
-  title = "Fleet map",
+  search,
+  title = "Risk Map",
 }: Props<P>) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -182,11 +192,43 @@ export default function StaticMap<P extends MapPin>({
               style={{ transform: `scale(${1 / view.zoom})` }}
               aria-label={m.label}
             >
-              {renderPin ? renderPin(m, selectedId === m.id) : <DefaultPin pin={m} selected={selectedId === m.id} />}
+              {/* A caller can style some pins and leave the rest to the default. */}
+              {renderPin?.(m, selectedId === m.id) ?? <DefaultPin pin={m} selected={selectedId === m.id} />}
             </button>
           </span>
         ))}
       </div>
+
+      {/* Title band - the map blurs and fades out beneath it */}
+      <div className="absolute top-0 inset-x-0 z-10 px-4 py-3.5">
+        <ProgressiveBlur className="rounded-t-xl" />
+        <div className="absolute inset-0 rounded-t-xl bg-gradient-to-b from-[#faf5ed] to-[#faf5ed]/0 pointer-events-none" />
+        <div className="relative flex items-start justify-between gap-3">
+          <h3 className="text-base text-gray-900 shrink-0">{title}</h3>
+          <span className="flex-1" />
+          <WidgetChat
+            title={title}
+            triggerClassName="w-8 h-8 -mt-1 -mr-1 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer shrink-0"
+          />
+        </div>
+      </div>
+
+      {/* Search sits on the map itself, beside the filters */}
+      {search && (
+        <div
+          className="absolute top-14 right-4 z-10 flex items-center gap-1.5 h-8 w-[200px] px-2.5 bg-white border border-gray-200 rounded-full shadow-sm"
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <input
+            value={search.value}
+            onChange={(e) => search.onChange(e.target.value)}
+            placeholder={search.placeholder}
+            aria-label={`Search the ${title.toLowerCase()}`}
+            className="flex-1 min-w-0 text-sm text-gray-700 placeholder-gray-500 outline-none bg-transparent"
+          />
+          <Search size={15} strokeWidth={1.5} className="text-gray-500 shrink-0" />
+        </div>
+      )}
 
       {overlay}
 
@@ -214,13 +256,6 @@ export default function StaticMap<P extends MapPin>({
         </button>
       </div>
 
-      {/* Chat affordance */}
-      <div className="absolute top-4 right-4 z-10" onPointerDown={(e) => e.stopPropagation()}>
-        <WidgetChat
-          title={title}
-          triggerClassName="w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-        />
-      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Info, Check, AlertTriangle, ChevronLeft, ChevronRight, X, Plus, GripVertical, BarChart2, ClipboardCheck, CalendarClock, Send, Lightbulb, Pencil, UserRoundPlus } from "lucide-react";
+import { Info, Check, AlertTriangle, ChevronLeft, ChevronRight, X, GripVertical, BarChart2, ClipboardCheck, CalendarClock, UserRoundPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type Suggestions } from "@/lib/knowledge-base";
 import { type CustomWidgetConfig } from "@/lib/custom-widget";
@@ -378,7 +378,7 @@ function StepStaffing() {
 
       {/* Add specialist */}
       <Button variant="outline" className="self-start gap-1.5 rounded-full h-auto px-4 py-2 text-sm text-gray-600 cursor-pointer">
-        <Plus size={14} /> Add specialist or sub-contractor not in system
+Add specialist or sub-contractor not in system
       </Button>
     </div>
   );
@@ -588,7 +588,6 @@ function StepParts() {
                     aria-expanded={open}
                     className="flex items-center gap-1.5 text-xs font-bold text-gray-700 border border-gray-200 rounded-full px-3 py-1 hover:border-gray-400 transition-colors cursor-pointer"
                   >
-                    <Lightbulb size={12} strokeWidth={1.5} className="text-gray-400" />
                     {open ? "Hide options" : `Resolve · ${fixes.length} options`}
                   </button>
 
@@ -627,7 +626,7 @@ function StepParts() {
 
       {/* Add part */}
       <Button variant="outline" className="self-start gap-1.5 rounded-full h-auto px-4 py-2 text-sm text-gray-600 cursor-pointer">
-        <Plus size={14} /> Add part not in ERP
+Add part not in ERP
       </Button>
 
       {/* Notes */}
@@ -822,7 +821,6 @@ function StepSchedule() {
             </p>
           </div>
           <Button onClick={() => setSent(true)} className="rounded-full h-auto px-4 py-2 text-sm cursor-pointer shrink-0">
-            <Send size={14} strokeWidth={1.5} />
             Confirm with customer
           </Button>
         </div>
@@ -864,7 +862,6 @@ function WizardCard({
         <div className="flex items-center justify-between p-6 border-t border-[#e5e5e5]/20">
           {!isFirst ? (
             <Button variant="outline" onClick={onBack} className="gap-1.5 rounded-full h-8 px-4 text-sm text-gray-700 cursor-pointer">
-              <ChevronLeft size={14} />
               Back
             </Button>
           ) : (
@@ -1033,7 +1030,6 @@ function OppWizardCard({
       <div className="flex items-center justify-between p-6 border-t border-[#e5e5e5]/20">
         {!isFirst ? (
           <Button variant="outline" onClick={onBack} className="gap-1.5 rounded-full h-8 px-4 text-sm text-gray-700 cursor-pointer">
-            <ChevronLeft size={14} />
             Back
           </Button>
         ) : (
@@ -1155,7 +1151,6 @@ function FlowWizardCard({
       <div className="flex items-center justify-between p-6 border-t border-[#e5e5e5]/20">
         {!isFirst ? (
           <Button variant="outline" onClick={onBack} className="gap-1.5 rounded-full h-8 px-4 text-sm text-gray-700 cursor-pointer">
-            <ChevronLeft size={14} />
             Back
           </Button>
         ) : (
@@ -1303,7 +1298,7 @@ function PanelBlock({ panel, onSend, onOpenDoc, onUpdate }: { panel: PlaybookPan
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-900 truncate">{o.title}</p>
-                  {o.recommended && <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-900 text-white shrink-0">Recommended by HMAX</span>}
+                  {o.recommended && <span className="text-[10px] text-gray-400 tracking-wider shrink-0">Recommended by HMAX</span>}
                 </div>
                 {o.subtitle && <p className="text-xs text-gray-400 truncate">{o.subtitle}</p>}
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
@@ -1387,7 +1382,6 @@ function RecapPanel({ panel, onOpenDoc, onUpdate }: { panel: Extract<PlaybookPan
           <div className="flex items-center gap-3 shrink-0">
             {canEdit && (
               <button onClick={() => setEditing(true)} className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">
-                <Pencil size={12} strokeWidth={1.5} />
                 Edit
               </button>
             )}

@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Check, Loader2, Send, Store, TriangleAlert, Truck } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Store, TriangleAlert, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import StaticMap, { DefaultPin } from "@/components/dashboard/static-map";
+import StaticMap from "@/components/dashboard/static-map";
 import { TabGroup } from "@/components/dashboard/filter-controls";
 import AttentionDrawer from "@/components/dashboard/attention-drawer";
 import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
@@ -11,13 +11,20 @@ import SlaContractDrawer from "@/components/dashboard/sales/sla-contract-drawer"
 import { resolveContract } from "@/lib/contract-lookup";
 import { CHART } from "@/lib/chart-theme";
 import { CUSTOMER_DETAILS, PM_ALERT_TYPES, type PmAlertType } from "@/lib/dashboard-data";
-import { PM_SITES, hoursBetween, hoursLabel, shortDate, type AltSupplier, type LatePart, type PmSite, type Point } from "@/lib/pm-map-data";
+import { PM_SITES, READINESS_ITEMS, hoursBetween, hoursLabel, shortDate, type AltSupplier, type LatePart, type PmSite, type Point } from "@/lib/pm-map-data";
 
 /* ── PM delivery map ─────────────────────────────────────────────────
    Contract sites filtered by risk type. A late part's shipment is drawn with
    the traffic disruption holding it up. From there the PM can contact the
    carrier (reroute or confirm a revised ETA) or explore local suppliers that
    could protect the schedule instead. */
+
+/* Readiness chips - blocked and pending read loud, ready reads quiet. */
+const READINESS_CLS: Record<string, string> = {
+  ready: "bg-gray-100 text-gray-600",
+  pending: "bg-amber-50 text-amber-700 border border-amber-200",
+  blocked: "bg-status-critical text-white font-bold",
+};
 
 /** Hours early (negative) or late (positive) against when the part is needed. */
 const slip = (part: LatePart, arrives: string) => hoursBetween(part.neededBy, arrives);
@@ -74,6 +81,7 @@ const line = (points: Point[]) => points.map(([x, y]) => `${x},${y}`).join(" ");
 
 export default function PmRiskMap() {
   const [risk, setRisk] = useState("all");
+  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   // The site whose late part is being worked, and how.
   const [flow, setFlow] = useState<{ siteId: string; kind: "contact" | "supplier" } | null>(null);
@@ -117,7 +125,17 @@ export default function PmRiskMap() {
     return p.shipment.revisedEta;
   };
 
-  const visible = useMemo(() => PM_SITES.filter((s) => risk === "all" || s.risks.includes(risk as PmAlertType)), [risk]);
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return PM_SITES.filter(
+      (s) =>
+        (risk === "all" || s.risks.includes(risk as PmAlertType)) &&
+        (!q ||
+          [s.contract, s.customer, s.latePart?.name, s.latePart?.code, s.latePart?.shipment.carrier, ...s.flags.map((f) => f.title)].some((v) =>
+            v?.toLowerCase().includes(q)
+          ))
+    );
+  }, [risk, query]);
 
   // Part shipments are drawn for the Spare parts view, or for the site whose tooltip is open.
   const showShipment = (s: PmSite) =>
@@ -189,48 +207,48 @@ export default function PmRiskMap() {
     const fixed = r?.kind === "rerouted" || r?.kind === "supplier";
     const supplier = r?.kind === "supplier" ? p.suppliers.find((x) => x.id === r.supplierId) : null;
     return (
-      <div className={`rounded-2xl border p-4 flex flex-col gap-3.5 ${fixed ? "bg-green-50 border-green-200" : "bg-[#fff1f2] border-[#fee2e2]"}`}>
+      <div className={`rounded-lg border p-3 flex flex-col gap-2 ${fixed ? "bg-green-50 border-green-200" : "bg-[#fff1f2] border-[#fee2e2]"}`}>
         <div className="flex items-center justify-between gap-2">
-          <p className={`flex items-center gap-1.5 text-[13px] leading-4 font-bold ${fixed ? "text-green-700" : "text-status-critical"}`}>
-            {fixed ? <Check size={16} className="shrink-0" /> : <TriangleAlert size={16} className="shrink-0" />}
+          <p className={`flex items-center gap-1.5 text-[11px] font-bold ${fixed ? "text-green-700" : "text-status-critical"}`}>
+            {fixed ? <Check size={12} className="shrink-0" /> : <TriangleAlert size={12} className="shrink-0" />}
             {r?.kind === "rerouted" ? "Carrier rerouted" : supplier ? "Sourced locally" : "Traffic disruption"}
           </p>
           {fixed ? (
             <SlipBadge hours={slip(p, arrival(s))} />
           ) : (
-            <span className="text-[11px] font-bold text-white bg-status-critical rounded-full px-2 py-1 whitespace-nowrap shrink-0">
+            <span className="text-[10px] font-bold text-white bg-status-critical rounded-full px-2 py-0.5 whitespace-nowrap shrink-0">
               {hoursLabel(slip(p, arrival(s)))} late
             </span>
           )}
         </div>
 
-        <div className="flex items-start gap-1">
-          <div className="flex-1 min-w-0 flex flex-col gap-1">
-            <p className="text-[15px] font-bold text-[#1c1c1e]">{p.name}</p>
-            <p className="text-[13px] text-[#8e8e93]">
+        <div className="flex items-start gap-2">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-gray-900">{p.name}</p>
+            <p className="text-xs text-gray-500">
               {p.code} · {p.supplier}
             </p>
           </div>
-          <p className="text-[15px] text-[#8e8e93] whitespace-nowrap">X{p.qty}</p>
+          <p className="text-xs text-gray-400 whitespace-nowrap">X{p.qty}</p>
         </div>
 
         {supplier && (
-          <p className="text-[13px] text-[#3a3a3c]">
+          <p className="text-xs text-gray-600">
             {supplier.name} · {supplier.stock} · on site {shortDate(supplier.arrives)}
           </p>
         )}
         {r?.kind === "rerouted" && (
-          <p className="text-[13px] text-[#3a3a3c]">
+          <p className="text-xs text-gray-600">
             {p.shipment.carrier} rerouted via the {p.reroute.via} · on site {shortDate(p.reroute.eta)}
           </p>
         )}
         {r?.kind === "awaiting" && (
-          <p className="flex items-center gap-1.5 text-[13px] text-[#3a3a3c]">
+          <p className="flex items-center gap-1.5 text-xs text-gray-600">
             <Loader2 size={13} className="animate-spin" /> Waiting on {p.shipment.carrier} to reply
           </p>
         )}
         {r?.kind === "eta-confirmed" && (
-          <p className="text-[13px] text-[#3a3a3c]">
+          <p className="text-xs text-gray-600">
             {p.shipment.carrier} confirmed {shortDate(p.shipment.revisedEta)} - still late.
           </p>
         )}
@@ -239,13 +257,13 @@ export default function PmRiskMap() {
           <div className="flex flex-col gap-2">
             <button
               onClick={() => startContact(s)}
-              className="w-full rounded-full bg-status-critical hover:opacity-90 px-4 py-3 text-sm font-bold text-white transition-opacity cursor-pointer"
+              className="w-full rounded-full bg-status-critical hover:opacity-90 py-1.5 text-xs font-bold text-white transition-opacity cursor-pointer"
             >
               Contact existing carrier
             </button>
             <button
               onClick={() => startSupplier(s)}
-              className="w-full rounded-full bg-white border border-[#d1d5db] hover:border-gray-400 px-4 py-3 text-sm font-bold text-[#1c1c1e] transition-colors cursor-pointer"
+              className="w-full rounded-full bg-white border border-gray-200 hover:border-gray-400 py-1.5 text-xs font-bold text-gray-800 transition-colors cursor-pointer"
             >
               Explore alternative supplier
             </button>
@@ -259,47 +277,68 @@ export default function PmRiskMap() {
     const showPart = s.latePart && (risk === "all" || risk === "Spare parts");
     const flags = (risk === "all" ? s.flags : s.flags.filter((f) => f.type === risk)).filter((f) => f.type !== "Spare parts" || !showPart);
     return (
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-start justify-between gap-3">
-            <p className="text-xl leading-[26px] font-bold text-gray-900">{s.contract}</p>
-            <span
-              className={`text-[11px] font-bold rounded-full px-2.5 py-1 whitespace-nowrap shrink-0 ${
-                s.status === "critical" ? "bg-status-critical text-white" : "bg-[#f2f2f7] text-[#48484a]"
-              }`}
-            >
-              {s.status === "critical" ? "Critical" : "At risk"}
-            </span>
+      <div className="flex flex-col gap-2.5">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-gray-900 leading-snug">{s.contract}</p>
+            <p className="text-xs text-gray-400 truncate">{s.customer}</p>
           </div>
-          <p className="text-sm text-[#8e8e93]">{s.customer}</p>
+          <span
+            className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${
+              s.status === "critical" ? "bg-status-critical text-white font-bold" : "border border-gray-300 text-gray-500"
+            }`}
+          >
+            {s.status === "critical" ? "Critical" : "At risk"}
+          </span>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {s.risks.map((t) => (
-            <span
-              key={t}
-              className={`text-[13px] font-medium rounded-full px-3 py-1.5 ${t === risk ? "bg-gray-900 text-white" : "bg-[#f2f2f7] text-[#48484a]"}`}
-            >
-              {t}
-            </span>
-          ))}
+        {/* The disruption leads - it's what needs a decision */}
+        {showPart && s.latePart && partBlock(s, s.latePart)}
+
+        <div>
+          <p className="text-[10px] text-gray-400 tracking-wider mb-1">Risks</p>
+          <div className="flex flex-wrap gap-1.5">
+            {s.risks.map((t) => (
+              <span key={t} className={`text-[10px] px-2 py-0.5 rounded-full ${t === risk ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600"}`}>
+                {t}
+              </span>
+            ))}
+          </div>
         </div>
+
+        <div>
+          <p className="text-[10px] text-gray-400 tracking-wider mb-1">Readiness</p>
+          <div className="flex flex-wrap gap-1.5">
+            {READINESS_ITEMS.map((item) => (
+              <span key={item} className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${READINESS_CLS[s.readiness[item]]}`}>
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* What is riding on it commercially */}
+        {s.value && (
+          <div>
+            <p className="text-[10px] text-gray-400 tracking-wider mb-1">Business impact</p>
+            <p className="text-xs text-gray-600">{s.value} contract value</p>
+          </div>
+        )}
 
         {flags.length > 0 && (
-          <ul className="flex flex-col gap-1">
+          <ul className="flex flex-col gap-1.5">
             {flags.map((f) => (
-              <li key={f.title} className="text-sm leading-5 text-[#3a3a3c]">
+              <li key={f.title} className="text-xs text-gray-600 leading-snug">
                 {f.title}
               </li>
             ))}
           </ul>
         )}
 
-        {showPart && s.latePart && partBlock(s, s.latePart)}
 
         <button
           onClick={() => openDetails(s)}
-          className="w-full rounded-full bg-white border border-[#d1d5db] hover:border-gray-400 px-4 py-3 text-sm font-bold text-[#48484a] transition-colors cursor-pointer"
+          className="w-full text-xs text-gray-700 border border-gray-200 rounded-full py-1.5 hover:border-gray-400 transition-colors cursor-pointer"
         >
           View details
         </button>
@@ -316,7 +355,7 @@ export default function PmRiskMap() {
             <Truck size={15} />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-sm text-gray-900 leading-snug">{p.shipment.carrier}</p>
+            <p className="text-sm font-bold text-gray-900 leading-snug">{p.shipment.carrier}</p>
             <p className="text-xs text-gray-400">
               {p.shipment.mode} · {p.name} ×{p.qty}
             </p>
@@ -337,7 +376,7 @@ export default function PmRiskMap() {
     const p = s.latePart!;
     return (
       <div className="flex flex-col gap-2">
-        <p className="flex items-center gap-1.5 text-sm text-status-critical">
+        <p className="flex items-center gap-1.5 text-sm font-bold text-status-critical">
           <TriangleAlert size={14} className="shrink-0" />
           {p.disruption.title}
         </p>
@@ -356,7 +395,7 @@ export default function PmRiskMap() {
           <Store size={15} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm text-gray-900 leading-snug">{sup.name}</p>
+          <p className="text-sm font-bold text-gray-900 leading-snug">{sup.name}</p>
           <p className="text-xs text-gray-400">
             {sup.location} · {sup.stock}
           </p>
@@ -571,7 +610,6 @@ export default function PmRiskMap() {
             </div>
           ) : (
             <Button onClick={closeFlow} className="rounded-full h-8 text-xs font-bold gap-1.5 cursor-pointer">
-              <Check size={14} />
               Done
             </Button>
           )}
@@ -613,11 +651,11 @@ export default function PmRiskMap() {
           <Button onClick={sendMessage} disabled={r?.kind === "awaiting" || !message.trim()} className="rounded-full h-8 text-xs font-bold gap-1.5 cursor-pointer">
             {r?.kind === "awaiting" ? (
               <>
-                <Loader2 size={13} className="animate-spin" /> Waiting on {part.shipment.carrier}
+Waiting on {part.shipment.carrier}
               </>
             ) : (
               <>
-                <Send size={13} /> Send to {contact.name.split(" ")[0]}
+Send to {contact.name.split(" ")[0]}
               </>
             )}
           </Button>
@@ -648,7 +686,7 @@ export default function PmRiskMap() {
                     {sup.stock} · on site {shortDate(sup.arrives)} · {sup.cost}
                   </span>
                   {sup.recommended && (
-                    <span className="inline-block mt-1 text-[9px] px-1.5 py-px rounded-full bg-gray-900 text-white">Recommended by HMAX</span>
+                    <span className="block mt-1 text-[10px] text-gray-400 tracking-wider">Recommended by HMAX</span>
                   )}
                 </span>
                 <SlipBadge hours={slip(part, sup.arrives)} />
@@ -657,14 +695,13 @@ export default function PmRiskMap() {
           })}
         </div>
         <Button onClick={reserveStock} disabled={!chosenSupplier} className="rounded-full h-8 text-xs font-bold gap-1.5 cursor-pointer">
-          <Check size={14} />
           <span className="truncate">Reserve stock from {part.suppliers.find((x) => x.id === chosenSupplier)?.location ?? "supplier"}</span>
         </Button>
       </>
     );
   } else {
     overlay = (
-      <div className="absolute top-4 left-4 right-16 z-10 flex flex-wrap items-center gap-2" onPointerDown={(e) => e.stopPropagation()}>
+      <div className="absolute top-14 left-4 right-[224px] z-10 flex flex-wrap items-center gap-2" onPointerDown={(e) => e.stopPropagation()}>
         <TabGroup
           value={risk}
           onChange={(v) => {
@@ -675,6 +712,9 @@ export default function PmRiskMap() {
           countFor={(t) => PM_SITES.filter((s) => s.risks.includes(t as PmAlertType)).length}
           label="Risk type"
         />
+        {visible.length === 0 && (
+          <p className="text-sm text-gray-500 bg-white/90 rounded-full px-4 py-2 shadow">No contracts match this search or filter.</p>
+        )}
       </div>
     );
   }
@@ -689,15 +729,15 @@ export default function PmRiskMap() {
         renderTip={(pin) =>
           pin.truck ? truckTip(pin.truck) : pin.disruption ? disruptionTip(pin.disruption) : pin.supplier ? supplierTip(pin.supplier) : pin.site ? siteTip(pin.site) : null
         }
-        renderPin={(pin, selected) => renderPin(pin, selected) ?? <DefaultPin pin={pin} selected={selected} />}
+        renderPin={renderPin}
         layer={routes}
         overlay={overlay}
         selectedId={selectedId}
         onSelect={setSelectedId}
-        tipWidth={flow ? 288 : 340}
-        tipHeight={flow ? 220 : 420}
-        tipClassName={(pin) => (pin.site && !flow ? "rounded-3xl border-[#e5e5e5] p-5" : undefined)}
-        title="Delivery map"
+        tipWidth={288}
+        tipHeight={flow ? 220 : 380}
+        search={flow ? undefined : { value: query, onChange: setQuery, placeholder: "Search contracts" }}
+        title="Risk Map"
       />
     </>
   );
