@@ -104,7 +104,7 @@ export default function RevenueAtRisk() {
                 axisLine={false}
               />
               <YAxis type="number" domain={[0, max]} hide />
-              <Bar dataKey="amount" fill={CHART.line} radius={[4, 4, 0, 0]} maxBarSize={44}>
+              <Bar {...CHART.motion} dataKey="amount" fill={CHART.line} radius={[4, 4, 0, 0]} maxBarSize={44}>
                 <LabelList dataKey="amountLabel" position="top" fontSize={11} fontWeight={700} fill="#171717" />
               </Bar>
             </BarChart>

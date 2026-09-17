@@ -23,6 +23,9 @@ interface DetailDrawers {
   openAsset: (assetId: string) => void;
   openContract: (ref: ContractRef) => void;
   openLead: (oppId: string) => void;
+  /** How many drawers are stacked right now. Anything that closes on Escape
+   *  checks this first, so the top drawer closes before whatever is beneath. */
+  count: number;
 }
 
 const DetailDrawersContext = createContext<DetailDrawers | null>(null);
@@ -58,13 +61,15 @@ export function DetailDrawerProvider({ children }: { children: React.ReactNode }
     return () => window.removeEventListener("keydown", onKey, true);
   }, [top, close]);
 
+  const openCount = layers.filter((l) => !l.closing).length;
   const api = useMemo<DetailDrawers>(
     () => ({
       openAsset: (id) => open({ kind: "asset", id }),
       openContract: (ref) => open(ref),
       openLead: (id) => open({ kind: "lead", id }),
+      count: openCount,
     }),
-    [open]
+    [open, openCount]
   );
 
   // Starting a conversation from any drawer clears the whole stack, so no

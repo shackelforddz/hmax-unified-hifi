@@ -189,10 +189,10 @@ export function ConditionTrend({ data, totals }: { data: ConditionPoint[]; total
             <XAxis dataKey="date" interval={2} tick={{ fontSize: 9, fill: G400 }} tickLine={false} axisLine={{ stroke: G200 }} />
             <YAxis tick={{ fontSize: 9, fill: G400 }} tickLine={false} axisLine={false} width={22} />
             {/* Stack order bottom→top: wear, other, mechanical, dielectric */}
-            <Area type="monotone" dataKey="wear" stackId="1" stroke={S4} fill={S4} fillOpacity={0.9} strokeWidth={1} />
-            <Area type="monotone" dataKey="other" stackId="1" stroke={S3} fill={S3} fillOpacity={0.9} strokeWidth={1} />
-            <Area type="monotone" dataKey="mechanical" stackId="1" stroke={S2} fill={S2} fillOpacity={0.9} strokeWidth={1} />
-            <Area type="monotone" dataKey="dielectric" stackId="1" stroke={S1} fill={S1} fillOpacity={0.9} strokeWidth={1} />
+            <Area {...CHART.motion} type="monotone" dataKey="wear" stackId="1" stroke={S4} fill={S4} fillOpacity={0.9} strokeWidth={1} />
+            <Area {...CHART.motion} type="monotone" dataKey="other" stackId="1" stroke={S3} fill={S3} fillOpacity={0.9} strokeWidth={1} />
+            <Area {...CHART.motion} type="monotone" dataKey="mechanical" stackId="1" stroke={S2} fill={S2} fillOpacity={0.9} strokeWidth={1} />
+            <Area {...CHART.motion} type="monotone" dataKey="dielectric" stackId="1" stroke={S1} fill={S1} fillOpacity={0.9} strokeWidth={1} />
           </AreaChart>
         </ResponsiveContainer>
         <div className="flex flex-col gap-1.5">
@@ -219,7 +219,7 @@ export function ParameterTrend({ data, rows }: { data: ParameterPoint[]; rows: P
         <LineChart data={data} margin={{ top: 6, right: 10, bottom: 0, left: 0 }}>
           <XAxis dataKey="date" interval={1} tick={{ fontSize: 9, fill: G400 }} tickLine={false} axisLine={{ stroke: G200 }} />
           <YAxis tick={{ fontSize: 9, fill: G400 }} tickLine={false} axisLine={false} width={22} />
-          <Line type="monotone" dataKey="value" stroke={SERIES} strokeWidth={2} dot={{ r: 2.5, fill: "#fff", stroke: SERIES, strokeWidth: 1.5 }} />
+          <Line {...CHART.motion} type="monotone" dataKey="value" stroke={SERIES} strokeWidth={2} dot={{ r: 2.5, fill: "#fff", stroke: SERIES, strokeWidth: 1.5 }} />
         </LineChart>
       </ResponsiveContainer>
 
@@ -307,9 +307,9 @@ function PhaseChart({
           {lines.map((l) => (
             <ReferenceLine key={l.label} y={l.y} stroke={l.color} strokeDasharray="4 3" strokeWidth={1.5} />
           ))}
-          <Line type="monotone" dataKey="a" stroke={S1} strokeWidth={1.75} dot={false} />
-          <Line type="monotone" dataKey="b" stroke={S2} strokeWidth={1.75} dot={false} />
-          <Line type="monotone" dataKey="c" stroke={S4} strokeWidth={1.75} dot={false} />
+          <Line {...CHART.motion} type="monotone" dataKey="a" stroke={S1} strokeWidth={1.75} dot={false} />
+          <Line {...CHART.motion} type="monotone" dataKey="b" stroke={S2} strokeWidth={1.75} dot={false} />
+          <Line {...CHART.motion} type="monotone" dataKey="c" stroke={S4} strokeWidth={1.75} dot={false} />
         </LineChart>
       </ResponsiveContainer>
       <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-[10px] text-gray-500">

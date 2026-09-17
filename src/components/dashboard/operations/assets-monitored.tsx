@@ -42,7 +42,7 @@ export default function AssetsMonitored() {
             </defs>
             <XAxis dataKey="label" interval={0} tick={{ fontSize: 10, fill: "#A3A3A3" }} tickLine={false} axisLine={false} />
             <YAxis domain={["dataMin - 10", "dataMax + 5"]} hide />
-            <Area
+            <Area {...CHART.motion}
               type="monotone"
               dataKey="value"
               stroke={CHART.line}

@@ -18,4 +18,7 @@ export const CHART = {
   /** Threshold lines and breached marks. */
   warning: "#f59e0b",
   alert: "#fa000f",
+  /** Series draw-on. Recharts defaults to 1.5s, which reads as a chart
+   *  loading rather than a chart arriving - spread this onto every series. */
+  motion: { animationDuration: 600, animationEasing: "ease-out" },
 } as const;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import KpiCard from "@/components/dashboard/kpi-card";
+import KpiStrip from "@/components/dashboard/kpi-strip";
 import ContractsAttention from "@/components/dashboard/operations/contracts-attention";
 import FinancialPerformance from "@/components/dashboard/operations/financial-performance";
 import ResourceCapacity from "@/components/dashboard/operations/resource-capacity";
@@ -33,40 +33,42 @@ export default function OperationsDashboard() {
         id: "portfolio-health",
         span: 12,
         node: (
-          <div className="grid grid-cols-4 gap-4 h-full">
-            <KpiCard
-              id="executed-margin"
-              label="Executed margin"
-              value={P.executedMargin}
-              trend={`${P.marginDelta} vs ${P.asSoldMargin} as-sold`}
-              sparkline="portfolio-margin"
-              direction="down"
-            />
-            <KpiCard
-              id="revenue-vs-forecast"
-              label="Revenue vs forecast"
-              value={P.revenue}
-              trend={`${P.revenueDelta} vs ${P.revenueForecast} forecast`}
-              sparkline="revenue-mtd"
-              direction="down"
-            />
-            <KpiCard
-              id="outstanding-payments"
-              label="Outstanding payments"
-              value={OUTSTANDING.total}
-              trend={OUTSTANDING.note}
-              sparkline="contracts-at-risk"
-              direction="flat"
-            />
-            <KpiCard
-              id="resource-coverage"
-              label="Resource coverage"
-              value={P.resourceCoverage}
-              trend={P.resourceNote}
-              sparkline="active-contracts"
-              direction="flat"
-            />
-          </div>
+          <KpiStrip
+            kpis={[
+              {
+                id: "executed-margin",
+                label: "Executed margin",
+                value: P.executedMargin,
+                trend: `${P.marginDelta} vs ${P.asSoldMargin} as-sold`,
+                sparkline: "portfolio-margin",
+                direction: "down",
+              },
+              {
+                id: "revenue-vs-forecast",
+                label: "Revenue vs forecast",
+                value: P.revenue,
+                trend: `${P.revenueDelta} vs ${P.revenueForecast} forecast`,
+                sparkline: "revenue-mtd",
+                direction: "down",
+              },
+              {
+                id: "outstanding-payments",
+                label: "Outstanding payments",
+                value: OUTSTANDING.total,
+                trend: OUTSTANDING.note,
+                sparkline: "contracts-at-risk",
+                direction: "flat",
+              },
+              {
+                id: "resource-coverage",
+                label: "Resource coverage",
+                value: P.resourceCoverage,
+                trend: P.resourceNote,
+                sparkline: "active-contracts",
+                direction: "flat",
+              },
+            ]}
+          />
         ),
       },
       // ── Bento: where the work is and what's due next, then the money and

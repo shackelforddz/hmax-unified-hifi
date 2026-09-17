@@ -1,6 +1,6 @@
 "use client";
 
-import KpiCard from "@/components/dashboard/kpi-card";
+import KpiStrip from "@/components/dashboard/kpi-strip";
 import { OPPORTUNITIES, STAGE_PROB, oppValue as parseVal, type OppStage } from "@/lib/sales-data";
 
 const fmt = (n: number) => `€${n.toFixed(1)}M`;
@@ -20,41 +20,43 @@ export default function OpportunityStats() {
   const weightedPct = Math.round((weighted / total) * 100);
   const delta = total - LAST_MONTH;
 
-  // Same KpiCard strip every other dashboard opens with.
+  // Same KPI strip every other dashboard opens with.
   return (
-    <div className="grid grid-cols-4 gap-4 h-full">
-      <KpiCard
-        id="pipeline-value"
-        label="Pipeline value"
-        value={fmt(total)}
-        trend={`${fmt(delta)} vs last month`}
-        sparkline="portfolio-value"
-        direction="up"
-      />
-      <KpiCard
-        id="weighted-forecast"
-        label="Weighted forecast"
-        value={fmt(weighted)}
-        trend={`${weightedPct}% of pipeline`}
-        sparkline="revenue-mtd"
-        direction="up"
-      />
-      <KpiCard
-        id="at-offer"
-        label="At offer or beyond"
-        value={String(offerPlus.length)}
-        trend={`of ${OPPORTUNITIES.length} leads · ${fmt(offerPlusValue)}`}
-        sparkline="active-contracts"
-        direction="flat"
-      />
-      <KpiCard
-        id="active-leads"
-        label="Active leads"
-        value={String(OPPORTUNITIES.length)}
-        trend={`${renewals} renewals · ${OPPORTUNITIES.length - renewals} new`}
-        sparkline="contracts-at-risk"
-        direction="flat"
-      />
-    </div>
+    <KpiStrip
+      kpis={[
+        {
+          id: "pipeline-value",
+          label: "Pipeline value",
+          value: fmt(total),
+          trend: `${fmt(delta)} vs last month`,
+          sparkline: "portfolio-value",
+          direction: "up",
+        },
+        {
+          id: "weighted-forecast",
+          label: "Weighted forecast",
+          value: fmt(weighted),
+          trend: `${weightedPct}% of pipeline`,
+          sparkline: "revenue-mtd",
+          direction: "up",
+        },
+        {
+          id: "at-offer",
+          label: "At offer or beyond",
+          value: String(offerPlus.length),
+          trend: `of ${OPPORTUNITIES.length} leads · ${fmt(offerPlusValue)}`,
+          sparkline: "active-contracts",
+          direction: "flat",
+        },
+        {
+          id: "active-leads",
+          label: "Active leads",
+          value: String(OPPORTUNITIES.length),
+          trend: `${renewals} renewals · ${OPPORTUNITIES.length - renewals} new`,
+          sparkline: "contracts-at-risk",
+          direction: "flat",
+        },
+      ]}
+    />
   );
 }

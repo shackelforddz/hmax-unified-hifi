@@ -70,6 +70,13 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ── Motion ────────────────────────────────────────────────────────
+     Arriving decelerates into place, leaving accelerates away, and
+     anything that moves both ways eases at both ends. */
+  --ease-entrance: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 :root {
@@ -79,7 +86,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: #222222;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -179,7 +186,7 @@
   }
 }
 .animate-message-in {
-  animation: message-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: message-in 0.32s var(--ease-entrance) both;
 }
 
 /* Step content cross-fade (used when the wizard advances) */
@@ -194,7 +201,7 @@
   }
 }
 .animate-step-in {
-  animation: step-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: step-in 0.24s var(--ease-entrance) both;
 }
 
 /* Typing indicator bounce */
@@ -214,9 +221,92 @@
   animation: typing-bounce 1.2s infinite ease-in-out;
 }
 
+/* Menus, popovers and map tooltips - anchored, so they barely travel and
+   they are done almost immediately */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-pop-in {
+  animation: pop-in 0.14s var(--ease-entrance);
+}
+
+/* Modals - centred, so they scale rather than travel */
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-dialog-in {
+  animation: dialog-in 0.2s var(--ease-entrance);
+}
+
+/* Panels that appear in the layout and push it around */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-rise-in {
+  animation: rise-in 0.24s var(--ease-entrance);
+}
+
+/* KPI records arriving under the strip, and replaying when they swap */
+@keyframes records-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-records-in {
+  animation: records-in 0.24s var(--ease-entrance);
+}
+
+/* Swapping between KPIs while already expanded: the panel is staying put, so
+   the content only crossfades - no second vertical move on top of the resize */
+@keyframes records-swap {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-records-swap {
+  animation: records-swap 0.16s var(--ease-entrance);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-message-in,
-  .animate-step-in,
+  /* Covers transitions and third-party animation too, not only the keyframes
+     defined here. Left at a hair above zero so transitionend still fires. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
   .typing-dot {
     animation: none;
   }

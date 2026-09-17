@@ -5,7 +5,7 @@ import { X, ChevronDown, CheckCircle2, Circle, CalendarClock, ClipboardList, Pac
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { WORK_ORDERS, WORK_ORDER_DETAILS, type WorkOrder, type WorkOrderDetail, type WoStatus, type WoPriority } from "@/lib/work-orders-data";
-import { AssetLink, ContractLink } from "@/components/dashboard/detail-drawers";
+import { AssetLink, ContractLink, drawerLayer } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 function Card({ children }: { children: React.ReactNode }) {
@@ -68,7 +68,7 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
         Actions <ChevronDown size={14} className={`transition-transform ${open ? "rotate-180" : ""}`} />
       </Button>
       {open && (
-        <div className="absolute bottom-full mb-2 right-0 w-full min-w-[220px] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-10 animate-message-in">
+        <div className="absolute bottom-full mb-2 right-0 w-full min-w-[220px] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-10 animate-pop-in">
           {ACTIONS.map(({ label, icon: Icon }) => (
             <Button key={label} variant="ghost" onClick={() => { setOpen(false); onAction(label); }} className="w-full justify-start gap-2.5 px-4 py-2.5 h-auto text-sm text-gray-700 rounded-none cursor-pointer">
               <Icon size={15} strokeWidth={1.5} className="text-gray-400 shrink-0" />
@@ -185,6 +185,7 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
   const w = workOrderId ? WORK_ORDERS.find((x) => x.id === workOrderId) ?? null : null;
   const d = workOrderId ? WORK_ORDER_DETAILS[workOrderId] ?? null : null;
   const open = !!w;
+  const shell = drawerLayer(open);
   const launch = useConversationLauncher();
 
   const runAction = (prompt: string) => {
@@ -201,8 +202,8 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
 
   return (
     <>
-      <div onClick={onClose} className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} />
-      <div className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"}`}>
+      <div onClick={onClose} {...shell.backdrop} />
+      <div {...shell.panel}>
         {w && (
           <>
             <div className="shrink-0 px-6 pt-6 pb-4 border-b border-gray-100">

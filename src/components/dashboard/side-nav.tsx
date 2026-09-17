@@ -95,7 +95,7 @@ export default function SideNav() {
           </button>
 
           {open && (
-            <div className="absolute left-11 bottom-0 w-60 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-50 animate-message-in">
+            <div className="absolute left-11 bottom-0 w-60 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-50 animate-pop-in">
               <div className="px-4 py-3 flex items-center gap-3 border-b border-gray-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={MOCK_USER.avatar} alt="" aria-hidden className="w-9 h-9 rounded-full object-cover bg-gray-200 shrink-0" />

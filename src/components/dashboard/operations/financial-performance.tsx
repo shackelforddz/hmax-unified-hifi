@@ -40,7 +40,7 @@ function CausesPopover({
           ? { left, bottom: height - y + 14, width: POPOVER_W }
           : { left, top: y + 14, width: POPOVER_W }
       }
-      className="absolute z-30 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-message-in"
+      className="absolute z-30 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden animate-pop-in"
     >
       <div className="px-4 pt-3 pb-2 border-b border-gray-100 flex items-start gap-2">
         <div className="flex-1 min-w-0">
@@ -150,7 +150,7 @@ export default function FinancialPerformance() {
                   strokeDasharray="3 3"
                   label={{ value: `Plan ${F.planMargin}%`, position: "insideTopRight", fontSize: 9, fill: "#A3A3A3" }}
                 />
-                <Area
+                <Area {...CHART.motion}
                   type="monotone"
                   dataKey="value"
                   stroke={CHART.line}

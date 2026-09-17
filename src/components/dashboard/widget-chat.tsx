@@ -99,7 +99,7 @@ export default function WidgetChat({ title, triggerClassName }: Props) {
           <div
             ref={popRef}
             style={{ position: "fixed", top: pos.top, left: pos.left, width: POPOVER_W }}
-            className="z-[60] bg-white rounded-xl shadow-xl border border-gray-100 p-4 animate-message-in"
+            className="z-[60] bg-white rounded-xl shadow-xl border border-gray-100 p-4 animate-pop-in"
           >
             <p className="text-sm text-gray-900 mb-0.5">Ask about {title}</p>
             <p className="text-xs text-gray-400 mb-3">

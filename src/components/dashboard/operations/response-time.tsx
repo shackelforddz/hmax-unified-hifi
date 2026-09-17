@@ -44,7 +44,7 @@ export default function ResponseTime() {
               strokeDasharray="3 3"
               label={{ value: `SLA ${R.target}h`, position: "insideTopRight", fontSize: 9, fill: "#A3A3A3" }}
             />
-            <Area
+            <Area {...CHART.motion}
               type="monotone"
               dataKey="value"
               stroke={CHART.line}

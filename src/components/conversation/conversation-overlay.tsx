@@ -414,7 +414,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
 
   return (
     <div
-      className={`fixed inset-0 p-6 z-50 flex transition-opacity duration-300 ${
+      className={`fixed inset-0 p-6 z-50 flex transition-opacity duration-[340ms] ease-[var(--ease-standard)] ${
         visible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       style={{
@@ -441,12 +441,12 @@ export default function ConversationOverlay({ visible, onClose, context, initial
       {/* Left - customer context. For widget-launched chats it stays hidden
           until the conversation is tied to a specific customer. */}
       <div
-        className={`relative z-10 rounded-2xl shrink-0 overflow-hidden transition-[width,margin] duration-500 ease-in-out ${
+        className={`relative z-10 rounded-2xl shrink-0 overflow-hidden transition-[width,margin] duration-[340ms] ease-[var(--ease-standard)] ${
           showPanel ? "w-[372px] mr-6" : "w-0"
         }`}
       >
         <div
-          className={`w-[372px] h-full transition-transform duration-500 ease-in-out ${
+          className={`w-[372px] h-full transition-transform duration-[340ms] ease-[var(--ease-standard)] ${
             showPanel ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -492,7 +492,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
           <div className={`mx-auto w-full ${started ? "max-w-[600px] pt-14 pb-32" : "max-w-[632px] px-4 flex-1 flex flex-col items-center justify-center"}`}>
             {!started ? (
               /* Welcome - title, the prompt, then four starting points */
-              <div className="w-full flex flex-col items-center gap-16 animate-message-in">
+              <div className="w-full flex flex-col items-center gap-16 animate-rise-in">
                 <div className="flex flex-col items-center gap-2 text-center">
                   <h1 className="text-4xl font-bold text-gray-950">Create A New Conversation</h1>
                   <p className="text-xl text-gray-500">Need Help? Ask Me Anything!</p>
@@ -554,12 +554,12 @@ export default function ConversationOverlay({ visible, onClose, context, initial
 
       {/* Document panel - pushes in from the right, mirroring the context panel */}
       <div
-        className={`relative z-10 shrink-0 overflow-hidden transition-[width] duration-500 ease-in-out ${
+        className={`relative z-10 shrink-0 overflow-hidden transition-[width] duration-[340ms] ease-[var(--ease-standard)] ${
           docVisible ? "w-[460px]" : "w-0"
         }`}
       >
         <div
-          className={`w-[460px] h-full transition-transform duration-500 ease-in-out ${
+          className={`w-[460px] h-full transition-transform duration-[340ms] ease-[var(--ease-standard)] ${
             docVisible ? "translate-x-0" : "translate-x-full"
           }`}
         >

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract } from "@/lib/operations-data";
 import { CUSTOMER_DETAILS } from "@/lib/dashboard-data";
-import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
+import { useDetailDrawers, drawerLayer } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 /** "Baltic Wind NL" -> "baltic-wind-nl", the CUSTOMER_DETAILS key. */
@@ -80,6 +80,7 @@ export default function CustomerDrawer({ customer, onClose }: Props) {
   const drawers = useDetailDrawers();
   const contracts: OpsContract[] = customer ? OPS_CONTRACTS.filter((c) => c.customer === customer) : [];
   const open = !!customer && contracts.length > 0;
+  const shell = drawerLayer(open);
   const launch = useConversationLauncher();
 
   useEffect(() => {
@@ -118,15 +119,8 @@ export default function CustomerDrawer({ customer, onClose }: Props) {
 
   return (
     <>
-      <div
-        onClick={onClose}
-        className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
-      />
-      <div
-        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${
-          open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
-        }`}
-      >
+      <div onClick={onClose} {...shell.backdrop} />
+      <div {...shell.panel}>
         {open && customer && (
           <>
             {/* Header */}

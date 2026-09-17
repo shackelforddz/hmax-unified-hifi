@@ -68,7 +68,7 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
         Actions <ChevronDown size={14} className={`transition-transform ${open ? "rotate-180" : ""}`} />
       </Button>
       {open && (
-        <div className="absolute bottom-full mb-2 right-0 w-full min-w-[220px] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-10 animate-message-in">
+        <div className="absolute bottom-full mb-2 right-0 w-full min-w-[220px] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-10 animate-pop-in">
           {ACTIONS.map(({ label, icon: Icon }) => (
             <Button
               key={label}
@@ -211,7 +211,7 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base text-gray-900 flex items-center gap-2">
               <span className="relative flex w-2 h-2">
-                <span className="absolute inline-flex w-full h-full rounded-full bg-gray-400 opacity-75 animate-ping" />
+                <span className="absolute inline-flex w-full h-full rounded-full bg-gray-400 opacity-75 animate-ping [animation-duration:2.5s]" />
                 <span className="relative inline-flex w-2 h-2 rounded-full bg-gray-900" />
               </span>
               Live sensor faults

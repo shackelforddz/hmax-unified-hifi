@@ -59,7 +59,7 @@ function AssignTaskDialog({
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-[420px] bg-white rounded-2xl shadow-xl border border-gray-100 p-5 animate-message-in">
+      <div className="relative w-full max-w-[420px] bg-white rounded-2xl shadow-xl border border-gray-100 p-5 animate-dialog-in">
         <div className="flex items-start justify-between gap-3 mb-4">
           <div>
             <p className="text-base text-gray-900">Assign a task</p>
@@ -199,7 +199,7 @@ export default function ConversationPeople({ participants, suggested = [], onAdd
         </button>
 
         {open && (
-          <div className="absolute right-0 top-11 z-50 w-[320px] bg-white rounded-xl shadow-xl border border-gray-100 animate-message-in overflow-hidden">
+          <div className="absolute right-0 top-11 z-50 w-[320px] bg-white rounded-xl shadow-xl border border-gray-100 animate-pop-in overflow-hidden">
             {/* Already in the conversation */}
             {participants.length > 0 && (
               <div className="px-4 pt-4 pb-3 border-b border-gray-100">

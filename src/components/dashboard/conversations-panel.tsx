@@ -144,7 +144,7 @@ function ConversationMenu({ c, onDelete }: { c: StoredConversation; onDelete?: (
         <div
           ref={menuRef}
           role="menu"
-          className="fixed z-50 w-56 bg-white rounded-xl shadow-xl border border-gray-100 p-1 animate-message-in"
+          className="fixed z-50 w-56 bg-white rounded-xl shadow-xl border border-gray-100 p-1 animate-pop-in"
           style={{ top: pos.top, right: pos.right }}
         >
           {confirming ? (

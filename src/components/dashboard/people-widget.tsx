@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { ChevronRight, MapPin } from "lucide-react";
 import WidgetChat from "@/components/dashboard/widget-chat";
-import { ALL, Select } from "@/components/dashboard/filter-controls";
 import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
 import OpportunityDrawer from "@/components/dashboard/sales/opportunity-drawer";
 import { DELIVERY_TEAM, type Person } from "@/lib/people-data";
@@ -150,20 +149,9 @@ function PersonCard({
 export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" }: { people?: Person[]; title?: string }) {
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [leadDrawer, setLeadDrawer] = useState<Opportunity | null>(null);
-  const [comp, setComp] = useState(ALL);
-  const [cert, setCert] = useState(ALL);
 
-  // Filter options derived from the current team.
-  const competencyOptions = Array.from(new Set(people.flatMap((p) => p.competencies))).sort();
-  const certOptions = Array.from(new Set(people.flatMap((p) => p.certifications.map((c) => c.name)))).sort();
-
-  const visible = people.filter(
-    (p) =>
-      (comp === ALL || p.competencies.includes(comp)) &&
-      (cert === ALL || p.certifications.some((c) => c.name === cert))
-  );
-  // Busiest first.
-  const sorted = [...visible].sort((a, b) => b.allocation - a.allocation);
+  // Busiest first - the whole team, every time.
+  const sorted = [...people].sort((a, b) => b.allocation - a.allocation);
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -173,47 +161,16 @@ export default function PeopleWidget({ people = DELIVERY_TEAM, title = "People" 
         detail={leadDrawer ? leadDetail(leadDrawer) : null}
         onClose={() => setLeadDrawer(null)}
       />
-      <div className="px-5 pt-5 pb-4 flex flex-col gap-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-base text-gray-900">{title}</h3>
-          </div>
-          <WidgetChat title={title} />
-        </div>
-        {/* Filters - competency and certification, when the team has any */}
-        {(competencyOptions.length > 0 || certOptions.length > 0) && (
-          <div className="flex items-start justify-end gap-2 w-full">
-            {competencyOptions.length > 0 && (
-              <Select
-                value={comp}
-                onChange={setComp}
-                allLabel="All Competencies"
-                options={competencyOptions}
-                label="Filter by competency"
-              />
-            )}
-            {certOptions.length > 0 && (
-              <Select
-                value={cert}
-                onChange={setCert}
-                allLabel="All Certifications"
-                options={certOptions}
-                label="Filter by certification"
-              />
-            )}
-          </div>
-        )}
+      <div className="px-5 pt-5 pb-4 flex items-start justify-between">
+        <h3 className="text-base text-gray-900">{title}</h3>
+        <WidgetChat title={title} />
       </div>
 
-      {sorted.length > 0 ? (
-        <div className="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {sorted.map((p) => (
-            <PersonCard key={p.id} person={p} onOpenContract={setDrawerId} onOpenLead={setLeadDrawer} />
-          ))}
-        </div>
-      ) : (
-        <p className="text-sm text-gray-400 text-center px-4 py-6">No one on your team matches the selected filters.</p>
-      )}
+      <div className="p-4 pt-0 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        {sorted.map((p) => (
+          <PersonCard key={p.id} person={p} onOpenContract={setDrawerId} onOpenLead={setLeadDrawer} />
+        ))}
+      </div>
     </div>
   );
 }

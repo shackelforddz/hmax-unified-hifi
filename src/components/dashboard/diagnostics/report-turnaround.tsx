@@ -40,7 +40,7 @@ export default function ReportTurnaround() {
                     <stop offset="100%" stopColor={CHART.fill} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <Area type="monotone" dataKey="v" stroke={CHART.line} strokeWidth={2} fill="url(#turnaroundSpark)" dot={false} />
+                <Area {...CHART.motion} type="monotone" dataKey="v" stroke={CHART.line} strokeWidth={2} fill="url(#turnaroundSpark)" dot={false} />
               </AreaChart>
             </ResponsiveContainer>
           </div>

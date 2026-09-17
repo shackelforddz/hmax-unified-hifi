@@ -38,8 +38,8 @@ export default function FleetHealth() {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={F.points} margin={{ top: 8, right: 4, bottom: 4, left: 4 }}>
               <YAxis domain={[55, 92]} hide />
-              <Line type="monotone" dataKey="avg" stroke={CHART.line} strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="std" stroke="#A3A3A3" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
+              <Line {...CHART.motion} type="monotone" dataKey="avg" stroke={CHART.line} strokeWidth={2} dot={false} />
+              <Line {...CHART.motion} type="monotone" dataKey="std" stroke="#A3A3A3" strokeWidth={1.5} strokeDasharray="4 3" dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

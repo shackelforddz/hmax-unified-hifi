@@ -50,8 +50,8 @@ export default function RevenueTiming() {
             <BarChart data={POINTS} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
             <XAxis dataKey="label" interval={0} tick={{ fontSize: 10, fill: "#A3A3A3" }} tickLine={false} axisLine={false} />
             <YAxis hide />
-            <Bar dataKey="collected" stackId="invoiced" fill={CHART.line} />
-            <Bar dataKey="outstanding" stackId="invoiced" fill={OUTSTANDING} radius={[3, 3, 0, 0]} />
+            <Bar {...CHART.motion} dataKey="collected" stackId="invoiced" fill={CHART.line} />
+            <Bar {...CHART.motion} dataKey="outstanding" stackId="invoiced" fill={OUTSTANDING} radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

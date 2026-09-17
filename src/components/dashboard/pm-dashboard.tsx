@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import KpiCard from "@/components/dashboard/kpi-card";
+import KpiStrip from "@/components/dashboard/kpi-strip";
 import AttentionList from "@/components/dashboard/attention-list";
 import DeliveryTrend from "@/components/dashboard/delivery-trend";
 import RevenueAtRisk from "@/components/dashboard/revenue-at-risk";
@@ -28,13 +28,7 @@ export default function PmDashboard() {
         // The KPI strip moves as one block - the cards inside it don't reorder.
         id: "kpis",
         span: 12,
-        node: (
-          <div className="grid grid-cols-4 gap-4 h-full">
-            {KPI_DATA.map((kpi) => (
-              <KpiCard key={kpi.id} {...kpi} />
-            ))}
-          </div>
-        ),
+        node: <KpiStrip kpis={KPI_DATA} />,
       },
       // ── Bento: where delivery is at risk and what's due, then how delivery
       //    is trending and who we're waiting on ──

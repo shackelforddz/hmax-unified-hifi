@@ -65,7 +65,7 @@ export function ChartBody({ config, fill = false }: { config: CustomWidgetConfig
         <Plot fill={fill} height={90}>
           <LineChart data={series} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
             <YAxis hide domain={["dataMin", "dataMax"]} />
-            <Line type="monotone" dataKey="value" stroke={CHART.line} strokeWidth={2} dot={false} />
+            <Line {...CHART.motion} type="monotone" dataKey="value" stroke={CHART.line} strokeWidth={2} dot={false} />
           </LineChart>
         </Plot>
       </div>
@@ -77,7 +77,7 @@ export function ChartBody({ config, fill = false }: { config: CustomWidgetConfig
       <div className={`flex items-center gap-4 ${fill ? "flex-1 min-h-0" : ""}`}>
         <Plot fill={fill} height={150} width="55%" className="self-stretch shrink-0">
           <PieChart>
-            <Pie data={series} dataKey="value" nameKey="label" innerRadius="50%" outerRadius="83%" paddingAngle={2} stroke="none">
+            <Pie {...CHART.motion} data={series} dataKey="value" nameKey="label" innerRadius="50%" outerRadius="83%" paddingAngle={2} stroke="none">
               {series.map((_, i) => (
                 <Cell key={i} fill={GRAYS[i % GRAYS.length]} />
               ))}
@@ -105,7 +105,7 @@ export function ChartBody({ config, fill = false }: { config: CustomWidgetConfig
           <BarChart layout="vertical" data={series} margin={{ top: 4, right: 40, bottom: 0, left: 8 }} barCategoryGap={10}>
             <XAxis type="number" domain={[0, max]} hide />
             <YAxis type="category" dataKey="label" width={110} tick={{ fontSize: 12, fill: "#525252" }} tickLine={false} axisLine={false} />
-            <Bar dataKey="value" fill={CHART.line} radius={[4, 4, 4, 4]} barSize={12}>
+            <Bar {...CHART.motion} dataKey="value" fill={CHART.line} radius={[4, 4, 4, 4]} barSize={12}>
               <LabelList dataKey="value" position="right" fontSize={12} fill="#171717" formatter={(v) => formatValue(Number(v ?? 0), unit)} />
             </Bar>
           </BarChart>
@@ -127,7 +127,7 @@ export function ChartBody({ config, fill = false }: { config: CustomWidgetConfig
           </defs>
           <XAxis dataKey="label" interval={0} tick={{ fontSize: 10, fill: "#A3A3A3" }} tickLine={false} axisLine={false} />
           <YAxis hide domain={["dataMin", "dataMax"]} />
-          <Area type="monotone" dataKey="value" stroke={CHART.line} strokeWidth={2} fill={`url(#cwArea-${config.id})`} dot={{ r: 2, fill: "#fff", stroke: CHART.line, strokeWidth: 1.5 }} />
+          <Area {...CHART.motion} type="monotone" dataKey="value" stroke={CHART.line} strokeWidth={2} fill={`url(#cwArea-${config.id})`} dot={{ r: 2, fill: "#fff", stroke: CHART.line, strokeWidth: 1.5 }} />
         </AreaChart>
       </Plot>
     </div>

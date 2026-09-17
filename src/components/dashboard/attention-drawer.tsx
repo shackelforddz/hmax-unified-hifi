@@ -15,7 +15,7 @@ import {
 } from "@/lib/dashboard-data";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "./conversation-launcher";
-import { AssetLink, ContractLink } from "@/components/dashboard/detail-drawers";
+import { AssetLink, ContractLink, drawerLayer } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 function Tag({ children }: { children: React.ReactNode }) {
@@ -316,7 +316,7 @@ function ActionsMenu() {
       </Button>
 
       {open && (
-        <div className="absolute bottom-full mb-2 right-0 w-full min-w-[230px] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-10 animate-message-in">
+        <div className="absolute bottom-full mb-2 right-0 w-full min-w-[230px] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-10 animate-pop-in">
           {ACTIONS.map(({ label, icon: Icon }) => (
             <Button
               key={label}
@@ -342,6 +342,7 @@ interface Props {
 export default function AttentionDrawer({ itemId, onClose }: Props) {
   const detail = itemId ? CUSTOMER_DETAILS[itemId] : null;
   const open = !!detail;
+  const shell = drawerLayer(open);
   const launch = useConversationLauncher();
 
   const runAction = (prompt: string) => {
@@ -360,19 +361,10 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
   return (
     <>
       {/* Backdrop */}
-      <div
-        onClick={onClose}
-        className={`fixed inset-0 z-40 bg-black/20 transition-opacity duration-300 ${
-          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-      />
+      <div onClick={onClose} {...shell.backdrop} />
 
       {/* Drawer */}
-      <div
-        className={`fixed top-0 right-0 bottom-0 z-50 w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${
-          open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
-        }`}
-      >
+      <div {...shell.panel}>
         {detail && (
           <>
             {/* Header */}

@@ -46,6 +46,8 @@ export interface KpiRecord {
 export interface KpiDetail {
   /** What the list is, above the rows. */
   caption: string;
+  /** Column headings for the four fields of a record. */
+  columns: { title: string; meta: string; value: string; status: string };
   records: KpiRecord[];
   /** One line on what is moving the number. */
   note?: string;
@@ -238,6 +240,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   /* Project Manager */
   "active-contracts": {
     caption: "Delivery contracts and service agreements",
+    columns: { title: "Contract", meta: "Customer and owner", value: "Value", status: "Status" },
     records: allContracts,
     note: "Two contracts moved out of on-track this month.",
     action: {
@@ -248,6 +251,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "contracts-at-risk": {
     caption: "Contracts carrying an open risk",
+    columns: { title: "Contract", meta: "Customer and owner", value: "Value", status: "Status" },
     records: contractsAtRisk,
     note: "Both critical contracts are blocked on parts, not on labour.",
     action: {
@@ -258,6 +262,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "revenue-mtd": {
     caption: "Milestone invoices dated this month",
+    columns: { title: "Invoice", meta: "Contract and due date", value: "Amount", status: "Status" },
     records: monthInvoices.map((i) =>
       invoiceRow(i, i.row.status === "Draft" ? "warn" : i.row.status === "Overdue" ? "critical" : "good")
     ),
@@ -270,6 +275,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "portfolio-value": {
     caption: "Contract value by agreement",
+    columns: { title: "Contract", meta: "Customer and owner", value: "Value", status: "Status" },
     records: allContracts,
     note: `${CONTRACT_BOOK.atRisk} of the ${CONTRACT_BOOK.total} book sits on contracts flagged at risk.`,
     action: {
@@ -282,6 +288,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   /* Operations */
   "executed-margin": {
     caption: "Executed margin by contract",
+    columns: { title: "Contract", meta: "As-sold and revenue", value: "Executed", status: "State" },
     records: OPS_CONTRACTS.flatMap((c) => {
       const f = OPS_CONTRACT_DETAILS[c.id]?.finance;
       if (!f) return [];
@@ -307,6 +314,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "revenue-vs-forecast": {
     caption: "Milestones late or still to land",
+    columns: { title: "Milestone", meta: "Contract", value: "Dates", status: "State" },
     records: openMilestones,
     note: "Revenue only recognises when the milestone does.",
     action: {
@@ -317,6 +325,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "outstanding-payments": {
     caption: "Invoices past their due date",
+    columns: { title: "Invoice", meta: "Contract and due date", value: "Amount", status: "Status" },
     records: overdueInvoices.map((i) => invoiceRow(i, "critical")),
     note: "Each one is a milestone already delivered and signed off.",
     action: {
@@ -327,6 +336,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "resource-coverage": {
     caption: "Utilisation by team",
+    columns: { title: "Team", meta: "Allocation", value: "Utilisation", status: "Slack" },
     records: TEAMS.map((t) => ({
       id: t.name,
       title: t.name,
@@ -346,6 +356,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   /* Sales */
   "pipeline-value": {
     caption: "Open leads by value",
+    columns: { title: "Lead", meta: "Account and owner", value: "Value", status: "Stage" },
     records: [...OPPORTUNITIES].sort(byValue).map((o) => leadRow(o)),
     note: `${renewals.length} of the ${OPPORTUNITIES.length} leads renew a contract already in the book.`,
     action: {
@@ -356,6 +367,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "weighted-forecast": {
     caption: "Each lead at its win probability",
+    columns: { title: "Lead", meta: "Account and owner", value: "Weighted", status: "Stage" },
     records: [...OPPORTUNITIES].sort(byWeighted).map((o) => leadRow(o, true)),
     note: "Weighted at 20% for prospects, 60% at bid, 90% in negotiation.",
     action: {
@@ -366,6 +378,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "at-offer": {
     caption: "Leads at bid or in negotiation",
+    columns: { title: "Lead", meta: "Account and owner", value: "Value", status: "Stage" },
     records: [...offerPlus].sort(byValue).map((o) => leadRow(o)),
     note: "Everything past bid has a customer deadline attached.",
     action: {
@@ -376,6 +389,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "active-leads": {
     caption: "Every open lead",
+    columns: { title: "Lead", meta: "Account and owner", value: "Value", status: "Type" },
     records: OPPORTUNITIES.map((o) => ({ ...leadRow(o), status: o.category })),
     note: "Renewals convert faster - they already have service history behind them.",
     action: {
@@ -388,6 +402,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   /* Reliability Engineer */
   "critical-assets": {
     caption: "Assets blocking a review",
+    columns: { title: "Asset", meta: "Finding", value: "Health", status: "Status" },
     records: reviewCritical.map(assetRow),
     note: "Each one is holding up a scope you are meant to sign off.",
     action: {
@@ -398,6 +413,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "at-risk": {
     caption: "Assets scoring under 60",
+    columns: { title: "Asset", meta: "Finding", value: "Health", status: "Status" },
     records: reviewAtRisk.map(assetRow),
     note: "Still serviceable, so an inspection now is cheaper than a failure later.",
     action: {
@@ -408,6 +424,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "overdue-insp": {
     caption: "Maintenance past its due date",
+    columns: { title: "Task", meta: "Contract and interval", value: "Due", status: "Status" },
     records: overdueMaintenance.map(({ row, owner, link }) => ({
       id: `${link.id}-${row.task}`,
       title: row.task,
@@ -428,6 +445,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   /* Diagnostics */
   "reports-awaiting": {
     caption: "Reports awaiting your interpretation",
+    columns: { title: "Report", meta: "Asset and category", value: "Score", status: "Status" },
     records: ASSET_REPORT_ALERTS.map((a) => {
       const score = dgaScore(a.id);
       return {
@@ -446,6 +464,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "outstanding-reports": {
     caption: "Field reports in the queue",
+    columns: { title: "Report", meta: "Engineer and submitted", value: "Waiting", status: "Priority" },
     records: REPORTS_AWAITING.map((r) => ({
       id: r.id,
       title: `${r.code} · ${r.type}`,
@@ -464,6 +483,7 @@ export const KPI_DETAIL: Record<string, KpiDetail> = {
   },
   "low-dga": {
     caption: "Assets scoring under 60 on DGA",
+    columns: { title: "Asset", meta: "Location", value: "DGA score", status: "Status" },
     records: lowDga.map((a) => ({
       id: a.assetId,
       title: a.assetId.toUpperCase(),

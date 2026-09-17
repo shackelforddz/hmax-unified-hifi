@@ -293,7 +293,7 @@ export default function DocumentViewer({ doc, onClose, onAsk }: Props) {
       <div onClick={onClose} className="absolute inset-0 bg-black/40 animate-in fade-in" />
 
       {/* Document sheet */}
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-[760px] max-h-[90vh] flex flex-col overflow-hidden animate-message-in">
+      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-[760px] max-h-[90vh] flex flex-col overflow-hidden animate-dialog-in">
         {/* Header */}
         <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div className="min-w-0">

@@ -52,7 +52,7 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
         Actions <ChevronDown size={14} className={`transition-transform ${open ? "rotate-180" : ""}`} />
       </Button>
       {open && (
-        <div className="absolute bottom-full mb-2 right-0 w-full min-w-[220px] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-10 animate-message-in">
+        <div className="absolute bottom-full mb-2 right-0 w-full min-w-[220px] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-10 animate-pop-in">
           {ACTIONS.map(({ label, icon: Icon }) => (
             <Button key={label} variant="ghost" onClick={() => { setOpen(false); onAction(label); }} className="w-full justify-start gap-2.5 px-4 py-2.5 h-auto text-sm text-gray-700 rounded-none cursor-pointer">
               <Icon size={15} strokeWidth={1.5} className="text-gray-400 shrink-0" />

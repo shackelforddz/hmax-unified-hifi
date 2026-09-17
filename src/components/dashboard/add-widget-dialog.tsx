@@ -378,7 +378,7 @@ export default function AddWidgetDialog({ onDashboard, onAddLibrary, onAddCustom
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
 
       {/* Dialog */}
-      <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-message-in">
+      <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-dialog-in">
         {/* Header */}
         <div className="flex items-center justify-between gap-4 px-6 pt-5 pb-4 border-b border-gray-100">
           <h2 className="text-lg text-gray-900 shrink-0">Add widget</h2>

@@ -458,7 +458,6 @@ export default function PmRiskMap() {
     if (pin.disruption) {
       return (
         <span className="relative flex items-center">
-          <span className="absolute -inset-2 rounded-full bg-status-critical/25 animate-ping [animation-duration:2s]" />
           <span className={`relative size-7 rounded-full flex items-center justify-center shadow-md bg-status-critical text-white ${ring}`}>
             <TriangleAlert size={14} />
           </span>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import KpiCard from "@/components/dashboard/kpi-card";
+import KpiStrip from "@/components/dashboard/kpi-strip";
 import FleetMap from "@/components/dashboard/sales/fleet-map";
 import FleetHealth from "@/components/dashboard/sales/fleet-health";
 import AssetsMonitored from "@/components/dashboard/operations/assets-monitored";
@@ -37,13 +37,7 @@ export default function ReliabilityDashboard() {
         // The health KPI strip moves as one block.
         id: "kpis",
         span: 12,
-        node: (
-          <div className="grid grid-cols-3 gap-4 h-full">
-            {HEALTH_KPIS.map((k) => (
-              <KpiCard key={k.id} {...k} />
-            ))}
-          </div>
-        ),
+        node: <KpiStrip kpis={HEALTH_KPIS} />,
       },
       // ── Bento: the map leads, with average asset health and coverage stacked
       //    beside it, then the review queues ──
