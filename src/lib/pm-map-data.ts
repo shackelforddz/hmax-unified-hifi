@@ -75,6 +75,41 @@ export const READINESS_ITEMS = ["Material", "Site access", "Technician", "Equipm
 export type ReadinessItem = (typeof READINESS_ITEMS)[number];
 export type Readiness = Record<ReadinessItem, ReadinessStatus>;
 
+/** What each item means in each state - the detail behind a readiness chip. */
+export const READINESS_LABEL: Record<ReadinessStatus, string> = {
+  ready: "Ready",
+  pending: "Pending",
+  blocked: "Blocked",
+};
+
+export const READINESS_DETAIL: Record<ReadinessItem, Record<ReadinessStatus, string>> = {
+  Material: {
+    ready: "Every part is on site and checked in against the pick list.",
+    pending: "Goods received, but the visual check against the order is still outstanding.",
+    blocked: "A part is still with the supplier and the purchase order has not been raised.",
+  },
+  "Site access": {
+    ready: "Written access is agreed and the permit is on file.",
+    pending: "Access agreed verbally - the written agreement is still to be issued.",
+    blocked: "No access agreement is in place, so the crew cannot mobilise.",
+  },
+  Technician: {
+    ready: "The crew is assigned and confirmed for the window.",
+    pending: "A crew is pencilled in but not yet released from its current job.",
+    blocked: "No qualified crew is available for the window.",
+  },
+  Equipment: {
+    ready: "Lifting and test equipment is booked to the site.",
+    pending: "Equipment is requested; the hire is not confirmed.",
+    blocked: "The access the scope assumes - crane reach and road width - the site cannot give.",
+  },
+  HSE: {
+    ready: "Risk assessment and method statement are approved.",
+    pending: "The method statement is with the customer for sign-off.",
+    blocked: "HSE clearance has not been granted for this work.",
+  },
+};
+
 const READINESS: Record<string, Readiness> = {
   "xcel-energy": { Material: "blocked", "Site access": "ready", Technician: "pending", Equipment: "ready", HSE: "ready" },
   siemens: { Material: "pending", "Site access": "ready", Technician: "blocked", Equipment: "pending", HSE: "pending" },

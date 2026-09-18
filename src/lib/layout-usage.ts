@@ -28,6 +28,10 @@ const SEED: Record<string, Record<string, number>> = {
 
 /** Readable names for the widgets a recommendation talks about. */
 const NAMES: Record<string, string> = {
+  // The KPI strip each dashboard opens with.
+  kpis: "KPIs",
+  "portfolio-health": "KPIs",
+  "lead-stats": "KPIs",
   attention: "Contracts that need your attention",
   "contracts-attention": "Contracts needing attention",
   "waiting-on": "Waiting on",

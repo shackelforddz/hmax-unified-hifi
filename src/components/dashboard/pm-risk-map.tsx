@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Check, Loader2, Store, TriangleAlert, Truck } from "lucide-react";
+import { ArrowLeft, Check, Clock, Loader2, Store, TriangleAlert, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StaticMap from "@/components/dashboard/static-map";
 import { TabGroup } from "@/components/dashboard/filter-controls";
@@ -11,7 +11,21 @@ import SlaContractDrawer from "@/components/dashboard/sales/sla-contract-drawer"
 import { resolveContract } from "@/lib/contract-lookup";
 import { CHART } from "@/lib/chart-theme";
 import { CUSTOMER_DETAILS, PM_ALERT_TYPES, type PmAlertType } from "@/lib/dashboard-data";
-import { PM_SITES, READINESS_ITEMS, hoursBetween, hoursLabel, shortDate, type AltSupplier, type LatePart, type PmSite, type Point } from "@/lib/pm-map-data";
+import {
+  PM_SITES,
+  READINESS_DETAIL,
+  READINESS_ITEMS,
+  READINESS_LABEL,
+  hoursBetween,
+  hoursLabel,
+  shortDate,
+  type AltSupplier,
+  type LatePart,
+  type PmSite,
+  type Point,
+  type Readiness,
+  type ReadinessItem,
+} from "@/lib/pm-map-data";
 
 /* ── PM delivery map ─────────────────────────────────────────────────
    Contract sites filtered by risk type. A late part's shipment is drawn with
@@ -25,6 +39,53 @@ const READINESS_CLS: Record<string, string> = {
   pending: "bg-amber-50 text-amber-700 border border-amber-200",
   blocked: "bg-status-critical text-white font-bold",
 };
+
+/* An icon per state, so a chip reads before its colour does. */
+const READINESS_ICON: Record<string, typeof Check> = {
+  ready: Check,
+  pending: Clock,
+  blocked: TriangleAlert,
+};
+
+/** The five things a mobilisation waits on. Hovering a chip explains what that
+ *  state actually means for this site - the detail sits above the row rather
+ *  than beside the chip, so it can never run off the edge of the tooltip. */
+function ReadinessChips({ readiness }: { readiness: Readiness }) {
+  const [hovered, setHovered] = useState<ReadinessItem | null>(null);
+  const status = hovered ? readiness[hovered] : null;
+
+  return (
+    <div>
+      <p className="text-[10px] text-gray-400 tracking-wider mb-1">Readiness</p>
+      <div className="relative flex flex-wrap gap-1.5">
+        {READINESS_ITEMS.map((item) => {
+          const state = readiness[item];
+          const Icon = READINESS_ICON[state];
+          return (
+            <span
+              key={item}
+              onMouseEnter={() => setHovered(item)}
+              onMouseLeave={() => setHovered((h) => (h === item ? null : h))}
+              className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap cursor-default ${READINESS_CLS[state]}`}
+            >
+              <Icon size={10} strokeWidth={2.5} className="shrink-0" />
+              {item}
+            </span>
+          );
+        })}
+
+        {hovered && status && (
+          <span className="pointer-events-none absolute bottom-full left-0 right-0 mb-1.5 z-30 rounded-lg bg-gray-900 p-2 shadow-lg animate-message-in">
+            <span className="block text-[10px] font-bold text-white">
+              {hovered} · {READINESS_LABEL[status]}
+            </span>
+            <span className="block text-[10px] text-white/70 leading-4 mt-0.5">{READINESS_DETAIL[hovered][status]}</span>
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 /** Hours early (negative) or late (positive) against when the part is needed. */
 const slip = (part: LatePart, arrives: string) => hoursBetween(part.neededBy, arrives);
@@ -257,7 +318,7 @@ export default function PmRiskMap() {
           <div className="flex flex-col gap-2">
             <button
               onClick={() => startContact(s)}
-              className="w-full rounded-full bg-status-critical hover:opacity-90 py-1.5 text-xs font-bold text-white transition-opacity cursor-pointer"
+              className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/80 py-1.5 text-xs font-bold transition-colors cursor-pointer"
             >
               Contact existing carrier
             </button>
@@ -306,16 +367,7 @@ export default function PmRiskMap() {
           </div>
         </div>
 
-        <div>
-          <p className="text-[10px] text-gray-400 tracking-wider mb-1">Readiness</p>
-          <div className="flex flex-wrap gap-1.5">
-            {READINESS_ITEMS.map((item) => (
-              <span key={item} className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${READINESS_CLS[s.readiness[item]]}`}>
-                {item}
-              </span>
-            ))}
-          </div>
-        </div>
+        <ReadinessChips readiness={s.readiness} />
 
         {/* What is riding on it commercially */}
         {s.value && (

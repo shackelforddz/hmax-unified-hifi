@@ -20,6 +20,14 @@
   --color-gray-950: #0a0a0a;
 }
 
+/* HMAX's own suggestions get their own palette - the only place in the product
+   that uses colour this way, so a recommendation never reads as chrome. */
+@theme {
+  --color-ai-violet: #7c5cff;
+  --color-ai-blue: #3b82f6;
+  --color-ai-cyan: #22d3ee;
+}
+
 /* Status + chart accents from the hi-fi design. */
 @theme {
   --color-status-critical: #fa000f;
@@ -295,6 +303,46 @@
 .animate-records-swap {
   animation: records-swap 0.16s var(--ease-entrance);
 }
+
+/* ── HMAX suggestion surfaces ─────────────────────────────────────────
+   Three colour fields drift behind a pane of glass. They are deliberately
+   slow and out of phase, so the surface never repeats visibly. */
+@keyframes ai-drift-a {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  33%  { transform: translate3d(18%, 12%, 0) scale(1.18); }
+  66%  { transform: translate3d(-10%, 20%, 0) scale(0.92); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes ai-drift-b {
+  0%   { transform: translate3d(0, 0, 0) scale(1.05); }
+  40%  { transform: translate3d(-22%, 14%, 0) scale(0.9); }
+  70%  { transform: translate3d(12%, -16%, 0) scale(1.2); }
+  100% { transform: translate3d(0, 0, 0) scale(1.05); }
+}
+@keyframes ai-drift-c {
+  0%   { transform: translate3d(0, 0, 0) scale(0.95); }
+  50%  { transform: translate3d(16%, -18%, 0) scale(1.25); }
+  100% { transform: translate3d(0, 0, 0) scale(0.95); }
+}
+.animate-ai-drift-a { animation: ai-drift-a 26s ease-in-out infinite; }
+.animate-ai-drift-b { animation: ai-drift-b 32s ease-in-out infinite; }
+.animate-ai-drift-c { animation: ai-drift-c 22s ease-in-out infinite; }
+
+/* A highlight passing over the glass, long enough apart to read as light
+   rather than as a loading state. */
+@keyframes ai-sheen {
+  0%   { transform: translateX(-120%); }
+  60%  { transform: translateX(220%); }
+  100% { transform: translateX(220%); }
+}
+.animate-ai-sheen { animation: ai-sheen 7s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+
+/* The indicator that marks a live suggestion. */
+@keyframes ai-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.82); }
+}
+.animate-ai-pulse { animation: ai-pulse 2.4s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   /* Covers transitions and third-party animation too, not only the keyframes

@@ -6,6 +6,7 @@ import CustomWidgetView from "./sales/custom-widget-view";
 import { buildWidget, suggestVisual, type WidgetType, type CustomWidgetConfig } from "@/lib/custom-widget";
 import { WIDGET_LIBRARY, WIDGET_CATEGORIES, libraryWidget, type WidgetCategory } from "./widget-library";
 import { Button } from "@/components/ui/button";
+import { RecommendationActions, RecommendationCard, RecommendationHead } from "./recommendation-card";
 import { useAppSelector } from "@/store/hooks";
 
 const VISUALS: { type: WidgetType; label: string; icon: typeof LineChart }[] = [
@@ -67,39 +68,71 @@ export function suggestedWidgetFor(role: string) {
   return widget ? { widget, reason: s.reason } : null;
 }
 
-/* The size a widget is laid out at before it's shrunk onto a card - roughly
-   what its span gives it on a dashboard, so charts keep their real proportions
-   instead of being stretched across a very wide, very short box. */
-const LAYOUT_WIDTH: Record<number, number> = { 4: 400, 6: 600, 8: 800, 12: 1100 };
-const layoutSize = (span: number) => ({ w: LAYOUT_WIDTH[span] ?? 600, h: span >= 12 ? 440 : 320 });
+/* Every widget is laid out on the same canvas before it is shrunk onto a card.
+   Sizing it by span instead made a wide widget letterbox and a tall one tower
+   over its neighbours; one canvas means every preview shrinks by the same
+   amount and the cards line up. */
+const CANVAS = { w: 440, h: 260 };
+const PREVIEW_H = 140;
+
+/* A preview is a shape, not a reading: it drops to ink so a row of them reads
+   as a set rather than a rainbow. Marks drawn from the theme tokens are
+   redefined to ink outright; the rest - chart series carrying their colour as
+   a literal - are desaturated, which leaves white and the greys untouched. */
+const MONO: React.CSSProperties = {
+  filter: "grayscale(1)",
+  "--color-chart-line": "#222222",
+  "--color-status-critical": "#525252",
+  "--color-status-warning": "#8a8a8a",
+  "--color-status-ok": "#6b6b6b",
+} as React.CSSProperties;
 
 /* A live, shrunk-down render of the real widget. Non-interactive: it is a
-   picture of what you are about to add, not a working copy. The widget is laid
-   out at its dashboard size, then scaled uniformly to fit and centred. */
-export function WidgetPreview({ render, span, height = 140, className = "bg-gray-50" }: { render: () => ReactNode; span: number; height?: number; className?: string }) {
+   picture of what you are about to add, not a working copy. */
+export function WidgetPreview({
+  render,
+  className = "bg-gray-50",
+  bare = false,
+}: {
+  render: () => ReactNode;
+  className?: string;
+  /** Drop the preview's own frame, for a preview that already sits in one. */
+  bare?: boolean;
+}) {
   const boxRef = useRef<HTMLSpanElement>(null);
-  const [boxWidth, setBoxWidth] = useState(0);
+  const [box, setBox] = useState({ w: 0, h: 0 });
   useEffect(() => {
     const el = boxRef.current;
     if (!el) return;
-    const measure = () => setBoxWidth(el.clientWidth);
+    const measure = () => setBox({ w: el.clientWidth, h: el.clientHeight });
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
 
-  const { w, h } = layoutSize(span);
-  const pad = 8;
-  const scale = boxWidth ? Math.min((boxWidth - pad * 2) / w, (height - pad * 2) / h) : 0;
+  const { w, h } = CANVAS;
+  // Framed previews share one height so a grid of them lines up. A bare one
+  // takes the canvas's own proportions instead, so the widget fills the frame
+  // it has been given rather than sitting in a band of empty space.
+  const pad = bare ? 0 : 8;
+  const scale = box.w ? Math.min((box.w - pad * 2) / w, (box.h - pad * 2) / h) : 0;
 
   return (
-    <span ref={boxRef} className={`block rounded-lg border border-gray-100 overflow-hidden relative ${className}`} style={{ height }}>
+    <span
+      ref={boxRef}
+      className={`block overflow-hidden relative ${bare ? "" : `rounded-lg border border-gray-100 ${className}`}`}
+      style={bare ? { aspectRatio: `${w} / ${h}` } : { height: PREVIEW_H }}
+    >
       {scale > 0 && (
         <span
           aria-hidden
-          className="absolute top-1/2 left-1/2 pointer-events-none select-none [&>*]:h-full"
-          style={{ width: w, height: h, transform: `translate(-50%, -50%) scale(${scale})` }}
+          // A bare preview sits in a frame of its own, so the widget's card -
+          // its white fill and border - would be a second frame inside it.
+          className={`absolute top-1/2 left-1/2 pointer-events-none select-none [&>*]:h-full ${
+            bare ? "[&>*]:bg-transparent [&>*]:border-0" : ""
+          }`}
+          style={{ width: w, height: h, transform: `translate(-50%, -50%) scale(${scale})`, ...MONO }}
         >
           {render()}
         </span>
@@ -141,37 +174,30 @@ function LibraryPane({
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-3 max-h-[420px] overflow-y-auto no-scrollbar pr-1">
         {showSuggestion && suggestion && (
-          <div className="col-span-2 rounded-xl bg-gray-100 p-3 grid grid-cols-2 gap-4 items-center">
-            <WidgetPreview render={suggestion.widget.render} span={suggestion.widget.span} height={160} className="bg-white" />
-            <div className="flex flex-col gap-2 pr-1">
-              <span className="self-start text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#3b82f6] text-white">
-                Recommended by HMAX
-              </span>
-              <span className="text-sm font-bold text-gray-900 leading-5">{suggestion.widget.title}</span>
-              <span className="text-xs text-gray-500 leading-4">{suggestion.reason}</span>
-              <div className="flex items-center gap-2">
-                {isOnDashboard(suggestion.widget.id) ? (
-                  <span className="flex items-center gap-1 text-xs text-gray-400">
-                    <Check size={13} strokeWidth={2} /> On this dashboard
-                  </span>
-                ) : (
-                  <Button
-                    onClick={() => onPick(suggestion.widget.id)}
-                    className="rounded-full h-8 px-4 text-xs font-bold cursor-pointer"
-                  >
-                    Add to dashboard
-                  </Button>
-                )}
-                <Button
-                  onClick={dismiss}
-                  variant="ghost"
-                  className="rounded-full h-8 px-3 text-xs font-bold text-gray-500 hover:text-gray-900 cursor-pointer"
-                >
-                  Dismiss
-                </Button>
+          <RecommendationCard className="col-span-2">
+            <div className="flex flex-1 items-start gap-4">
+              <div className="flex-1 min-w-0">
+                <RecommendationHead title={suggestion.widget.title}>{suggestion.reason}</RecommendationHead>
+              </div>
+              <div className="hidden sm:block w-[200px] shrink-0 rounded-xl border border-gray-200 p-2">
+                <WidgetPreview render={suggestion.widget.render} bare />
               </div>
             </div>
-          </div>
+            <RecommendationActions>
+              {isOnDashboard(suggestion.widget.id) ? (
+                <span className="flex items-center gap-1 text-sm text-gray-500">
+                  <Check size={14} strokeWidth={2} /> On this dashboard
+                </span>
+              ) : (
+                <Button onClick={() => onPick(suggestion.widget.id)} className="rounded-full px-4 cursor-pointer">
+                  Add to dashboard
+                </Button>
+              )}
+              <Button onClick={dismiss} variant="ghost" className="rounded-full px-4 cursor-pointer">
+                Dismiss
+              </Button>
+            </RecommendationActions>
+          </RecommendationCard>
         )}
         {matches.filter((w) => !showSuggestion || w.id !== suggestion?.widget.id).map((w) => {
           const added = isOnDashboard(w.id);
@@ -194,7 +220,7 @@ function LibraryPane({
                 added ? "border-gray-200 bg-gray-50 cursor-default" : "border-gray-200 hover:border-gray-400 cursor-pointer"
               }`}
             >
-              <WidgetPreview render={w.render} span={w.span} />
+              <WidgetPreview render={w.render} />
               <span className="flex flex-col gap-1 px-1 pb-0.5">
                 <span className="flex items-start justify-between gap-2">
                   <span className="text-sm font-bold text-gray-900 leading-5">{w.title}</span>

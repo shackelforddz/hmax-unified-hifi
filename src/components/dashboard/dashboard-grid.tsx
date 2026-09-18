@@ -9,6 +9,7 @@ import CustomWidgetView from "./sales/custom-widget-view";
 import { type CustomWidgetConfig } from "@/lib/custom-widget";
 import { recommendedLayout, recordInteraction, usageFor, widgetName, type LayoutSize } from "@/lib/layout-usage";
 import { useAppSelector } from "@/store/hooks";
+import { RecommendationActions, RecommendationCard, RecommendationHead, RecommendationTag } from "./recommendation-card";
 
 /* A widget slot in the dashboard bento grid. Spans are out of 12 columns. */
 export interface GridItem {
@@ -354,55 +355,51 @@ export default function DashboardGrid({
 
       {/* The suggestions themselves - opened from the bar, side by side */}
       {!editing && panelOpen && suggestions > 0 && (
-        <div className="grid gap-3 md:grid-cols-2 animate-message-in">
+        <div className="flex flex-col md:flex-row items-stretch gap-4 animate-message-in">
           {layoutSuggestion && (
-            <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-2">
-              <span className="text-[11px] text-gray-400 tracking-wider">Recommended by HMAX</span>
-              <p className="text-sm font-bold text-gray-900">A layout built around what you use most</p>
-              <p className="text-xs text-gray-500 leading-4">
-                Widgets are ordered by how much you&apos;ve used them over the last 30 days and resized so every row fills.{" "}
-                {topUsed.map(widgetName).join(", ")} lead the dashboard.
-              </p>
-              <div className="flex flex-wrap gap-1.5 pt-0.5">
+            <RecommendationCard>
+              <RecommendationHead title="A layout built around what you use most">
+                Widgets are ordered by how much you&apos;ve used them over the last 30 days and resized so every row
+                fills. {topUsed.map(widgetName).join(", ")} lead the dashboard.
+              </RecommendationHead>
+              <div className="flex flex-wrap gap-2">
                 {topUsed.map((id) => (
-                  <span key={id} className="text-[11px] text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
-                    {widgetName(id)} · {usage[id]} interactions
-                  </span>
+                  <RecommendationTag key={id}>
+                    {widgetName(id)} • {usage[id]} interactions
+                  </RecommendationTag>
                 ))}
               </div>
-              <div className="flex items-center gap-2 pt-2 mt-auto">
-                <Button size="sm" onClick={previewRecommended} className="rounded-full cursor-pointer">
+              <RecommendationActions>
+                <Button onClick={previewRecommended} className="rounded-full px-4 cursor-pointer">
                   Preview layout
                 </Button>
-                <Button variant="ghost" size="sm" onClick={dismissLayout} className="rounded-full text-gray-500 cursor-pointer">
+                <Button variant="ghost" onClick={dismissLayout} className="rounded-full px-4 cursor-pointer">
                   Dismiss
                 </Button>
-              </div>
-            </div>
+              </RecommendationActions>
+            </RecommendationCard>
           )}
 
           {widgetSuggestion && (
-            <div className="bg-white border border-gray-200 rounded-xl p-4 grid grid-cols-2 gap-4">
-              <WidgetPreview
-                render={widgetSuggestion.widget.render}
-                span={widgetSuggestion.widget.span}
-                height={150}
-                className="bg-gray-50"
-              />
-              <div className="flex flex-col gap-2 min-w-0">
-                <span className="text-[11px] text-gray-400 tracking-wider">Recommended by HMAX</span>
-                <p className="text-sm font-bold text-gray-900 leading-5">{widgetSuggestion.widget.title}</p>
-                <p className="text-xs text-gray-500 leading-4">{widgetSuggestion.reason}</p>
-                <div className="flex items-center gap-2 pt-1 mt-auto">
-                  <Button size="sm" onClick={() => addSuggested(widgetSuggestion.widget.id)} className="rounded-full cursor-pointer">
-                    Add to dashboard
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={dismissWidget} className="rounded-full text-gray-500 cursor-pointer">
-                    Dismiss
-                  </Button>
+            <RecommendationCard>
+              <div className="flex flex-1 items-start gap-4">
+                <div className="flex-1 min-w-0">
+                  <RecommendationHead title={widgetSuggestion.widget.title}>{widgetSuggestion.reason}</RecommendationHead>
+                </div>
+                {/* What the widget looks like, rendered small */}
+                <div className="hidden sm:block w-[200px] shrink-0 rounded-xl border border-gray-200 p-2">
+                  <WidgetPreview render={widgetSuggestion.widget.render} bare />
                 </div>
               </div>
-            </div>
+              <RecommendationActions>
+                <Button onClick={() => addSuggested(widgetSuggestion.widget.id)} className="rounded-full px-4 cursor-pointer">
+                  Add to dashboard
+                </Button>
+                <Button variant="ghost" onClick={dismissWidget} className="rounded-full px-4 cursor-pointer">
+                  Dismiss
+                </Button>
+              </RecommendationActions>
+            </RecommendationCard>
           )}
         </div>
       )}
