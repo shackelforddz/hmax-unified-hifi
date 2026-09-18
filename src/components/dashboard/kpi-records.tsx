@@ -17,7 +17,7 @@ const CHIP: Record<KpiTone, string> = {
 /* Four columns: what it is, whose it is, what it contributes, where it stands. */
 const GRID = "grid grid-cols-[minmax(0,2.4fr)_minmax(0,1.7fr)_9rem_minmax(0,7rem)] gap-4 items-baseline";
 
-function Row({ record, onOpen }: { record: KpiRecord; onOpen: () => void }) {
+function Row({ record }: { record: KpiRecord }) {
   const drawers = useDetailDrawers();
   const clickable = !!record.link && !!drawers;
 
@@ -47,7 +47,6 @@ function Row({ record, onOpen }: { record: KpiRecord; onOpen: () => void }) {
     <button
       type="button"
       onClick={() => {
-        onOpen();
         const l = record.link!;
         if (l.kind === "asset") drawers!.openAsset(l.id);
         else if (l.kind === "lead") drawers!.openLead(l.id);
@@ -97,7 +96,7 @@ export default function KpiRecords({ kpi, onClose }: { kpi: KpiData; onClose: ()
       </div>
       <div className="max-h-[296px] overflow-y-auto no-scrollbar">
         {detail.records.map((r) => (
-          <Row key={r.id} record={r} onOpen={onClose} />
+          <Row key={r.id} record={r} />
         ))}
         {detail.records.length === 0 && (
           <p className="px-4 py-8 text-sm text-gray-400 text-center border-t border-gray-100">Nothing to list right now.</p>

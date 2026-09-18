@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { X, ChevronRight, Mail, Phone } from "lucide-react";
+import { X, ChevronRight, Mail, Phone, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract } from "@/lib/operations-data";
@@ -70,6 +70,133 @@ function DrillRow({ onClick, children }: { onClick: () => void; children: React.
   );
 }
 
+/** Everything a customer's contracts cover, rolled up - read by the drawer,
+ *  by its body, and by the facts beside the full page. */
+export function customerRollup(customer: string | null) {
+  const contracts: OpsContract[] = customer ? OPS_CONTRACTS.filter((c) => c.customer === customer) : [];
+  if (!customer || contracts.length === 0) return null;
+
+  const assets = contracts.flatMap((c) =>
+    (OPS_CONTRACT_DETAILS[c.id]?.assets ?? []).map((a) => ({ ...a, contractId: c.id, contractName: c.name }))
+  );
+  const value = contracts.reduce((s, c) => s + parseValue(c.value), 0);
+  const alerts = contracts.reduce((s, c) => s + c.alerts.length, 0);
+  const avgHealth = assets.length ? Math.round(assets.reduce((s, a) => s + a.health, 0) / assets.length) : 0;
+  const worst = contracts.some((c) => c.status === "critical") ? "critical" : "at-risk";
+
+  // Customer-side contacts live on each contract; dedupe across them.
+  const contacts = Array.from(
+    new Map(
+      contracts.flatMap((c) => OPS_CONTRACT_DETAILS[c.id]?.contacts ?? []).map((p) => [p.email, p])
+    ).values()
+  );
+
+  const detail = CUSTOMER_DETAILS[slug(customer)];
+  const region = OPS_CONTRACT_DETAILS[contracts[0]?.id]?.related.region;
+  const summary =
+    detail?.contextSummary ??
+    `${customer} holds ${contracts.length} active contract${contracts.length > 1 ? "s" : ""} worth ${fmtValue(value)}, covering ${assets.length} asset${assets.length > 1 ? "s" : ""} at an average health of ${avgHealth}%. ${alerts} alert${alerts > 1 ? "s are" : " is"} open across the estate.`;
+
+  return {
+    contracts,
+    assets,
+    value,
+    alerts,
+    avgHealth,
+    worst,
+    contacts,
+    region,
+    summary,
+    subtitle: detail?.subtitle ?? `Customer estate${region ? ` · ${region}` : ""}`,
+    facts: [
+      { label: "Status", value: worst === "critical" ? "Critical" : "At risk" },
+      { label: "Estate value", value: fmtValue(value) },
+      { label: "Contracts", value: String(contracts.length) },
+      { label: "Assets", value: String(assets.length) },
+      { label: "Avg health", value: `${avgHealth}%` },
+      { label: "Open alerts", value: String(alerts) },
+    ],
+  };
+}
+
+/** The customer's estate - the same content the drawer shows. */
+export function CustomerBody({ customer, onAction }: { customer: string; onAction: (prompt: string) => void }) {
+  const drawers = useDetailDrawers();
+  const roll = customerRollup(customer);
+  if (!roll) return null;
+  const { assets, value, contracts, avgHealth, contacts, worst, summary } = roll;
+  void onAction;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <ContextSummary summary={summary} critical={worst === "critical"} />
+
+      {contacts.length > 0 && (
+        <Card>
+          <SectionTitle>Contacts</SectionTitle>
+          <div className="flex flex-col gap-3">
+            {contacts.map((p) => (
+              <div key={p.email}>
+                <p className="text-sm text-gray-800">{p.name}</p>
+                <p className="text-xs text-gray-400">{p.role}</p>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                  <span className="flex items-center gap-1.5 text-xs text-gray-500">
+                    <Mail size={12} strokeWidth={1.5} className="text-gray-400" />
+                    {p.email}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs text-gray-500">
+                    <Phone size={12} strokeWidth={1.5} className="text-gray-400" />
+                    {p.phone}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      <Card>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base text-gray-900">Contracts</h3>
+          <span className="text-xs text-gray-400">{fmtValue(value)} total</span>
+        </div>
+        <div className="flex flex-col">
+          {contracts.map((c) => (
+            <DrillRow key={c.id} onClick={() => drawers?.openContract({ kind: "ops", id: c.id })}>
+              <span className="flex-1 min-w-0">
+                <span className="block text-sm text-gray-700 truncate group-hover:text-gray-900 transition-colors">{c.name}</span>
+                <span className="block text-xs text-gray-400">
+                  {c.value} · {c.owner} · {c.alerts.length} alert{c.alerts.length === 1 ? "" : "s"}
+                </span>
+              </span>
+              <StatusBadge status={c.status} />
+            </DrillRow>
+          ))}
+        </div>
+      </Card>
+
+      <Card>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-base text-gray-900">Assets</h3>
+          <span className="text-xs text-gray-400">{avgHealth}% avg health</span>
+        </div>
+        <div className="flex flex-col">
+          {assets.map((a) => (
+            <DrillRow key={a.code} onClick={() => drawers?.openAsset(a.code.toLowerCase())}>
+              <span className="flex-1 min-w-0">
+                <span className="block text-sm text-gray-700 truncate group-hover:text-gray-900 transition-colors">{a.code}</span>
+                <span className="block text-xs text-gray-400 truncate">{a.type}</span>
+              </span>
+              <HealthBar pct={a.health} />
+              <StatusBadge status={a.status} />
+            </DrillRow>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 interface Props {
   customer: string | null;
   onClose: () => void;
@@ -90,27 +217,7 @@ export default function CustomerDrawer({ customer, onClose }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  // Everything the customer's contracts cover, rolled up.
-  const assets = contracts.flatMap((c) =>
-    (OPS_CONTRACT_DETAILS[c.id]?.assets ?? []).map((a) => ({ ...a, contractId: c.id, contractName: c.name }))
-  );
-  const value = contracts.reduce((s, c) => s + parseValue(c.value), 0);
-  const alerts = contracts.reduce((s, c) => s + c.alerts.length, 0);
-  const avgHealth = assets.length ? Math.round(assets.reduce((s, a) => s + a.health, 0) / assets.length) : 0;
-  const worst = contracts.some((c) => c.status === "critical") ? "critical" : "at-risk";
-
-  // Customer-side contacts live on each contract; dedupe across them.
-  const contacts = Array.from(
-    new Map(
-      contracts.flatMap((c) => OPS_CONTRACT_DETAILS[c.id]?.contacts ?? []).map((p) => [p.email, p])
-    ).values()
-  );
-
-  const detail = customer ? CUSTOMER_DETAILS[slug(customer)] : undefined;
-  const region = customer ? OPS_CONTRACT_DETAILS[contracts[0]?.id]?.related.region : undefined;
-  const summary =
-    detail?.contextSummary ??
-    `${customer} holds ${contracts.length} active contract${contracts.length > 1 ? "s" : ""} worth ${fmtValue(value)}, covering ${assets.length} asset${assets.length > 1 ? "s" : ""} at an average health of ${avgHealth}%. ${alerts} alert${alerts > 1 ? "s are" : " is"} open across the estate.`;
+  const roll = customerRollup(customer);
 
   const runAction = (prompt: string) => {
     onClose();
@@ -128,27 +235,28 @@ export default function CustomerDrawer({ customer, onClose }: Props) {
               <div className="flex items-start justify-between">
                 <div className="min-w-0">
                   <h2 className="text-2xl text-gray-900">{customer}</h2>
-                  <p className="text-sm text-gray-400 mt-0.5">
-                    {detail?.subtitle ?? `Customer estate${region ? ` · ${region}` : ""}`}
-                  </p>
+                  <p className="text-sm text-gray-400 mt-0.5">{roll?.subtitle ?? ""}</p>
                 </div>
-                <button
-                  onClick={onClose}
-                  aria-label="Close"
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
-                >
-                  <X size={18} />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => drawers?.openPage({ kind: "customer", id: customer! })}
+                    aria-label="Open as a page"
+                    title="Open as a page"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <Maximize2 size={15} strokeWidth={1.5} />
+                  </button>
+                  <button
+                    onClick={onClose}
+                    aria-label="Close"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
               <div className="flex flex-wrap gap-x-8 gap-y-3 mt-4">
-                {[
-                  { label: "Status", value: worst === "critical" ? "Critical" : "At risk" },
-                  { label: "Estate value", value: fmtValue(value) },
-                  { label: "Contracts", value: String(contracts.length) },
-                  { label: "Assets", value: String(assets.length) },
-                  { label: "Avg health", value: `${avgHealth}%` },
-                  { label: "Open alerts", value: String(alerts) },
-                ].map((s) => (
+                {(roll?.facts ?? []).map((s) => (
                   <div key={s.label}>
                     <p className="text-[11px] text-gray-400 tracking-wider">{s.label}</p>
                     <p className="text-sm text-gray-800 mt-0.5">{s.value}</p>
@@ -158,73 +266,9 @@ export default function CustomerDrawer({ customer, onClose }: Props) {
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-5 bg-white flex flex-col gap-4">
-              <ContextSummary summary={summary} critical={worst === "critical"} />
-
-              {contacts.length > 0 && (
-                <Card>
-                  <SectionTitle>Contacts</SectionTitle>
-                  <div className="flex flex-col gap-3">
-                    {contacts.map((p) => (
-                      <div key={p.email}>
-                        <p className="text-sm text-gray-800">{p.name}</p>
-                        <p className="text-xs text-gray-400">{p.role}</p>
-                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
-                          <span className="flex items-center gap-1.5 text-xs text-gray-500">
-                            <Mail size={12} strokeWidth={1.5} className="text-gray-400" />
-                            {p.email}
-                          </span>
-                          <span className="flex items-center gap-1.5 text-xs text-gray-500">
-                            <Phone size={12} strokeWidth={1.5} className="text-gray-400" />
-                            {p.phone}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-              )}
-
-              <Card>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-base text-gray-900">Contracts</h3>
-                  <span className="text-xs text-gray-400">{fmtValue(value)} total</span>
-                </div>
-                <div className="flex flex-col">
-                  {contracts.map((c) => (
-                    <DrillRow key={c.id} onClick={() => drawers?.openContract({ kind: "ops", id: c.id })}>
-                      <span className="flex-1 min-w-0">
-                        <span className="block text-sm text-gray-700 truncate group-hover:text-gray-900 transition-colors">{c.name}</span>
-                        <span className="block text-xs text-gray-400">
-                          {c.value} · {c.owner} · {c.alerts.length} alert{c.alerts.length === 1 ? "" : "s"}
-                        </span>
-                      </span>
-                      <StatusBadge status={c.status} />
-                    </DrillRow>
-                  ))}
-                </div>
-              </Card>
-
-              <Card>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-base text-gray-900">Assets</h3>
-                  <span className="text-xs text-gray-400">{avgHealth}% avg health</span>
-                </div>
-                <div className="flex flex-col">
-                  {assets.map((a) => (
-                    <DrillRow key={a.code} onClick={() => drawers?.openAsset(a.code.toLowerCase())}>
-                      <span className="flex-1 min-w-0">
-                        <span className="block text-sm text-gray-700 truncate group-hover:text-gray-900 transition-colors">{a.code}</span>
-                        <span className="block text-xs text-gray-400 truncate">{a.type}</span>
-                      </span>
-                      <HealthBar pct={a.health} />
-                      <StatusBadge status={a.status} />
-                    </DrillRow>
-                  ))}
-                </div>
-              </Card>
+            <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-5 bg-white">
+              <CustomerBody customer={customer} onAction={runAction} />
             </div>
-
             {/* Footer */}
             <div className="shrink-0 px-6 py-4 border-t border-gray-100">
               <Button

@@ -10,14 +10,23 @@ import { ConversationLauncherContext, useConversationLauncher, type LaunchFn } f
 import { getAssetDetail, resolveAssetId } from "@/lib/asset-lookup";
 import { OPPORTUNITIES, leadDetail } from "@/lib/sales-data";
 import { resolveContract, type ContractRef } from "@/lib/contract-lookup";
+import { useAppSelector } from "@/store/hooks";
 
 /* ── Stacked detail drawers ──────────────────────────────────────────
    Drilling into an asset, contract or lead from inside a drawer slides its
    detail drawer over the current one, with no dimming. Each close (X,
    Escape or a click beside it) peels back just the top drawer. */
 
-type Detail = { kind: "asset"; id: string } | { kind: "lead"; id: string } | ContractRef;
-type Layer = { key: number; detail: Detail; closing: boolean };
+/** Records that can be stacked as a drawer. */
+export type DrawerDetail = { kind: "asset"; id: string } | { kind: "lead"; id: string } | ContractRef;
+/** Records that can be read as a full page - the drawers, plus the ones that
+ *  only ever open from a widget. */
+export type Detail =
+  | DrawerDetail
+  | { kind: "attention"; id: string }
+  | { kind: "customer"; id: string }
+  | { kind: "work-order"; id: string };
+type Layer = { key: number; detail: DrawerDetail; closing: boolean };
 
 interface DetailDrawers {
   openAsset: (assetId: string) => void;
@@ -26,6 +35,11 @@ interface DetailDrawers {
   /** How many drawers are stacked right now. Anything that closes on Escape
    *  checks this first, so the top drawer closes before whatever is beneath. */
   count: number;
+  /** The record being read as a full page, under its own tab. */
+  page: Detail | null;
+  /** Leave the drawers behind and open the same record as a page. */
+  openPage: (detail: Detail) => void;
+  closePage: () => void;
 }
 
 const DetailDrawersContext = createContext<DetailDrawers | null>(null);
@@ -35,11 +49,23 @@ const noopSubscribe = () => () => {};
 
 export function DetailDrawerProvider({ children }: { children: React.ReactNode }) {
   const [layers, setLayers] = useState<Layer[]>([]);
+  const [page, setPage] = useState<Detail | null>(null);
+
+  // Switching persona lands on a different dashboard, so whatever was open
+  // belongs to the one being left. Adjusted during render rather than in an
+  // effect, so the new dashboard never paints the old record first.
+  const role = useAppSelector((st) => st.auth.selectedRole);
+  const [lastRole, setLastRole] = useState(role);
+  if (role !== lastRole) {
+    setLastRole(role);
+    setPage(null);
+    setLayers([]);
+  }
   const keyRef = useRef(0);
   // Portals need document.body, which only exists once on the client.
   const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false);
 
-  const open = useCallback((detail: Detail) => {
+  const open = useCallback((detail: DrawerDetail) => {
     setLayers((ls) => [...ls, { key: ++keyRef.current, detail, closing: false }]);
   }, []);
 
@@ -68,8 +94,15 @@ export function DetailDrawerProvider({ children }: { children: React.ReactNode }
       openContract: (ref) => open(ref),
       openLead: (id) => open({ kind: "lead", id }),
       count: openCount,
+      page,
+      // The page replaces the drawers rather than sitting under them.
+      openPage: (detail) => {
+        setLayers([]);
+        setPage(detail);
+      },
+      closePage: () => setPage(null),
     }),
-    [open, openCount]
+    [open, openCount, page]
   );
 
   // Starting a conversation from any drawer clears the whole stack, so no

@@ -10,6 +10,8 @@ import WaitingOn from "@/components/dashboard/waiting-on";
 import PmRiskMap from "@/components/dashboard/pm-risk-map";
 import { KPI_DATA } from "@/lib/dashboard-data";
 import DashboardTabs from "@/components/dashboard/dashboard-tabs";
+import DetailPage, { pageTabFor } from "@/components/dashboard/detail-page";
+import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContractsTable from "@/components/dashboard/tables/contracts-table";
 import AssetsTable from "@/components/dashboard/tables/assets-table";
 import PeopleWidget from "@/components/dashboard/people-widget";
@@ -20,6 +22,13 @@ const TABS = ["Overview", "Customers", "Contracts", "Assets"];
 
 export default function PmDashboard() {
   const [tab, setTab] = useState("Overview");
+  const drawers = useDetailDrawers();
+  const page = drawers?.page;
+  const pageTab = pageTabFor(page, TABS);
+  const change = (next: string) => {
+    drawers?.closePage();
+    setTab(next);
+  };
 
   // Draggable widgets, in their default order. Spans are out of 12.
   const gridItems: GridItem[] = useMemo(
@@ -43,10 +52,20 @@ export default function PmDashboard() {
     []
   );
 
+  // A record opened as a page takes over the tab it belongs to.
+  if (page && pageTab) {
+    return (
+      <div className="flex flex-col gap-4">
+        <DashboardTabs tabs={TABS} active={pageTab} onChange={change} />
+        <DetailPage detail={page} backLabel={pageTab} />
+      </div>
+    );
+  }
+
   if (tab !== "Overview") {
     return (
       <div className="flex flex-col gap-4">
-        <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
+        <DashboardTabs tabs={TABS} active={tab} onChange={change} />
         {tab === "Customers" && <CustomersTable />}
         {tab === "Contracts" && <ContractsTable />}
         {tab === "Assets" && <AssetsTable />}
@@ -56,7 +75,7 @@ export default function PmDashboard() {
 
   return (
     <div className="flex flex-col gap-4">
-      <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
+      <DashboardTabs tabs={TABS} active={tab} onChange={change} />
 
       <DashboardGrid storageKey="pm" items={gridItems} />
 

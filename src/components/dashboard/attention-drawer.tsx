@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import {
-  X, CheckCircle2, Circle, FileText, ChevronDown, Building2, Cpu, TrendingUp,
-  TriangleAlert, RefreshCw, UserPlus, ExternalLink,
-} from "lucide-react";
+import { X, CheckCircle2, Circle, FileText, ChevronDown, Building2, Cpu, TrendingUp, TriangleAlert, RefreshCw, UserPlus, ExternalLink, Maximize2 } from "lucide-react";
 import {
   ATTENTION_ITEMS,
   CUSTOMER_DETAILS,
@@ -15,7 +12,7 @@ import {
 } from "@/lib/dashboard-data";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "./conversation-launcher";
-import { AssetLink, ContractLink, drawerLayer } from "@/components/dashboard/detail-drawers";
+import { AssetLink, ContractLink, drawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 function Tag({ children }: { children: React.ReactNode }) {
@@ -68,7 +65,7 @@ function SectionTitle({ children, action }: { children: React.ReactNode; action?
   );
 }
 
-function DrawerBody({ d, critical, onAction }: { d: CustomerDetail; critical: boolean; onAction: (prompt: string) => void }) {
+export function AttentionBody({ d, critical, onAction }: { d: CustomerDetail; critical: boolean; onAction: (prompt: string) => void }) {
   return (
     <div className="flex flex-col gap-4">
       {/* Context summary */}
@@ -288,7 +285,7 @@ const ACTIONS = [
   { label: "Open in SAP", icon: ExternalLink },
 ];
 
-function ActionsMenu() {
+export function AttentionActions() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -344,6 +341,7 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
   const open = !!detail;
   const shell = drawerLayer(open);
   const launch = useConversationLauncher();
+  const drawers = useDetailDrawers();
 
   const runAction = (prompt: string) => {
     onClose();
@@ -374,12 +372,22 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
                   <h2 className="text-2xl text-gray-900">{detail.name}</h2>
                   <p className="text-sm text-gray-400 mt-0.5">{detail.subtitle}</p>
                 </div>
-                <button
-                  onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
-                >
-                  <X size={18} />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => drawers?.openPage({ kind: "attention", id: itemId! })}
+                    aria-label="Open as a page"
+                    title="Open as a page"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <Maximize2 size={15} strokeWidth={1.5} />
+                  </button>
+                  <button
+                    onClick={onClose}
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
 
               {/* Stats row */}
@@ -409,7 +417,7 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
 
             {/* Scrollable body */}
             <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-5 bg-white">
-              <DrawerBody d={detail} critical={ATTENTION_ITEMS.find((a) => a.id === itemId)?.status === "critical"} onAction={runAction} />
+              <AttentionBody d={detail} critical={ATTENTION_ITEMS.find((a) => a.id === itemId)?.status === "critical"} onAction={runAction} />
             </div>
 
             {/* Footer */}
@@ -417,7 +425,7 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
               <Button variant="outline" className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer">
                 Create A Conversation
               </Button>
-              <ActionsMenu />
+              <AttentionActions />
             </div>
           </>
         )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { X, ChevronDown, CalendarClock, ClipboardList, Package, UserPlus, ExternalLink, FileText, ScrollText, PencilRuler, Eye } from "lucide-react";
+import { X, ChevronDown, CalendarClock, ClipboardList, Package, UserPlus, ExternalLink, FileText, ScrollText, PencilRuler, Eye, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { CHART } from "@/lib/chart-theme";
@@ -15,7 +15,7 @@ import { ASSET_DRAWINGS } from "@/lib/asset-drawings-data";
 import { SITE_CONSTRAINTS } from "@/lib/reliability-data";
 import { Aging, ScoreCalculation, RiskMatrix, ConditionTrend, ParameterTrend, Diagnostics } from "./asset-condition";
 import DocumentViewer, { type ViewDoc } from "./document-viewer";
-import { drawerLayer, ContractLink } from "@/components/dashboard/detail-drawers";
+import { drawerLayer, ContractLink, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -50,7 +50,7 @@ const ACTIONS = [
   { label: "Open in SAP", icon: ExternalLink },
 ];
 
-function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
+export function AssetActions({ onAction }: { onAction: (label: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -606,6 +606,7 @@ export default function AssetDrawer({ assetId, onClose, layer, hidden }: Props) 
   const stacked = layer !== undefined;
   const shell = drawerLayer(open, layer);
   const launch = useConversationLauncher();
+  const drawers = useDetailDrawers();
   const [tab, setTab] = useState<DrawerTab>("summary");
   const [viewDoc, setViewDoc] = useState<ViewDoc | null>(null);
 
@@ -652,13 +653,23 @@ export default function AssetDrawer({ assetId, onClose, layer, hidden }: Props) 
                     <p className="text-sm text-gray-400 mt-0.5">{detail.type} · {detail.location}</p>
                   </div>
                 </div>
-                <button
-                  onClick={onClose}
-                  aria-label="Close"
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
-                >
-                  <X size={18} />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => drawers?.openPage({ kind: "asset", id: assetId! })}
+                    aria-label="Open as a page"
+                    title="Open as a page"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <Maximize2 size={15} strokeWidth={1.5} />
+                  </button>
+                  <button
+                    onClick={onClose}
+                    aria-label="Close"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
 
               {/* Stats */}
@@ -716,7 +727,7 @@ export default function AssetDrawer({ assetId, onClose, layer, hidden }: Props) 
               >
                 Create A Conversation
               </Button>
-              <ActionsMenu onAction={(label) => runAction(`${label} for ${detail.code}`)} />
+              <AssetActions onAction={(label) => runAction(`${label} for ${detail.code}`)} />
             </div>
           </>
         )}

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import DataTable, { type Column } from "@/components/dashboard/data-table";
-import ContractDrawer from "@/components/dashboard/operations/contract-drawer";
+import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import { OPS_CONTRACTS, type OpsContract } from "@/lib/operations-data";
 
 function ContractStatusBadge({ status }: { status: OpsContract["status"] }) {
@@ -39,18 +38,17 @@ const COLUMNS: Column<OpsContract>[] = [
 ];
 
 export default function ContractsTable() {
-  const [contractId, setContractId] = useState<string | null>(null);
+  const drawers = useDetailDrawers();
 
   return (
     <>
-      <ContractDrawer contractId={contractId} onClose={() => setContractId(null)} />
       <DataTable
         title="Contracts"
         subtitle={`${OPS_CONTRACTS.length} active contracts`}
         columns={COLUMNS}
         rows={OPS_CONTRACTS}
         getKey={(c) => c.id}
-        onRowClick={(c) => setContractId(c.id)}
+        onRowClick={(c) => drawers?.openPage({ kind: "ops", id: c.id })}
       />
     </>
   );

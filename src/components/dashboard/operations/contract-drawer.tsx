@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { X, ChevronDown, CheckCircle2, Circle, CalendarClock, ClipboardList, RefreshCw, UserPlus, ExternalLink } from "lucide-react";
+import { X, ChevronDown, CheckCircle2, Circle, CalendarClock, ClipboardList, RefreshCw, UserPlus, ExternalLink, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract, type OpsContractDetail, type RiskProfile } from "@/lib/operations-data";
 import { SCOPE_REVIEWS } from "@/lib/reliability-data";
 import ContractSections from "./contract-sections";
-import { drawerLayer } from "@/components/dashboard/detail-drawers";
+import { drawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 function Card({ children }: { children: React.ReactNode }) {
@@ -51,7 +51,7 @@ const ACTIONS = [
   { label: "Open in SAP", icon: ExternalLink },
 ];
 
-function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
+export function ContractActions({ onAction }: { onAction: (label: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -81,7 +81,7 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
   );
 }
 
-function DrawerBody({ c, d, onAction }: { c: OpsContract; d: OpsContractDetail; onAction: (p: string) => void }) {
+export function ContractBody({ c, d, onAction }: { c: OpsContract; d: OpsContractDetail; onAction: (p: string) => void }) {
   return (
     <div className="flex flex-col gap-4">
       {/* Context summary + recommended actions */}
@@ -201,6 +201,7 @@ export default function ContractDrawer({ contractId, onClose, layer, hidden }: P
   const stacked = layer !== undefined;
   const shell = drawerLayer(open, layer);
   const launch = useConversationLauncher();
+  const drawers = useDetailDrawers();
 
   const runAction = (prompt: string) => {
     onClose();
@@ -227,9 +228,19 @@ export default function ContractDrawer({ contractId, onClose, layer, hidden }: P
                   <h2 className="text-2xl text-gray-900">{c.name}</h2>
                   <p className="text-sm text-gray-400 mt-0.5">{c.customer} · {c.value}</p>
                 </div>
-                <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
-                  <X size={18} />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => drawers?.openPage({ kind: "ops", id: contractId! })}
+                    aria-label="Open as a page"
+                    title="Open as a page"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <Maximize2 size={15} strokeWidth={1.5} />
+                  </button>
+                  <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
               <div className="flex flex-wrap gap-x-8 gap-y-3 mt-4">
                 {[
@@ -247,14 +258,14 @@ export default function ContractDrawer({ contractId, onClose, layer, hidden }: P
             </div>
 
             <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-5 bg-white">
-              <DrawerBody c={c} d={d} onAction={runAction} />
+              <ContractBody c={c} d={d} onAction={runAction} />
             </div>
 
             <div className="shrink-0 flex gap-3 px-6 py-4 border-t border-gray-100">
               <Button variant="outline" onClick={() => runAction(`Tell me about the ${c.name} contract`)} className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer">
                 Create A Conversation
               </Button>
-              <ActionsMenu onAction={(label) => runAction(`${label} for ${c.name}`)} />
+              <ContractActions onAction={(label) => runAction(`${label} for ${c.name}`)} />
             </div>
           </>
         )}

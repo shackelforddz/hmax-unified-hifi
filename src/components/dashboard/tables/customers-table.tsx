@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 import DataTable, { type Column } from "@/components/dashboard/data-table";
-import CustomerDrawer from "@/components/dashboard/operations/customer-drawer";
+import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract } from "@/lib/operations-data";
 
 /* ── Estate roll-up ──────────────────────────────────────────────────
@@ -91,20 +90,17 @@ const ESTATE_COLUMNS: Column<Estate>[] = [
 ];
 
 export default function CustomersTable() {
-  const [customer, setCustomer] = useState<string | null>(null);
+  const drawers = useDetailDrawers();
 
   return (
     <>
-      {/* Contracts and assets open over the customer drawer. */}
-      <CustomerDrawer customer={customer} onClose={() => setCustomer(null)} />
-
       <DataTable
         title="Customers"
         subtitle={`${ESTATES.length} customers · ${fmtValue(ESTATES.reduce((s, e) => s + e.value, 0))} under contract`}
         columns={ESTATE_COLUMNS}
         rows={ESTATES}
         getKey={(e) => e.customer}
-        onRowClick={(e) => setCustomer(e.customer)}
+        onRowClick={(e) => drawers?.openPage({ kind: "customer", id: e.customer })}
       />
     </>
   );

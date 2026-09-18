@@ -8,6 +8,8 @@ import ResourceCapacity from "@/components/dashboard/operations/resource-capacit
 import UpcomingServicing from "@/components/dashboard/upcoming-servicing";
 import FleetMap from "@/components/dashboard/sales/fleet-map";
 import DashboardTabs from "@/components/dashboard/dashboard-tabs";
+import DetailPage, { pageTabFor } from "@/components/dashboard/detail-page";
+import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContractsTable from "@/components/dashboard/tables/contracts-table";
 import PeopleWidget from "@/components/dashboard/people-widget";
 import { FIELD_ENGINEERS } from "@/lib/people-data";
@@ -24,6 +26,13 @@ const TABS = ["Overview", "Customers", "Contracts"];
 
 export default function OperationsDashboard() {
   const [tab, setTab] = useState("Overview");
+  const drawers = useDetailDrawers();
+  const page = drawers?.page;
+  const pageTab = pageTabFor(page, TABS);
+  const change = (next: string) => {
+    drawers?.closePage();
+    setTab(next);
+  };
 
   // Draggable widgets, in their default order. Spans are out of 12.
   const gridItems: GridItem[] = useMemo(
@@ -87,10 +96,20 @@ export default function OperationsDashboard() {
     []
   );
 
+  // A record opened as a page takes over the tab it belongs to.
+  if (page && pageTab) {
+    return (
+      <div className="flex flex-col gap-4">
+        <DashboardTabs tabs={TABS} active={pageTab} onChange={change} />
+        <DetailPage detail={page} backLabel={pageTab} />
+      </div>
+    );
+  }
+
   if (tab !== "Overview") {
     return (
       <div className="flex flex-col gap-4">
-        <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
+        <DashboardTabs tabs={TABS} active={tab} onChange={change} />
         {tab === "Customers" && <CustomersTable />}
         {tab === "Contracts" && <ContractsTable />}
       </div>
@@ -99,7 +118,7 @@ export default function OperationsDashboard() {
 
   return (
     <div className="flex flex-col gap-4">
-      <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
+      <DashboardTabs tabs={TABS} active={tab} onChange={change} />
 
       <DashboardGrid storageKey="operations" items={gridItems} />
 

@@ -9,6 +9,8 @@ import AssetsMonitored from "@/components/dashboard/operations/assets-monitored"
 import PeopleWidget from "@/components/dashboard/people-widget";
 import { FIELD_ENGINEERS } from "@/lib/people-data";
 import DashboardTabs from "@/components/dashboard/dashboard-tabs";
+import DetailPage, { pageTabFor } from "@/components/dashboard/detail-page";
+import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import AssetsTable from "@/components/dashboard/tables/assets-table";
 import { DIAGNOSTICS_STATS, ASSET_REPORT_ALERTS, REPORT_CATEGORY_OPTIONS } from "@/lib/field-reports-data";
 import { lowDgaAssets } from "@/lib/sales-data";
@@ -28,6 +30,13 @@ const KPIS = [
 
 export default function DiagnosticsDashboard() {
   const [tab, setTab] = useState("Overview");
+  const drawers = useDetailDrawers();
+  const page = drawers?.page;
+  const pageTab = pageTabFor(page, TABS);
+  const change = (next: string) => {
+    drawers?.closePage();
+    setTab(next);
+  };
 
   // Draggable widgets, in their default order. Spans are out of 12.
   const gridItems: GridItem[] = useMemo(
@@ -53,10 +62,20 @@ export default function DiagnosticsDashboard() {
     []
   );
 
+  // A record opened as a page takes over the tab it belongs to.
+  if (page && pageTab) {
+    return (
+      <div className="flex flex-col gap-4">
+        <DashboardTabs tabs={TABS} active={pageTab} onChange={change} />
+        <DetailPage detail={page} backLabel={pageTab} />
+      </div>
+    );
+  }
+
   if (tab !== "Overview") {
     return (
       <div className="flex flex-col gap-4">
-        <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
+        <DashboardTabs tabs={TABS} active={tab} onChange={change} />
         {tab === "Assets" && <AssetsTable />}
       </div>
     );
@@ -64,7 +83,7 @@ export default function DiagnosticsDashboard() {
 
   return (
     <div className="flex flex-col gap-4">
-      <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
+      <DashboardTabs tabs={TABS} active={tab} onChange={change} />
 
       <DashboardGrid storageKey="diagnostics" items={gridItems} />
 

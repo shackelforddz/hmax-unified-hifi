@@ -7,6 +7,8 @@ import AssetAlerts from "@/components/dashboard/sales/asset-alerts";
 import OpportunityStats from "@/components/dashboard/sales/opportunity-stats";
 import Opportunities from "@/components/dashboard/sales/opportunities";
 import DashboardTabs from "@/components/dashboard/dashboard-tabs";
+import DetailPage, { pageTabFor } from "@/components/dashboard/detail-page";
+import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import OpportunitiesTable from "@/components/dashboard/tables/opportunities-table";
 import ContractsTable from "@/components/dashboard/tables/contracts-table";
 import AssetsTable from "@/components/dashboard/tables/assets-table";
@@ -22,6 +24,13 @@ const TABS = ["Overview", "Leads", "Customers", "Contracts", "Assets"];
 
 export default function SalesDashboard() {
   const [tab, setTab] = useState("Overview");
+  const drawers = useDetailDrawers();
+  const page = drawers?.page;
+  const pageTab = pageTabFor(page, TABS);
+  const change = (next: string) => {
+    drawers?.closePage();
+    setTab(next);
+  };
 
   // Draggable widgets, in their default order. Spans are out of 12.
   const gridItems: GridItem[] = useMemo(
@@ -41,10 +50,20 @@ export default function SalesDashboard() {
     []
   );
 
+  // A record opened as a page takes over the tab it belongs to.
+  if (page && pageTab) {
+    return (
+      <div className="flex flex-col gap-4">
+        <DashboardTabs tabs={TABS} active={pageTab} onChange={change} />
+        <DetailPage detail={page} backLabel={pageTab} />
+      </div>
+    );
+  }
+
   if (tab !== "Overview") {
     return (
       <div className="flex flex-col gap-4">
-        <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
+        <DashboardTabs tabs={TABS} active={tab} onChange={change} />
         {tab === "Leads" && <OpportunitiesTable />}
         {tab === "Customers" && <CustomersTable />}
         {tab === "Contracts" && <ContractsTable />}
@@ -55,7 +74,7 @@ export default function SalesDashboard() {
 
   return (
     <div className="flex flex-col gap-4">
-      <DashboardTabs tabs={TABS} active={tab} onChange={setTab} />
+      <DashboardTabs tabs={TABS} active={tab} onChange={change} />
 
       <DashboardGrid storageKey="sales" items={gridItems} />
 

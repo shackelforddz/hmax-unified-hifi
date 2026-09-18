@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { X, ChevronDown, Check, Circle, FileText, RefreshCw, TrendingUp, UserPlus, ExternalLink } from "lucide-react";
+import { X, ChevronDown, Check, Circle, FileText, RefreshCw, TrendingUp, UserPlus, ExternalLink, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { SLA_CONTRACTS, type SlaContractDetail, type SlaBadge } from "@/lib/sales-data";
 import ContractSections from "@/components/dashboard/operations/contract-sections";
-import { AssetLink, drawerLayer } from "@/components/dashboard/detail-drawers";
+import { AssetLink, drawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 function Card({ children }: { children: React.ReactNode }) {
@@ -35,7 +35,7 @@ const ACTIONS = [
   { label: "Open in SAP", icon: ExternalLink },
 ];
 
-function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
+export function SlaActions({ onAction }: { onAction: (label: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -65,7 +65,7 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
   );
 }
 
-function DrawerBody({ d, onAction }: { d: SlaContractDetail; onAction: (p: string) => void }) {
+export function SlaBody({ d, onAction }: { d: SlaContractDetail; onAction: (p: string) => void }) {
   return (
     <div className="flex flex-col gap-4">
       {/* Summary */}
@@ -163,6 +163,7 @@ export default function SlaContractDrawer({ contractId, onClose, layer, hidden }
   const stacked = layer !== undefined;
   const shell = drawerLayer(open, layer);
   const launch = useConversationLauncher();
+  const drawers = useDetailDrawers();
 
   const runAction = (prompt: string) => {
     onClose();
@@ -189,9 +190,19 @@ export default function SlaContractDrawer({ contractId, onClose, layer, hidden }
                   <h2 className="text-2xl text-gray-900">{d.account}</h2>
                   <p className="text-sm text-gray-400 mt-0.5">{d.agreement}</p>
                 </div>
-                <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
-                  <X size={18} />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => drawers?.openPage({ kind: "sla", id: contractId! })}
+                    aria-label="Open as a page"
+                    title="Open as a page"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <Maximize2 size={15} strokeWidth={1.5} />
+                  </button>
+                  <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
               <div className="flex flex-wrap gap-x-8 gap-y-3 mt-4">
                 {[
@@ -209,14 +220,14 @@ export default function SlaContractDrawer({ contractId, onClose, layer, hidden }
             </div>
 
             <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-5 bg-white">
-              <DrawerBody d={d} onAction={runAction} />
+              <SlaBody d={d} onAction={runAction} />
             </div>
 
             <div className="shrink-0 flex gap-3 px-6 py-4 border-t border-gray-100">
               <Button variant="outline" onClick={() => runAction(`Tell me about the ${d.account} service agreement`)} className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer">
                 Create A Conversation
               </Button>
-              <ActionsMenu onAction={(label) => runAction(`${label} for the ${d.account} service agreement`)} />
+              <SlaActions onAction={(label) => runAction(`${label} for the ${d.account} service agreement`)} />
             </div>
           </>
         )}

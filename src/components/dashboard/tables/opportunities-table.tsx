@@ -1,20 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import DataTable, { type Column } from "@/components/dashboard/data-table";
-import OpportunityDrawer from "@/components/dashboard/sales/opportunity-drawer";
-import { OPPORTUNITIES, OPPORTUNITY_DETAILS, type Opportunity, type OpportunityDetail } from "@/lib/sales-data";
+import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
+import { OPPORTUNITIES, type Opportunity } from "@/lib/sales-data";
 
-function detailFor(opp: Opportunity): OpportunityDetail {
-  return (
-    OPPORTUNITY_DETAILS[opp.id] ?? {
-      summary: `${opp.account} - ${opp.title}. A ${opp.value} lead currently at the ${opp.stage} stage.`,
-      recommendations: [opp.recommendedAction],
-      assets: [],
-      related: { customer: opp.account, contract: "New lead", region: "North America" },
-    }
-  );
-}
 
 function StatusBadge({ status }: { status: Opportunity["status"] }) {
   const cls =
@@ -35,17 +24,16 @@ const COLUMNS: Column<Opportunity>[] = [
 ];
 
 export default function OpportunitiesTable() {
-  const [drawer, setDrawer] = useState<{ opp: Opportunity; detail: OpportunityDetail } | null>(null);
+  const drawers = useDetailDrawers();
   return (
     <>
-      <OpportunityDrawer opp={drawer?.opp ?? null} detail={drawer?.detail ?? null} onClose={() => setDrawer(null)} />
       <DataTable
         title="Leads"
         subtitle={`${OPPORTUNITIES.length} leads`}
         columns={COLUMNS}
         rows={OPPORTUNITIES}
         getKey={(o) => o.id}
-        onRowClick={(o) => setDrawer({ opp: o, detail: detailFor(o) })}
+        onRowClick={(o) => drawers?.openPage({ kind: "lead", id: o.id })}
       />
     </>
   );

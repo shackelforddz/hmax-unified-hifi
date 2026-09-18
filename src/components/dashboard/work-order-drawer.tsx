@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { X, ChevronDown, CheckCircle2, Circle, CalendarClock, ClipboardList, Package, UserPlus, ExternalLink } from "lucide-react";
+import { X, ChevronDown, CheckCircle2, Circle, CalendarClock, ClipboardList, Package, UserPlus, ExternalLink, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { WORK_ORDERS, WORK_ORDER_DETAILS, type WorkOrder, type WorkOrderDetail, type WoStatus, type WoPriority } from "@/lib/work-orders-data";
-import { AssetLink, ContractLink, drawerLayer } from "@/components/dashboard/detail-drawers";
+import { AssetLink, ContractLink, drawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 function Card({ children }: { children: React.ReactNode }) {
@@ -51,7 +51,7 @@ const ACTIONS = [
   { label: "Open in SAP", icon: ExternalLink },
 ];
 
-function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
+export function WorkOrderActions({ onAction }: { onAction: (label: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -81,7 +81,7 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
   );
 }
 
-function DrawerBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDetail; onAction: (p: string) => void }) {
+export function WorkOrderBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDetail; onAction: (p: string) => void }) {
   return (
     <div className="flex flex-col gap-4">
       {/* Summary + actions */}
@@ -187,6 +187,7 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
   const open = !!w;
   const shell = drawerLayer(open);
   const launch = useConversationLauncher();
+  const drawers = useDetailDrawers();
 
   const runAction = (prompt: string) => {
     onClose();
@@ -212,9 +213,19 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
                   <h2 className="text-2xl text-gray-900">{w.code}</h2>
                   <p className="text-sm text-gray-400 mt-0.5">{w.title}</p>
                 </div>
-                <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
-                  <X size={18} />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => drawers?.openPage({ kind: "work-order", id: workOrderId! })}
+                    aria-label="Open as a page"
+                    title="Open as a page"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <Maximize2 size={15} strokeWidth={1.5} />
+                  </button>
+                  <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
               <div className="flex flex-wrap gap-x-8 gap-y-3 mt-4">
                 {[
@@ -235,7 +246,7 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
 
             <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-5 bg-white">
               {d ? (
-                <DrawerBody w={w} d={d} onAction={runAction} />
+                <WorkOrderBody w={w} d={d} onAction={runAction} />
               ) : (
                 <p className="text-sm text-gray-400">No further detail recorded for this contract yet.</p>
               )}
@@ -245,7 +256,7 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
               <Button variant="outline" onClick={() => runAction(`Tell me about contract ${w.code}`)} className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer">
                 Create A Conversation
               </Button>
-              <ActionsMenu onAction={(label) => runAction(`${label} for contract ${w.code}`)} />
+              <WorkOrderActions onAction={(label) => runAction(`${label} for contract ${w.code}`)} />
             </div>
           </>
         )}

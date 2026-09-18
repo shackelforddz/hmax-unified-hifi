@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { X, ChevronDown, Check, Circle, Cpu, FileText, ClipboardCheck, UserPlus, ArrowUpRight, ExternalLink } from "lucide-react";
+import { X, ChevronDown, Check, Circle, Cpu, FileText, ClipboardCheck, UserPlus, ArrowUpRight, ExternalLink, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { OPP_STAGES, OPPORTUNITIES, leadMeta, type Opportunity, type OpportunityDetail } from "@/lib/sales-data";
 import OwnerBadge from "./owner-badge";
 import DocumentViewer, { type ViewDoc } from "./document-viewer";
-import { AssetLink, ContractLink, drawerLayer } from "@/components/dashboard/detail-drawers";
+import { AssetLink, ContractLink, drawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 // The lead rendered as a full brief document.
@@ -76,7 +76,7 @@ const ACTIONS = [
   { label: "Open in SAP", icon: ExternalLink },
 ];
 
-function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
+export function LeadActions({ onAction }: { onAction: (label: string) => void }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -111,7 +111,7 @@ function ActionsMenu({ onAction }: { onAction: (label: string) => void }) {
   );
 }
 
-function DrawerBody({ opp, detail, onAction }: { opp: Opportunity; detail: OpportunityDetail; onAction: (prompt: string) => void }) {
+export function LeadBody({ opp, detail, onAction }: { opp: Opportunity; detail: OpportunityDetail; onAction: (prompt: string) => void }) {
   const readyCount = opp.requirements.filter((r) => r.done).length;
   return (
     <div className="flex flex-col gap-4">
@@ -233,6 +233,7 @@ export default function OpportunityDrawer({ opp, detail, onClose, layer, hidden 
   const stacked = layer !== undefined;
   const shell = drawerLayer(open, layer);
   const launch = useConversationLauncher();
+  const drawers = useDetailDrawers();
   const [viewDoc, setViewDoc] = useState<ViewDoc | null>(null);
 
   const runAction = (prompt: string) => {
@@ -275,13 +276,23 @@ export default function OpportunityDrawer({ opp, detail, onClose, layer, hidden 
                     View full document
                   </button>
                 </div>
-                <button
-                  onClick={onClose}
-                  aria-label="Close"
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
-                >
-                  <X size={18} />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => drawers?.openPage({ kind: "lead", id: opp.id })}
+                    aria-label="Open as a page"
+                    title="Open as a page"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                  >
+                    <Maximize2 size={15} strokeWidth={1.5} />
+                  </button>
+                  <button
+                    onClick={onClose}
+                    aria-label="Close"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
               </div>
               <div className="flex flex-wrap gap-x-8 gap-y-3 mt-4">
                 {[
@@ -299,7 +310,7 @@ export default function OpportunityDrawer({ opp, detail, onClose, layer, hidden 
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto no-scrollbar px-6 py-5 bg-white">
-              <DrawerBody opp={opp} detail={detail} onAction={runAction} />
+              <LeadBody opp={opp} detail={detail} onAction={runAction} />
             </div>
 
             {/* Footer */}
@@ -311,7 +322,7 @@ export default function OpportunityDrawer({ opp, detail, onClose, layer, hidden 
               >
                 Create A Conversation
               </Button>
-              <ActionsMenu onAction={(label) => runAction(`${label} for the ${opp.account} lead`)} />
+              <LeadActions onAction={(label) => runAction(`${label} for the ${opp.account} lead`)} />
             </div>
           </>
         )}

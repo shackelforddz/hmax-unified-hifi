@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import DataTable, { type Column } from "@/components/dashboard/data-table";
-import AssetDrawer from "@/components/dashboard/sales/asset-drawer";
+import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import { ASSET_ALERTS, ASSET_DETAILS, type AssetAlert } from "@/lib/sales-data";
 
 function StatusBadge({ status }: { status: AssetAlert["status"] }) {
@@ -33,7 +33,7 @@ const COLUMNS: Column<AssetAlert>[] = [
 ];
 
 export default function AssetsTable() {
-  const [drawerId, setDrawerId] = useState<string | null>(null);
+  const drawers = useDetailDrawers();
   const [contract, setContract] = useState("all");
 
   const contracts = Array.from(new Set(ASSET_ALERTS.map(contractOf))).sort();
@@ -57,14 +57,13 @@ export default function AssetsTable() {
 
   return (
     <>
-      <AssetDrawer assetId={drawerId} onClose={() => setDrawerId(null)} />
       <DataTable
         title="Assets"
         subtitle={`${rows.length} monitored assets`}
         columns={COLUMNS}
         rows={rows}
         getKey={(a) => a.id}
-        onRowClick={(a) => setDrawerId(a.id)}
+        onRowClick={(a) => drawers?.openPage({ kind: "asset", id: a.id })}
         toolbar={toolbar}
       />
     </>
