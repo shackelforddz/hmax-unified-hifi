@@ -725,7 +725,7 @@ export default function AssetDrawer({ assetId, onClose, layer, hidden }: Props) 
                 onClick={() => runAction(`Tell me about ${detail.code}`)}
                 className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer"
               >
-                Create A Conversation
+                Ask HMAX
               </Button>
               <AssetActions onAction={(label) => runAction(`${label} for ${detail.code}`)} />
             </div>

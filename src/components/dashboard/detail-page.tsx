@@ -68,7 +68,7 @@ const ASSET_TABS = [
   { label: "Service history", value: "history" },
 ];
 
-export default function DetailPage({ detail, backLabel }: { detail: Detail; backLabel: string }) {
+export default function DetailPage({ detail }: { detail: Detail }) {
   const drawers = useDetailDrawers();
   const launch = useConversationLauncher();
   const [tab, setTab] = useState("summary");
@@ -248,7 +248,7 @@ export default function DetailPage({ detail, backLabel }: { detail: Detail; back
         className="self-start flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
       >
         <ArrowLeft size={15} strokeWidth={1.5} />
-        {backLabel}
+        Back
       </button>
 
       <div>
@@ -293,7 +293,7 @@ export default function DetailPage({ detail, backLabel }: { detail: Detail; back
                 onClick={() => run(page.context)(`Tell me about ${page.title}`)}
                 className="rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer"
               >
-                Create A Conversation
+                Ask HMAX
               </Button>
               {page.actions}
             </div>

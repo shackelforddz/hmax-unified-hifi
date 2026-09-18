@@ -225,7 +225,7 @@ export default function SlaContractDrawer({ contractId, onClose, layer, hidden }
 
             <div className="shrink-0 flex gap-3 px-6 py-4 border-t border-gray-100">
               <Button variant="outline" onClick={() => runAction(`Tell me about the ${d.account} service agreement`)} className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer">
-                Create A Conversation
+                Ask HMAX
               </Button>
               <SlaActions onAction={(label) => runAction(`${label} for the ${d.account} service agreement`)} />
             </div>

@@ -276,7 +276,7 @@ export default function CustomerDrawer({ customer, onClose }: Props) {
                 onClick={() => runAction(`Summarise the ${customer} estate`)}
                 className="w-full rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer"
               >
-                Create A Conversation
+                Ask HMAX
               </Button>
             </div>
           </>

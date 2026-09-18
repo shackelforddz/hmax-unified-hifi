@@ -263,7 +263,7 @@ export default function ContractDrawer({ contractId, onClose, layer, hidden }: P
 
             <div className="shrink-0 flex gap-3 px-6 py-4 border-t border-gray-100">
               <Button variant="outline" onClick={() => runAction(`Tell me about the ${c.name} contract`)} className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer">
-                Create A Conversation
+                Ask HMAX
               </Button>
               <ContractActions onAction={(label) => runAction(`${label} for ${c.name}`)} />
             </div>

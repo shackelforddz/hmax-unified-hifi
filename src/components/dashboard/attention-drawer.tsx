@@ -423,7 +423,7 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
             {/* Footer */}
             <div className="shrink-0 flex gap-3 px-6 py-4 border-t border-gray-100">
               <Button variant="outline" className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer">
-                Create A Conversation
+                Ask HMAX
               </Button>
               <AttentionActions />
             </div>

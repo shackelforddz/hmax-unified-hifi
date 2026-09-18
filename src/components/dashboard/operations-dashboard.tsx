@@ -101,7 +101,7 @@ export default function OperationsDashboard() {
     return (
       <div className="flex flex-col gap-4">
         <DashboardTabs tabs={TABS} active={pageTab} onChange={change} />
-        <DetailPage detail={page} backLabel={pageTab} />
+        <DetailPage detail={page} />
       </div>
     );
   }

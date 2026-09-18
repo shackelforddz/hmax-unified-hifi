@@ -320,7 +320,7 @@ export default function OpportunityDrawer({ opp, detail, onClose, layer, hidden 
                 onClick={() => runAction(`Tell me about the ${opp.account} lead`)}
                 className="flex-1 rounded-full h-auto py-2.5 text-sm text-gray-700 cursor-pointer"
               >
-                Create A Conversation
+                Ask HMAX
               </Button>
               <LeadActions onAction={(label) => runAction(`${label} for the ${opp.account} lead`)} />
             </div>
