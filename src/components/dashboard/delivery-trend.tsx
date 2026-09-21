@@ -6,6 +6,8 @@ import { AreaChart, Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer } fro
 import { CHART } from "@/lib/chart-theme";
 import { DELIVERY_TREND as D, type TrendPoint } from "@/lib/dashboard-data";
 import WidgetChat from "./widget-chat";
+import WidgetAlert, { WidgetAttentionGlow } from "./widget-alert";
+import { ATTENTION_DETAIL, NEEDS_ATTENTION } from "@/lib/widget-attention";
 import ContractDrawer from "./operations/contract-drawer";
 
 const POPOVER_W = 300;
@@ -104,7 +106,7 @@ export default function DeliveryTrend() {
   const point = selected ? D.points[selected.index] : null;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
+    <div className="relative overflow-hidden bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
       <ContractDrawer contractId={contractId} onClose={() => setContractId(null)} />
 
       {/* Header */}
@@ -112,7 +114,10 @@ export default function DeliveryTrend() {
         <div>
           <h3 className="text-base text-gray-900">Delivery performance</h3>
         </div>
-        <WidgetChat title="Delivery performance" />
+        <div className="flex items-center gap-2 shrink-0">
+  <WidgetChat title="Delivery performance" />
+          {NEEDS_ATTENTION.deliveryTrend && <WidgetAlert {...ATTENTION_DETAIL.deliveryTrend} />}
+        </div>
       </div>
 
       {/* Big value */}
@@ -211,6 +216,7 @@ export default function DeliveryTrend() {
           />
         )}
       </div>
+      {NEEDS_ATTENTION.deliveryTrend && <WidgetAttentionGlow />}
     </div>
   );
 }

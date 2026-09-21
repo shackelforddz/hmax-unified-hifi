@@ -8,7 +8,6 @@ import {
   ASSET_ALERTS,
   ASSET_DETAILS,
   leadDetail,
-  leadMeta,
   type Opportunity,
   type OpportunityDetail,
   type OppCategory,
@@ -126,7 +125,14 @@ function toAlert(opp: Opportunity, withContext: boolean): AlertItem {
     urgency: STATUS_URGENCY[opp.status],
     title: opp.title,
     detail,
-    meta: [...leadMeta(opp), ...(withContext ? renewalContext(opp.account) : [])],
+    // The card carries only what a decision needs; the rest of the bid cycle
+    // is on the lead itself.
+    meta: [
+      { label: "Value", value: opp.value },
+      { label: "Win confidence", value: `${opp.winConfidence}%` },
+      { label: "Owner", value: opp.owner },
+      ...(withContext ? renewalContext(opp.account) : []),
+    ],
     action: opp.recommendedAction,
     entity: { kind: "opportunity" as const, id: opp.id },
     playbook: buildPlaybook(

@@ -5,6 +5,8 @@ import { BarChart, Bar, XAxis, YAxis, LabelList, ResponsiveContainer } from "rec
 import { CHART } from "@/lib/chart-theme";
 import { REVENUE_AT_RISK as R, VENDOR_CONCENTRATION as V } from "@/lib/dashboard-data";
 import WidgetChat from "./widget-chat";
+import WidgetAlert, { WidgetAttentionGlow } from "./widget-alert";
+import { ATTENTION_DETAIL, NEEDS_ATTENTION } from "@/lib/widget-attention";
 
 const TITLE = "Revenue at risk";
 
@@ -67,11 +69,14 @@ export default function RevenueAtRisk() {
     }`;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
+    <div className="relative overflow-hidden bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
       {/* Header */}
       <div className="flex items-start justify-between mb-1">
         <h3 className="text-base text-gray-900">{TITLE}</h3>
-        <WidgetChat title={TITLE} />
+        <div className="flex items-center gap-2 shrink-0">
+  <WidgetChat title={TITLE} />
+          {NEEDS_ATTENTION.revenueAtRisk && <WidgetAlert {...ATTENTION_DETAIL.revenueAtRisk} />}
+        </div>
       </div>
 
       {/* Total */}
@@ -111,6 +116,7 @@ export default function RevenueAtRisk() {
           </ResponsiveContainer>
         </div>
       </div>
+      {NEEDS_ATTENTION.revenueAtRisk && <WidgetAttentionGlow />}
     </div>
   );
 }

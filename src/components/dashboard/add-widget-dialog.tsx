@@ -179,7 +179,7 @@ function LibraryPane({
               <div className="flex-1 min-w-0">
                 <RecommendationHead title={suggestion.widget.title}>{suggestion.reason}</RecommendationHead>
               </div>
-              <div className="hidden sm:block w-[200px] shrink-0 rounded-xl border border-gray-200 p-2">
+              <div className="hidden sm:block w-[200px] shrink-0 rounded-md p-2 bg-white">
                 <WidgetPreview render={suggestion.widget.render} bare />
               </div>
             </div>

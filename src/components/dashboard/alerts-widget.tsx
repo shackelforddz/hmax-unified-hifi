@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { ChevronDown, Eye, MessageCircle, EllipsisVertical, EyeOff, Trash2, CircleAlert, Circle } from "lucide-react";
+import { ChevronDown, Eye, MessageCircle, EllipsisVertical, EyeOff, Trash2, CircleAlert, TriangleAlert, Binoculars, Sparkles } from "lucide-react";
 import WidgetChat from "./widget-chat";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "./conversation-launcher";
@@ -176,6 +176,15 @@ function AlertCard({
   );
 }
 
+/* Each band says what kind of attention it wants: something breaking, a
+   warning, something to keep an eye on, and something HMAX put forward. */
+const GLYPH: Record<AlertUrgency, typeof CircleAlert> = {
+  critical: CircleAlert,
+  "at-risk": TriangleAlert,
+  watch: Binoculars,
+  proposed: Sparkles,
+};
+
 /* ── Urgency accordion ───────────────────────────────────────────── */
 function UrgencyBand({
   urgency,
@@ -189,7 +198,7 @@ function UrgencyBand({
   onToggle: () => void;
 }) {
   const { label, dot, band } = URGENCY[urgency];
-  const Glyph = urgency === "critical" || urgency === "at-risk" ? CircleAlert : Circle;
+  const Glyph = GLYPH[urgency];
   return (
     <button
       onClick={onToggle}

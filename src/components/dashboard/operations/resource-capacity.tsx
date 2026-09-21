@@ -1,12 +1,17 @@
 import WidgetChat from "@/components/dashboard/widget-chat";
+import WidgetAlert, { WidgetAttentionGlow } from "@/components/dashboard/widget-alert";
+import { ATTENTION_DETAIL, NEEDS_ATTENTION } from "@/lib/widget-attention";
 import { TEAMS } from "@/lib/operations-data";
 
 export default function ResourceCapacity() {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
+    <div className="relative overflow-hidden bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
       <div className="flex items-start justify-between mb-4">
         <h3 className="text-base text-gray-900">Resource &amp; Capacity</h3>
-        <WidgetChat title="Resource & Capacity" />
+        <div className="flex items-center gap-2 shrink-0">
+  <WidgetChat title="Resource & Capacity" />
+          {NEEDS_ATTENTION.resourceCapacity && <WidgetAlert {...ATTENTION_DETAIL.resourceCapacity} />}
+        </div>
       </div>
 
       {/* Teams */}
@@ -29,6 +34,7 @@ export default function ResourceCapacity() {
         })}
       </div>
 
+      {NEEDS_ATTENTION.resourceCapacity && <WidgetAttentionGlow />}
     </div>
   );
 }

@@ -4,14 +4,19 @@ import { LineChart, Line, YAxis, ResponsiveContainer } from "recharts";
 import { CHART } from "@/lib/chart-theme";
 import { FLEET_HEALTH as F } from "@/lib/sales-data";
 import WidgetChat from "@/components/dashboard/widget-chat";
+import WidgetAlert, { WidgetAttentionGlow } from "@/components/dashboard/widget-alert";
+import { ATTENTION_DETAIL, NEEDS_ATTENTION } from "@/lib/widget-attention";
 
 export default function FleetHealth() {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col">
+    <div className="relative overflow-hidden bg-white rounded-xl border border-gray-200 p-4 flex flex-col">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <h3 className="text-base text-gray-900">Average Asset Health</h3>
-        <WidgetChat title="Average Asset Health" />
+        <div className="flex items-center gap-2 shrink-0">
+  <WidgetChat title="Average Asset Health" />
+          {NEEDS_ATTENTION.fleetHealth && <WidgetAlert {...ATTENTION_DETAIL.fleetHealth} />}
+        </div>
       </div>
 
       {/* Stats */}
@@ -54,6 +59,7 @@ export default function FleetHealth() {
           <span className="w-3 h-0.5 bg-gray-400 inline-block" style={{ backgroundImage: "repeating-linear-gradient(90deg,#A3A3A3 0 3px,transparent 3px 6px)" }} /> Asset Health Standard
         </span>
       </div>
+      {NEEDS_ATTENTION.fleetHealth && <WidgetAttentionGlow />}
     </div>
   );
 }

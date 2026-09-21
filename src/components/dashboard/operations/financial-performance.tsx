@@ -5,6 +5,8 @@ import { X } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, ReferenceLine, ResponsiveContainer } from "recharts";
 import { CHART } from "@/lib/chart-theme";
 import WidgetChat from "@/components/dashboard/widget-chat";
+import WidgetAlert, { WidgetAttentionGlow } from "@/components/dashboard/widget-alert";
+import { ATTENTION_DETAIL, NEEDS_ATTENTION } from "@/lib/widget-attention";
 import { FINANCIALS as F, type MarginPoint } from "@/lib/operations-data";
 
 const POPOVER_W = 260;
@@ -110,10 +112,13 @@ export default function FinancialPerformance() {
   const point = selected ? F.trend[selected.index] : null;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
+    <div className="relative overflow-hidden bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
       <div className="flex items-start justify-between mb-4">
         <h3 className="text-base text-gray-900">Financial Performance</h3>
-        <WidgetChat title="Financial Performance" />
+        <div className="flex items-center gap-2 shrink-0">
+  <WidgetChat title="Financial Performance" />
+          {NEEDS_ATTENTION.financial && <WidgetAlert {...ATTENTION_DETAIL.financial} />}
+        </div>
       </div>
 
       {/* Headline stats */}
@@ -210,6 +215,7 @@ export default function FinancialPerformance() {
           )}
         </div>
       </div>
+      {NEEDS_ATTENTION.financial && <WidgetAttentionGlow />}
     </div>
   );
 }
