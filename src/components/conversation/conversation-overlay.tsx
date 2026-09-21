@@ -6,7 +6,6 @@ import {
   UserRoundPlus, X,
   TrendingUp, RefreshCw, ClipboardList, Wrench, Stethoscope, Search, Activity,
 } from "lucide-react";
-import ContextPanel from "./context-panel";
 import EntityContextPanel from "./context-panel-entity";
 import DocPanel from "./doc-panel";
 import ConversationPeople from "./conversation-people";
@@ -467,10 +466,13 @@ export default function ConversationOverlay({ visible, onClose, context, initial
             showPanel ? "translate-x-0" : "-translate-x-full"
           }`}
         >
+          {/* Whatever the conversation is about, the pane shows that record's
+              own detail content. With no record pinned, a customer mentioned
+              in the thread is enough to pin their estate. */}
           {activeEntity ? (
             <EntityContextPanel entity={activeEntity} onAction={(t) => send(t)} />
           ) : detectedCustomer ? (
-            <ContextPanel customer={detectedCustomer} />
+            <EntityContextPanel entity={{ kind: "customer", name: detectedCustomer }} onAction={(t) => send(t)} />
           ) : null}
         </div>
       </div>

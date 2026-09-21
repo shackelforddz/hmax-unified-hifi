@@ -7,6 +7,7 @@ import { useConversationLauncher } from "@/components/dashboard/conversation-lau
 import { WORK_ORDERS, WORK_ORDER_DETAILS, type WorkOrder, type WorkOrderDetail, type WoStatus, type WoPriority } from "@/lib/work-orders-data";
 import { AssetLink, ContractLink, drawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
+import { resolveAssetId } from "@/lib/asset-lookup";
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">{children}</div>;
@@ -191,7 +192,10 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
 
   const runAction = (prompt: string) => {
     onClose();
-    launch({ context: w?.code, prompt });
+    // The work order is read against its asset, so that's what the
+    // conversation's context pane shows.
+    const assetId = w ? resolveAssetId(w.asset) : null;
+    launch({ context: w?.code, prompt, entity: assetId ? { kind: "asset", id: assetId } : undefined });
   };
 
   useEffect(() => {

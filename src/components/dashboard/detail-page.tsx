@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "./conversation-launcher";
 import { useDetailDrawers, type Detail } from "./detail-drawers";
+import type { ContextEntity } from "./conversation-launcher";
 import { ContractActions, ContractBody } from "./operations/contract-drawer";
 import { SlaActions, SlaBody } from "./sales/sla-contract-drawer";
 import { LeadActions, LeadBody } from "./sales/opportunity-drawer";
@@ -18,12 +19,38 @@ import DocumentViewer, { type ViewDoc } from "./sales/document-viewer";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS } from "@/lib/operations-data";
 import { ASSET_CONDITION, OPPORTUNITIES, SLA_CONTRACTS, leadDetail, leadMeta } from "@/lib/sales-data";
 import { ASSET_NAMEPLATE } from "@/lib/asset-nameplate-data";
-import { getAssetDetail } from "@/lib/asset-lookup";
+import { getAssetDetail, resolveAssetId } from "@/lib/asset-lookup";
 import { AttentionActions, AttentionBody } from "./attention-drawer";
 import { WorkOrderActions, WorkOrderBody } from "./work-order-drawer";
 import { CustomerBody, customerRollup } from "./operations/customer-drawer";
 import { ATTENTION_ITEMS, CUSTOMER_DETAILS } from "@/lib/dashboard-data";
 import { WORK_ORDERS, WORK_ORDER_DETAILS } from "@/lib/work-orders-data";
+
+/** The same record, as a conversation addresses it - so a chat started here
+ *  opens with this record's detail content in its context pane. */
+function entityFor(detail: Detail): ContextEntity | undefined {
+  switch (detail.kind) {
+    case "asset":
+      return { kind: "asset", id: detail.id };
+    case "ops":
+    case "sla":
+      return { kind: "contract", id: detail.id };
+    case "lead":
+      return { kind: "opportunity", id: detail.id };
+    case "customer":
+      return { kind: "customer", name: detail.id };
+    case "attention": {
+      const name = CUSTOMER_DETAILS[detail.id]?.name;
+      return name ? { kind: "customer", name } : undefined;
+    }
+    case "work-order": {
+      // A work order is read against the asset it is raised on.
+      const asset = WORK_ORDERS.find((w) => w.id === detail.id)?.asset;
+      const id = asset ? resolveAssetId(asset) : null;
+      return id ? { kind: "asset", id } : undefined;
+    }
+  }
+}
 
 /** Which tab a record belongs under, so the page opens where it lives. */
 export const TAB_FOR: Record<Detail["kind"], string> = {
@@ -87,7 +114,7 @@ export default function DetailPage({ detail }: { detail: Detail }) {
   const back = () => drawers?.closePage();
   const run = (context: string) => (prompt: string) => {
     back();
-    launch({ context, prompt });
+    launch({ context, prompt, entity: entityFor(detail) });
   };
 
   const page = build();
