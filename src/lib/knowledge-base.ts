@@ -297,13 +297,20 @@ export function answerQuery(prompt: string, context?: string): string {
 /* ── Proactive suggestions ───────────────────────────────────────── */
 
 export interface Suggestions {
-  /** Quick follow-up questions the user can tap to keep exploring. */
+  /** Follow-up questions the user can tap to keep exploring. */
   prompts: string[];
   /** Proactive next-step CTAs that trigger an action. */
   actions: { label: string; prompt: string }[];
 }
 
-// Given the user's prompt (and optional widget context), suggest where to go next.
+/** The two things offered under a reply, labelled so the set reads as clear
+ *  categories rather than a row of undifferentiated chips. */
+export const FOLLOW_UP_LABEL = "Follow-ups";
+export const RECOMMENDATION_LABEL = "Recommended by HMAX";
+
+// Given the user's prompt (and optional widget context), suggest where to go
+// next. Every set is built the same way: why it's happening, what else is
+// worth looking at, then what to do about it.
 export function suggestNext(prompt: string, context?: string): Suggestions {
   const q = prompt.toLowerCase();
   const cust = detectCustomer(prompt);
@@ -313,7 +320,7 @@ export function suggestNext(prompt: string, context?: string): Suggestions {
 
   if (assetExists) {
     return {
-      prompts: [`Show repair history for ${asset}`, `What's the health trend for ${asset}?`, "Recommend the next action"],
+      prompts: [`What's driving the condition of ${asset}?`, `Show repair history for ${asset}`, `What's the health trend for ${asset}?`],
       actions: [
         { label: "Schedule inspection", prompt: `Schedule an inspection for ${asset}` },
         { label: "Create contract", prompt: `Create a contract for ${asset}` },
@@ -322,7 +329,7 @@ export function suggestNext(prompt: string, context?: string): Suggestions {
   }
   if (/(vendor|delta coils|supplier|concentration)/.test(q)) {
     return {
-      prompts: ["Which projects depend on Delta Coils?", "Are there alternative suppliers?", "What's the total revenue exposure?"],
+      prompts: ["Why is Delta Coils behind?", "Which projects depend on Delta Coils?", "Are there alternative suppliers?", "What's the total revenue exposure?"],
       actions: [
         { label: "Request vendor update", prompt: "Request a delivery update from Delta Coils Inc." },
         { label: "Draft risk summary", prompt: "Draft a vendor concentration risk summary" },
@@ -340,13 +347,13 @@ export function suggestNext(prompt: string, context?: string): Suggestions {
   }
   if (/margin/.test(q)) {
     return {
-      prompts: ["Which contracts drag margin the most?", "Show the Siemens change-order impact", "How does this compare to plan?"],
+      prompts: ["Which contracts drag margin the most?", "Show the Siemens change-order impact", "How does margin compare to plan?"],
       actions: [{ label: "Flag for review", prompt: "Flag the low-margin contracts for portfolio review" }],
     };
   }
   if (/(invoice|billing|revenue|risk\b)/.test(q)) {
     return {
-      prompts: ["What's blocking the Xcel invoice?", "Which invoices can be released now?", "Show revenue at risk by customer"],
+      prompts: ["What's blocking the Xcel invoice?", "Show revenue at risk by customer", "Which invoices can be released now?"],
       actions: [
         { label: "Raise purchase order", prompt: "Raise the purchase order for the transformer gasket set" },
         { label: "Create invoice", prompt: "Create an invoice for the completed Xcel milestones" },
@@ -355,19 +362,19 @@ export function suggestNext(prompt: string, context?: string): Suggestions {
   }
   if (/(sla|renewal|pipeline)/.test(q)) {
     return {
-      prompts: ["Which renewals need attention first?", "Show the AEP Ohio status", "What's the total renewal value?"],
+      prompts: ["Which renewals are at risk, and why?", "Show the AEP Ohio status", "What's the total renewal value?", "Which renewals need attention first?"],
       actions: [{ label: "Prepare renewal pack", prompt: "Prepare the SLA renewal pack for the at-risk accounts" }],
     };
   }
   if (/(fleet|health|score|asset|critical|repair)/.test(q)) {
     return {
-      prompts: ["Which assets are critical?", "Show the fleet health trend", "What's driving the decline?"],
+      prompts: ["What's driving the fleet health decline?", "Which assets are critical?", "Show the fleet health trend"],
       actions: [{ label: "Review critical assets", prompt: "Review the critical assets and recommend actions" }],
     };
   }
   if (cust) {
     return {
-      prompts: [`Show open risks for ${cust}`, `What are the next milestones for ${cust}?`, `Who owns the ${cust} account?`],
+      prompts: [`What's putting the ${cust} contract at risk?`, `Show open risks for ${cust}`, `What are the next milestones for ${cust}?`, `Who owns the ${cust} account?`],
       actions: [
         { label: "Generate project status", prompt: `Generate a project status report for ${cust}` },
         { label: "Start a mobilization plan", prompt: `Create a mobilization plan for ${cust}` },
@@ -376,12 +383,12 @@ export function suggestNext(prompt: string, context?: string): Suggestions {
   }
   if (context) {
     return {
-      prompts: [`Break down ${context} by driver`, `How does ${context} compare to plan?`, `What should I do about ${context}?`],
+      prompts: [`Break down ${context} by driver`, `How does ${context} compare to plan?`],
       actions: [{ label: "Add to my report", prompt: `Add ${context} to my weekly report` }],
     };
   }
   return {
-    prompts: ["What needs my attention today?", "Show the portfolio overview", "Which contracts are at risk?"],
+    prompts: ["Show the portfolio overview", "Which contracts are at risk?", "What needs my attention today?"],
     actions: [],
   };
 }

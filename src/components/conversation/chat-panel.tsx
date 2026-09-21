@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { Info, Check, AlertTriangle, ChevronLeft, ChevronRight, X, GripVertical, BarChart2, ClipboardCheck, CalendarClock, UserRoundPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { type Suggestions } from "@/lib/knowledge-base";
+import { FOLLOW_UP_LABEL, RECOMMENDATION_LABEL, type Suggestions } from "@/lib/knowledge-base";
 import { type CustomWidgetConfig } from "@/lib/custom-widget";
 import { type ContextEntity } from "@/components/dashboard/conversation-launcher";
 import { ChartBody } from "@/components/dashboard/sales/custom-widget-view";
@@ -1295,13 +1295,15 @@ export interface StoredConversation {
   seedPrompt?: string;
 }
 
+/* What follows a reply, in two labelled categories: the follow-ups the user
+   can keep pulling on, then HMAX's own recommendations. */
 function SuggestionBlock({ suggestions, onSend }: { suggestions: Suggestions; onSend?: (t: string) => void }) {
   const { prompts, actions } = suggestions;
   if (prompts.length === 0 && actions.length === 0) return null;
   return (
-    <div className="mt-3 ml-1 flex flex-col gap-2.5 animate-message-in">
+    <div className="mt-3 ml-1 flex flex-col gap-3 animate-message-in">
       {prompts.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <SuggestionRow label={FOLLOW_UP_LABEL}>
           {prompts.map((p) => (
             <button
               key={p}
@@ -1311,11 +1313,10 @@ function SuggestionBlock({ suggestions, onSend }: { suggestions: Suggestions; on
               {p}
             </button>
           ))}
-        </div>
+        </SuggestionRow>
       )}
       {actions.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11px] text-gray-500 tracking-wider">Recommended by HMAX</span>
+        <SuggestionRow label={RECOMMENDATION_LABEL}>
           {actions.map((a) => (
             <Button
               key={a.label}
@@ -1325,8 +1326,18 @@ function SuggestionBlock({ suggestions, onSend }: { suggestions: Suggestions; on
               {a.label}
             </Button>
           ))}
-        </div>
+        </SuggestionRow>
       )}
+    </div>
+  );
+}
+
+/** One category: its heading, then what it offers inline underneath. */
+function SuggestionRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-[11px] text-gray-500 tracking-wider leading-4">{label}</span>
+      <div className="flex flex-wrap items-center gap-2">{children}</div>
     </div>
   );
 }
