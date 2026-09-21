@@ -78,7 +78,7 @@ export default function RoleConfirmPage() {
           <div className="bg-white rounded-2xl ring-1 ring-gray-200 p-6 mb-6">
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <p className="text-[11px] tracking-wider text-gray-400 mb-3">Role identified</p>
+                <p className="text-[11px] tracking-wider text-gray-500 mb-3">Role identified</p>
                 <div className="flex items-center gap-3">
                   <div className="flex-shrink-0 w-11 h-11 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600">
                     <RoleIcon name={recommended.icon} size={20} />
@@ -88,11 +88,11 @@ export default function RoleConfirmPage() {
               </div>
               {intro && (
                 <div>
-                  <p className="text-[11px] tracking-wider text-gray-400 mb-3">What you&apos;ll see</p>
+                  <p className="text-[11px] tracking-wider text-gray-500 mb-3">What you&apos;ll see</p>
                   <ul className="flex flex-col gap-2">
                     {intro.highlights.map((h) => (
                       <li key={h} className="flex items-start gap-2 text-sm text-gray-600 leading-snug">
-                        <Check size={14} className="text-gray-400 shrink-0 mt-0.5" />
+                        <Check size={14} className="text-gray-500 shrink-0 mt-0.5" />
                         {h}
                       </li>
                     ))}
@@ -104,7 +104,7 @@ export default function RoleConfirmPage() {
 
           {/* Getting started - a quick primer on using the product */}
           <div className="bg-white rounded-2xl ring-1 ring-gray-200 p-6 mb-6">
-            <p className="text-[11px] tracking-wider text-gray-400 mb-4">Getting started - four things to try first</p>
+            <p className="text-[11px] tracking-wider text-gray-500 mb-4">Getting started - four things to try first</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-5">
               {HOW_TO_USE.map((step, i) => (
                 <div key={step.title} className="flex items-start gap-3">

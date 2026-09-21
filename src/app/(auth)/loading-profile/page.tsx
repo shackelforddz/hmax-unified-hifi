@@ -53,7 +53,7 @@ export default function LoadingProfilePage() {
           <h1 className=" text-[1.6rem] text-center mb-1">
             Welcome, {MOCK_USER.name}
           </h1>
-          <p className="text-sm text-gray-400 text-center mb-7">
+          <p className="text-sm text-gray-500 text-center mb-7">
             {MOCK_USER.email}
           </p>
 
@@ -65,7 +65,7 @@ export default function LoadingProfilePage() {
                 Hitachi Identity SSO Authenticated
               </span>
             </div>
-            <p className="text-xs text-gray-400 leading-relaxed pl-[23px]">
+            <p className="text-xs text-gray-500 leading-relaxed pl-[23px]">
               We've detected your role and prepared a personalized workspace.
             </p>
           </div>
@@ -78,7 +78,7 @@ export default function LoadingProfilePage() {
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <p className="text-xs text-gray-400 text-center">
+            <p className="text-xs text-gray-500 text-center">
               Configuring {selectedRole} view modules...
             </p>
           </div>
@@ -86,7 +86,7 @@ export default function LoadingProfilePage() {
       </main>
 
       <footer className="flex justify-center py-6">
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-gray-500">
           Auto-advancing to workspace customization...
         </p>
       </footer>

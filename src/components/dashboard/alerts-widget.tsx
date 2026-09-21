@@ -77,7 +77,7 @@ function AlertMenu({ onIgnore, onDelete }: { onIgnore: () => void; onDelete: () 
             }}
             className={item}
           >
-            <EyeOff size={14} strokeWidth={1.5} className="text-gray-400" />
+            <EyeOff size={14} strokeWidth={1.5} className="text-gray-500" />
             Ignore alert
           </button>
           <button
@@ -149,15 +149,16 @@ function AlertCard({
           <Eye size={16} strokeWidth={1.5} />
         </Button>
 
-        {/* Primary CTA - opens the conversation with the alert's playbook */}
+        {/* Primary CTA - a brief on the alert: what it is, the data behind it,
+            then what to do about it. The alert's own meta is the evidence. */}
         <Button
           size="icon"
           onClick={() =>
             launch({
               context: alert.customer,
-              prompt: alert.action,
+              prompt: `Summarise the ${alert.customer} alert, the data behind it, and what to do next`,
               entity: alert.entity,
-              playbook: alert.playbook,
+              playbook: alert.playbook && { ...alert.playbook, evidence: alert.meta },
             })
           }
           aria-label={alert.action}
@@ -206,12 +207,16 @@ function UrgencyBand({
       className={`w-full flex items-center pl-2 pr-4 py-2 rounded-full cursor-pointer ${band}`}
     >
       <div className="flex-1 min-w-0 flex gap-2.5 items-center">
-        {/* Filled status disc, per the hi-fi design */}
-        <span className="size-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: dot }}>
-          <Glyph size={16} strokeWidth={2} className="text-white" />
+        {/* The same disc the widget's own alert icon uses: the urgency colour
+            at a tenth, with the glyph in full. */}
+        <span
+          className="size-8 rounded-full flex items-center justify-center shrink-0"
+          style={{ backgroundColor: `${dot}1a`, color: dot }}
+        >
+          <Glyph size={16} strokeWidth={2} />
         </span>
         <span className="text-sm font-bold text-gray-900 leading-5 whitespace-nowrap">{label}</span>
-        <span className="text-xs text-gray-500 leading-4 whitespace-nowrap">{count}</span>
+        <span className="text-xs text-gray-600 leading-4 whitespace-nowrap">{count}</span>
       </div>
       <ChevronDown
         size={16}
@@ -353,7 +358,7 @@ export default function AlertsWidget({
           );
         })
       ) : (
-        <p className="text-sm text-gray-400 text-center py-6">{emptyLabel}</p>
+        <p className="text-sm text-gray-500 text-center py-6">{emptyLabel}</p>
       )}
 
       {footer}

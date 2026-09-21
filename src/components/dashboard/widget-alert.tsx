@@ -56,7 +56,7 @@ export default function WidgetAlert({ title, detail, widget, action }: WidgetAle
 
           {/* What to do about it */}
           <div className="mt-3 pt-3 border-t border-status-critical/20">
-            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
+            <p className="text-[11px] text-gray-500 tracking-wider mb-2">Recommended by HMAX</p>
             <Button
               onClick={() => {
                 setOpen(false);
@@ -78,7 +78,7 @@ export default function WidgetAlert({ title, detail, widget, action }: WidgetAle
  *  which is why it is inset past the edges. Clipped by the widget's own card. */
 export function WidgetAttentionGlow() {
   return (
-    <span aria-hidden className="pointer-events-none absolute h-[115px] w-[218px] right-[-16px] top-[-8px]">
+    <span aria-hidden className="pointer-events-none absolute h-[115px] w-[218px] right-[-16px] top-[-16px]">
       <span className="absolute inset-[-34.78%_-18.35%]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/widget-attention-glow.svg" alt="" className="block max-w-none size-full" />

@@ -52,7 +52,7 @@ function AssignTaskDialog({
     onClose();
   };
 
-  const field = "w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-300 border border-gray-200 rounded-full outline-none focus:border-gray-400";
+  const field = "w-full px-3 py-2 text-sm text-gray-700 placeholder-gray-500 border border-gray-200 rounded-full outline-none focus:border-gray-400";
   // Multi-line boxes keep a soft corner - a pill shape crops the text.
   const fieldBox = field.replace("rounded-full", "rounded-xl");
 
@@ -63,20 +63,20 @@ function AssignTaskDialog({
         <div className="flex items-start justify-between gap-3 mb-4">
           <div>
             <p className="text-base text-gray-900">Assign a task</p>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-500 mt-0.5">
               They&apos;ll be notified with this conversation as context.
             </p>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:bg-black/5 transition-colors cursor-pointer shrink-0"
+            className="w-7 h-7 rounded-full flex items-center justify-center text-gray-500 hover:bg-black/5 transition-colors cursor-pointer shrink-0"
           >
             <X size={15} strokeWidth={1.5} />
           </button>
         </div>
 
-        <label className="block text-xs text-gray-400 mb-1.5">Assignee</label>
+        <label className="block text-xs text-gray-500 mb-1.5">Assignee</label>
         <select
           value={assigneeId}
           onChange={(e) => setAssigneeId(e.target.value)}
@@ -89,7 +89,7 @@ function AssignTaskDialog({
           ))}
         </select>
 
-        <label className="block text-xs text-gray-400 mb-1.5">Task</label>
+        <label className="block text-xs text-gray-500 mb-1.5">Task</label>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -99,10 +99,10 @@ function AssignTaskDialog({
           className={`${field} mb-3`}
         />
 
-        <label className="block text-xs text-gray-400 mb-1.5">Due</label>
+        <label className="block text-xs text-gray-500 mb-1.5">Due</label>
         <input type="date" value={due} onChange={(e) => setDue(e.target.value)} className={`${field} mb-3 cursor-pointer`} />
 
-        <label className="block text-xs text-gray-400 mb-1.5">Note (optional)</label>
+        <label className="block text-xs text-gray-500 mb-1.5">Note (optional)</label>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
@@ -203,7 +203,7 @@ export default function ConversationPeople({ participants, suggested = [], onAdd
             {/* Already in the conversation */}
             {participants.length > 0 && (
               <div className="px-4 pt-4 pb-3 border-b border-gray-100">
-                <p className="text-[11px] text-gray-400 tracking-wider mb-2">In this conversation</p>
+                <p className="text-[11px] text-gray-500 tracking-wider mb-2">In this conversation</p>
                 <div className="flex flex-col gap-1">
                   {participants.map((p) => (
                     <div key={p.id} className="flex items-center gap-2.5">
@@ -211,7 +211,7 @@ export default function ConversationPeople({ participants, suggested = [], onAdd
                       <img src={p.avatar} alt="" aria-hidden className="w-7 h-7 rounded-full object-cover bg-gray-200 shrink-0" />
                       <span className="flex-1 min-w-0">
                         <span className="block text-sm text-gray-800 truncate">{p.name}</span>
-                        <span className="block text-xs text-gray-400 truncate">{p.role}</span>
+                        <span className="block text-xs text-gray-500 truncate">{p.role}</span>
                       </span>
                       <button
                         onClick={() => {
@@ -225,7 +225,7 @@ export default function ConversationPeople({ participants, suggested = [], onAdd
                       <button
                         onClick={() => onRemove(p)}
                         aria-label={`Remove ${p.name}`}
-                        className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-gray-300 hover:text-gray-600 hover:bg-black/5 transition-colors cursor-pointer"
+                        className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-600 hover:bg-black/5 transition-colors cursor-pointer"
                       >
                         <X size={13} strokeWidth={1.5} />
                       </button>
@@ -238,17 +238,17 @@ export default function ConversationPeople({ participants, suggested = [], onAdd
             {/* Add someone */}
             <div className="px-4 pt-4 pb-2">
               <p className="text-sm text-gray-900 mb-0.5">Add a coworker</p>
-              <p className="text-xs text-gray-400 mb-3">
+              <p className="text-xs text-gray-500 mb-3">
                 They get the thread and its context, and you can hand them a task.
               </p>
               <div className="flex items-center gap-2 border border-gray-200 rounded-lg px-2.5 py-1.5 focus-within:border-gray-400">
-                <Search size={14} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+                <Search size={14} strokeWidth={1.5} className="text-gray-500 shrink-0" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   autoFocus
                   placeholder="Search by name or role"
-                  className="flex-1 min-w-0 text-sm text-gray-700 placeholder-gray-300 outline-none bg-transparent"
+                  className="flex-1 min-w-0 text-sm text-gray-700 placeholder-gray-500 outline-none bg-transparent"
                 />
               </div>
             </div>
@@ -268,18 +268,18 @@ export default function ConversationPeople({ participants, suggested = [], onAdd
                     <img src={p.avatar} alt="" aria-hidden className="w-7 h-7 rounded-full object-cover bg-gray-200 shrink-0" />
                     <span className="flex-1 min-w-0">
                       <span className="block text-sm text-gray-800 truncate">{p.name}</span>
-                      <span className="block text-xs text-gray-400 truncate">
+                      <span className="block text-xs text-gray-500 truncate">
                         {p.role} · {p.allocation}% allocated
                       </span>
                       {isSuggested(p) && (
-                        <span className="block mt-1 text-[10px] text-gray-400 tracking-wider">Recommended by HMAX</span>
+                        <span className="block mt-1 text-[10px] text-gray-500 tracking-wider">Recommended by HMAX</span>
                       )}
                     </span>
-                    <span className="shrink-0 text-xs text-gray-400">Add</span>
+                    <span className="shrink-0 text-xs text-gray-500">Add</span>
                   </button>
                 ))
               ) : (
-                <p className="text-sm text-gray-400 text-center py-5">
+                <p className="text-sm text-gray-500 text-center py-5">
                   {query ? "No one matches that search." : "Everyone is already in this conversation."}
                 </p>
               )}

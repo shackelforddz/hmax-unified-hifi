@@ -122,7 +122,7 @@ export default function FleetMap({ mode, alerts = [], categoryOptions = [] }: Pr
             setRegion(ALL);
           }}
           className={`h-full px-3 rounded-full text-sm font-bold whitespace-nowrap transition-colors cursor-pointer ${
-            layer === l ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+            layer === l ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
           }`}
         >
           {l}
@@ -178,7 +178,7 @@ export default function FleetMap({ mode, alerts = [], categoryOptions = [] }: Pr
 
   const overlay = filters && (
     <>
-      <div className="absolute top-14 left-4 right-[224px] z-10 flex flex-wrap items-center gap-2" onPointerDown={(e) => e.stopPropagation()}>
+      <div className="absolute top-14 left-4 right-[224px] @max-[620px]:right-4 z-10 flex flex-wrap items-center gap-2" onPointerDown={(e) => e.stopPropagation()}>
         {filters}
       </div>
       {sites.length === 0 && (mode === "sales" && layer !== "Assets" ? leads.length === 0 : true) && (
@@ -282,7 +282,7 @@ function HealthBar({ pct }: { pct: number }) {
 
 function StatusBadge({ critical, label }: { critical: boolean; label: string }) {
   return (
-    <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${critical ? "bg-status-critical text-white font-bold" : "border border-gray-300 text-gray-500"}`}>
+    <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${critical ? "bg-status-critical-deep text-white font-bold" : "border border-gray-300 text-gray-500"}`}>
       {label}
     </span>
   );
@@ -320,17 +320,17 @@ export function SiteTip({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="text-sm font-bold text-gray-900 leading-snug">{c.name}</p>
-            <p className="text-xs text-gray-400 truncate">{c.customer} · {c.value}</p>
+            <p className="text-xs text-gray-500 truncate">{c.customer} · {c.value}</p>
           </div>
           <StatusBadge critical={c.status === "critical"} label={c.status === "critical" ? "Critical" : "At risk"} />
         </div>
 
         <div className="mt-3">
-          <p className="text-[11px] text-gray-400 tracking-wider mb-1">Contract health</p>
+          <p className="text-[11px] text-gray-500 tracking-wider mb-1">Contract health</p>
           <HealthBar pct={contractHealth(c.id)} />
-          <p className="text-[11px] text-gray-400 tracking-wider mt-2 mb-1">Asset health · {site.code}</p>
+          <p className="text-[11px] text-gray-500 tracking-wider mt-2 mb-1">Asset health · {site.code}</p>
           <HealthBar pct={site.health} />
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             {openAlerts} open alert{openAlerts === 1 ? "" : "s"} on the contract
           </p>
         </div>
@@ -354,10 +354,10 @@ export function SiteTip({
           )}
           <div className="min-w-0">
             <p className="text-xs text-gray-800 truncate">{c.owner}</p>
-            <p className="text-[11px] text-gray-400 truncate">Owner · {owner?.role ?? "Project Manager"}</p>
+            <p className="text-[11px] text-gray-500 truncate">Owner · {owner?.role ?? "Project Manager"}</p>
           </div>
         </div>
-        <p className="text-[11px] text-gray-400 mt-2 truncate">Pin: {site.code} · {site.type}</p>
+        <p className="text-[11px] text-gray-500 mt-2 truncate">Pin: {site.code} · {site.type}</p>
 
         <div className="flex gap-2 mt-3">
           <button onClick={onViewContract} className={`${tipButton} bg-gray-900 text-white hover:bg-gray-700`}>View contract</button>
@@ -372,21 +372,21 @@ export function SiteTip({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="text-sm font-bold text-gray-900">{site.code}</p>
-          <p className="text-xs text-gray-400 truncate">{site.type}</p>
+          <p className="text-xs text-gray-500 truncate">{site.type}</p>
         </div>
         <StatusBadge critical={site.status === "Critical"} label={site.status} />
       </div>
-      <p className="text-xs text-gray-400 mt-1">{site.customer} · {site.region}</p>
+      <p className="text-xs text-gray-500 mt-1">{site.customer} · {site.region}</p>
       {uncovered && <p className="mt-2 text-xs text-status-critical font-bold">No service agreement covers this asset</p>}
       <div className="mt-2">
-        <p className="text-[11px] text-gray-400 tracking-wider mb-1">Asset health</p>
+        <p className="text-[11px] text-gray-500 tracking-wider mb-1">Asset health</p>
         <HealthBar pct={site.health} />
       </div>
       {alert?.alert && (
         <div className="mt-2 pt-2 border-t border-gray-100">
           <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">{alertLabel?.(alert.category) ?? alert.category}</span>
           <p className="text-xs text-gray-800 leading-snug mt-1.5">{alert.alert.title}</p>
-          {alert.alert.impact && <p className="text-xs text-gray-400 mt-0.5">{alert.alert.impact}</p>}
+          {alert.alert.impact && <p className="text-xs text-gray-500 mt-0.5">{alert.alert.impact}</p>}
         </div>
       )}
       {mode === "sales" && (
@@ -418,7 +418,7 @@ export function LeadTip({ lead, onViewDetails }: { lead: LeadSite; onViewDetails
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="text-sm font-bold text-gray-900 leading-snug">{lead.title}</p>
-          <p className="text-xs text-gray-400 truncate">
+          <p className="text-xs text-gray-500 truncate">
             {lead.account} · {lead.value}
           </p>
         </div>

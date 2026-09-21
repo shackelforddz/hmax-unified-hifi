@@ -51,10 +51,18 @@ export const WIDGET_LIBRARY: LibraryWidget[] = [
   {
     id: "revenue-at-risk",
     title: "Revenue at risk",
-    description: "What is putting revenue at risk, by trigger or by vendor.",
+    description: "What is putting revenue at risk, by trigger.",
     category: "Commercial",
     span: 4,
     render: () => <RevenueAtRisk />,
+  },
+  {
+    id: "revenue-by-vendor",
+    title: "Revenue at risk by vendor",
+    description: "The same money by who we are exposed to, and on how many projects.",
+    category: "Commercial",
+    span: 4,
+    render: () => <RevenueAtRisk by="vendor" />,
   },
   {
     id: "delivery-trend",

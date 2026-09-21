@@ -18,7 +18,7 @@ export default function ResponseTime() {
 
       <div className="flex items-end gap-2 mb-3">
         <span className="text-2xl font-bold text-gray-900 leading-none">{R.current}</span>
-        <span className="flex items-center gap-0.5 text-xs text-gray-400 mb-0.5">
+        <span className="flex items-center gap-0.5 text-xs text-gray-500 mb-0.5">
           <ArrowDown size={11} strokeWidth={2} />
           {R.delta}
         </span>

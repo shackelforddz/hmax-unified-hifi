@@ -21,7 +21,7 @@ export default function DashboardTabs({
           >
             <span
               className={`text-2xl font-bold leading-none transition-colors ${
-                isActive ? "text-gray-900" : "text-gray-400 hover:text-gray-600"
+                isActive ? "text-gray-900" : "text-gray-500 hover:text-gray-600"
               }`}
             >
               {tab}

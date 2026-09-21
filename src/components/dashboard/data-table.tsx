@@ -27,7 +27,7 @@ export default function DataTable<T>({ title, subtitle, columns, rows, getKey, o
       <div className="px-5 pt-5 pb-4 border-b border-gray-100 flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h3 className="text-base text-gray-900">{title}</h3>
-          {subtitle && <p className="text-sm text-gray-400 mt-0.5">{subtitle}</p>}
+          {subtitle && <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>}
         </div>
         <div className="flex items-center gap-3 shrink-0">
           {toolbar}
@@ -42,7 +42,7 @@ export default function DataTable<T>({ title, subtitle, columns, rows, getKey, o
               {columns.map((c, i) => (
                 <th
                   key={i}
-                  className={`px-5 py-3 text-[11px] text-gray-400 tracking-wider font-normal whitespace-nowrap ${
+                  className={`px-5 py-3 text-[11px] text-gray-500 tracking-wider font-normal whitespace-nowrap ${
                     c.align === "right" ? "text-right" : "text-left"
                   } ${c.className ?? ""}`}
                 >
@@ -71,7 +71,7 @@ export default function DataTable<T>({ title, subtitle, columns, rows, getKey, o
           </tbody>
         </table>
         {rows.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-10">Nothing to show here yet.</p>
+          <p className="text-sm text-gray-500 text-center py-10">Nothing to show here yet.</p>
         )}
       </div>
     </div>

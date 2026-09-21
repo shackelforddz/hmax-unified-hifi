@@ -5,9 +5,18 @@ import AlertsWidget from "./alerts-widget";
 import AttentionDrawer from "./attention-drawer";
 import { ATTENTION_ITEMS, PM_ALERT_TYPES } from "@/lib/dashboard-data";
 import { buildPlaybook } from "@/lib/alert-playbooks";
+import { OPS_CONTRACTS } from "@/lib/operations-data";
+import type { ContextEntity } from "@/components/dashboard/conversation-launcher";
 import { parseMetaString, withImpact, type AlertItem, type AlertUrgency } from "@/lib/alerts";
 
 const TITLE = "Contracts that need your attention";
+
+/** The delivery contract an attention item belongs to. Falls back to the
+ *  customer when a customer has no delivery contract of their own. */
+function contractFor(customer: string): ContextEntity {
+  const contract = OPS_CONTRACTS.find((c) => c.customer === customer);
+  return contract ? { kind: "contract", id: contract.id } : { kind: "customer", name: customer };
+}
 
 /** Flatten contracts down to their individual flags - one card per alert. */
 function toAlerts(): AlertItem[] {
@@ -21,7 +30,9 @@ function toAlerts(): AlertItem[] {
       detail: flag.detail,
       meta: withImpact(parseMetaString(item.meta), flag.impact),
       action: flag.action,
-      entity: { kind: "customer" as const, name: item.customer },
+      // The alert is about a contract, so the conversation opens with that
+      // contract's detail beside it rather than the customer's estate.
+      entity: contractFor(item.customer),
       playbook: buildPlaybook(flag.action, flag.detail, { title: flag.title }),
       detailId: item.id,
     }))

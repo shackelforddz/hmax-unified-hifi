@@ -28,7 +28,7 @@ export default function ContextSummary({
           <TriangleAlert size={16} strokeWidth={2} className="shrink-0" />
           Context summary
         </h3>
-        <span className="text-[11px] px-2 py-0.5 rounded-full bg-status-critical text-white font-bold whitespace-nowrap">Critical</span>
+        <span className="text-[11px] px-2 py-0.5 rounded-full bg-status-critical-deep text-white font-bold whitespace-nowrap">Critical</span>
       </div>
       <p className="text-sm text-gray-800 leading-relaxed">{summary}</p>
       {children}

@@ -50,6 +50,8 @@ export type PlaybookPanel =
 
 export interface Playbook {
   situation: string;
+  /** The alert's own data, shown as the evidence behind the summary. */
+  evidence?: { label?: string; value: string }[];
   recommendation: string;
   steps: PlaybookStep[];
   panel?: PlaybookPanel;

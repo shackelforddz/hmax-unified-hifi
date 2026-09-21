@@ -31,11 +31,11 @@ export default function UpcomingServicing() {
           >
             <div className="flex-1 min-w-0">
               <p className="text-sm text-gray-900 truncate">{s.task}</p>
-              <p className="text-xs text-gray-400 truncate">
+              <p className="text-xs text-gray-500 truncate">
                 {s.customer} • {s.owner}
               </p>
             </div>
-            <span className="flex items-center gap-1 text-xs text-gray-400 shrink-0 whitespace-nowrap">
+            <span className="flex items-center gap-1 text-xs text-gray-500 shrink-0 whitespace-nowrap">
               <Clock size={12} strokeWidth={1.5} />
               {s.dueIn}
             </span>

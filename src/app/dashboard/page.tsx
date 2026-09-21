@@ -11,6 +11,7 @@ import DiagnosticsDashboard from "@/components/dashboard/diagnostics-dashboard";
 import ConversationOverlay from "@/components/conversation/conversation-overlay";
 import { type StoredConversation } from "@/components/conversation/chat-panel";
 import { DetailDrawerProvider } from "@/components/dashboard/detail-drawers";
+import { ToastProvider } from "@/components/dashboard/toast";
 import { ConversationLauncherContext, type LaunchArgs } from "@/components/dashboard/conversation-launcher";
 import { useAppSelector } from "@/store/hooks";
 
@@ -44,6 +45,7 @@ export default function DashboardPage() {
 
   return (
     <ConversationLauncherContext.Provider value={openConversation}>
+    <ToastProvider>
     <DetailDrawerProvider>
     <div className="h-screen bg-[#F5F5F5] overflow-hidden flex">
 
@@ -60,7 +62,9 @@ export default function DashboardPage() {
       </main>
 
       {/* Conversation log */}
-      <aside className="w-[400px] shrink-0 px-6 py-6">
+      {/* The log narrows before the dashboard does - the sheet is the
+          workspace, so it keeps the width on a smaller desktop. */}
+      <aside className="w-[320px] xl:w-[360px] 2xl:w-[400px] shrink-0 px-4 xl:px-6 py-6">
         <ConversationsPanel
           conversations={conversations}
           onNewConversation={() => openConversation()}
@@ -83,6 +87,7 @@ export default function DashboardPage() {
       />
     </div>
     </DetailDrawerProvider>
+    </ToastProvider>
     </ConversationLauncherContext.Provider>
   );
 }

@@ -59,7 +59,7 @@ export default function KpiCard({ id, label, value, trend, sparkline, direction 
       <div className="flex items-end justify-between">
         <div>
           <div className="text-2xl font-bold text-gray-900 leading-none mb-2">{value}</div>
-          <div className="flex items-center gap-1 text-xs text-gray-400">
+          <div className="flex items-center gap-1 text-xs text-gray-500">
             {direction !== "flat" && <Arrow size={11} strokeWidth={2} />}
             <span>{trend}</span>
           </div>

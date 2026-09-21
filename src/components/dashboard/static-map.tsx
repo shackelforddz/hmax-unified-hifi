@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Plus, Minus, Search } from "lucide-react";
-import WidgetChat from "@/components/dashboard/widget-chat";
+import WidgetChat, { TRIGGER } from "@/components/dashboard/widget-chat";
 import ProgressiveBlur from "@/components/progressive-blur";
 
 /* ── Static map ──────────────────────────────────────────────────────
@@ -172,7 +172,7 @@ export default function StaticMap<P extends MapPin>({
   return (
     <div
       ref={viewportRef}
-      className="relative rounded-xl overflow-hidden border border-gray-200 h-full min-h-[420px] bg-gray-100 select-none touch-none"
+      className="@container relative rounded-xl overflow-hidden border border-gray-200 h-full min-h-[420px] bg-gray-100 select-none touch-none"
       style={{ cursor: view.zoom > 1 ? (drag.current ? "grabbing" : "grab") : "default" }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -208,7 +208,7 @@ export default function StaticMap<P extends MapPin>({
           <span className="flex-1" />
           <WidgetChat
             title={title}
-            triggerClassName="w-8 h-8 -mt-1 -mr-1 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer shrink-0"
+            triggerClassName={`${TRIGGER} -mt-1 -mr-1`}
           />
         </div>
       </div>
@@ -216,7 +216,7 @@ export default function StaticMap<P extends MapPin>({
       {/* Search sits on the map itself, beside the filters */}
       {search && (
         <div
-          className="absolute top-14 right-4 z-10 flex items-center gap-1.5 h-8 w-[200px] px-2.5 bg-white border border-gray-200 rounded-full shadow-sm"
+          className="absolute top-14 right-4 z-10 flex items-center gap-1.5 h-8 w-[200px] @max-[620px]:hidden px-2.5 bg-white border border-gray-200 rounded-full shadow-sm"
           onPointerDown={(e) => e.stopPropagation()}
         >
           <input

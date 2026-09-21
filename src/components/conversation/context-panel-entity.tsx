@@ -88,7 +88,7 @@ function Badge({ label, urgent }: { label: string; urgent: boolean }) {
   return (
     <span
       className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs leading-4 font-bold whitespace-nowrap shrink-0 ${
-        urgent ? "bg-status-critical text-white" : "bg-[#f5f5f5] text-gray-900"
+        urgent ? "bg-status-critical-deep text-white" : "bg-[#f5f5f5] text-gray-900"
       }`}
     >
       {label}
@@ -144,12 +144,12 @@ function AssetContext({ id, onAction }: { id: string; onAction?: (prompt: string
             { label: "Last service", value: d.stats.lastService },
           ].map((s) => (
             <div key={s.label}>
-              <p className="text-[11px] text-gray-400 tracking-wider">{s.label}</p>
+              <p className="text-[11px] text-gray-500 tracking-wider">{s.label}</p>
               <p className="text-sm text-gray-800 mt-0.5">{s.value}</p>
             </div>
           ))}
           <div>
-            <p className="text-[11px] text-gray-400 tracking-wider">Health</p>
+            <p className="text-[11px] text-gray-500 tracking-wider">Health</p>
             <div className="flex items-center gap-2 mt-1.5">
               <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div className="h-full bg-chart-line rounded-full" style={{ width: `${d.stats.healthPct}%` }} />
@@ -167,7 +167,7 @@ function AssetContext({ id, onAction }: { id: string; onAction?: (prompt: string
             key={t.value}
             onClick={() => setTab(t.value)}
             className={`py-3 mr-6 text-sm border-b-2 -mb-px transition-colors cursor-pointer ${
-              tab === t.value ? "border-gray-900 text-gray-900" : "border-transparent text-gray-400 hover:text-gray-600"
+              tab === t.value ? "border-gray-900 text-gray-900" : "border-transparent text-gray-500 hover:text-gray-600"
             }`}
           >
             {t.label}
@@ -301,7 +301,7 @@ function OpportunityContext({ id }: { id: string }) {
           {OPP_STAGES.map((s, i) => (
             <div key={s} className="flex-1">
               <div className={`h-1.5 rounded-full ${i <= idx ? "bg-gray-900" : "bg-gray-200"}`} />
-              <p className={`text-[10px] mt-1 text-center ${i === idx ? "text-gray-900" : "text-gray-400"}`}>{s}</p>
+              <p className={`text-[10px] mt-1 text-center ${i === idx ? "text-gray-900" : "text-gray-500"}`}>{s}</p>
             </div>
           ))}
         </div>
@@ -312,7 +312,7 @@ function OpportunityContext({ id }: { id: string }) {
           <p className={`text-sm leading-relaxed ${opp.status === "stalled" ? "text-gray-800" : "text-gray-500"}`}>{d.summary}</p>
           {d.recommendations.length > 0 && (
             <div>
-              <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
+              <p className="text-[11px] text-gray-500 tracking-wider mb-2">Recommended by HMAX</p>
               <div className="flex flex-col gap-2">
                 {d.recommendations.map((r, i) => (
                   <div key={i} className="flex gap-2.5">
@@ -329,12 +329,12 @@ function OpportunityContext({ id }: { id: string }) {
       <Card>
         <div className="flex items-center justify-between">
           <SectionTitle>Offer readiness</SectionTitle>
-          <span className="text-xs text-gray-400">{readyCount} of {opp.requirements.length} complete</span>
+          <span className="text-xs text-gray-500">{readyCount} of {opp.requirements.length} complete</span>
         </div>
         <div className="flex flex-col">
           {opp.requirements.map((r) => (
             <div key={r.label} className="flex items-center gap-2.5 py-2 border-b border-gray-100 last:border-0">
-              <span className={`text-sm ${r.done ? "text-gray-900" : "text-gray-300"}`}>{r.done ? "✓" : "○"}</span>
+              <span className={`text-sm ${r.done ? "text-gray-900" : "text-gray-500"}`}>{r.done ? "✓" : "○"}</span>
               <span className={`text-sm ${r.done ? "text-gray-700" : "text-gray-500"}`}>{r.label}</span>
               <span className="ml-auto flex items-center gap-2 shrink-0">
                 <OwnerBadge owner={r.owner} />

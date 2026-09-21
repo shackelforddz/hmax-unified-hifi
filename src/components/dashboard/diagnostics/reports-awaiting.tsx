@@ -7,9 +7,9 @@ import { REPORTS_AWAITING, type FieldReport } from "@/lib/field-reports-data";
 
 function SignatureCell({ report }: { report: FieldReport }) {
   if (report.faultSignature) {
-    return <span className="bg-status-critical text-white font-bold text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">Fault signature</span>;
+    return <span className="bg-status-critical-deep text-white font-bold text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">Fault signature</span>;
   }
-  return <span className="text-gray-300">-</span>;
+  return <span className="text-gray-500">-</span>;
 }
 
 function WaitingCell({ days }: { days: number }) {

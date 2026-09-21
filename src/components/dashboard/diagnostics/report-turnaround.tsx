@@ -24,12 +24,12 @@ export default function ReportTurnaround() {
         <div className="shrink-0 w-40">
           <div className="flex items-end gap-1">
             <p className="text-2xl font-bold text-gray-900 leading-none">{T.actualDays}</p>
-            <p className="text-sm text-gray-400 mb-0.5">days</p>
+            <p className="text-sm text-gray-500 mb-0.5">days</p>
           </div>
           <p className="flex items-center gap-1 text-xs text-gray-500 mt-1.5">
             {overTarget > 0 && <ArrowUp size={11} strokeWidth={2} className="shrink-0" />}
             <span className="text-gray-700">{overTarget > 0 ? `${overTarget} days` : "on target"}</span>
-            <span className="text-gray-400">vs {T.targetDays}-day target</span>
+            <span className="text-gray-500">vs {T.targetDays}-day target</span>
           </p>
           <div className="w-full h-8 mt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -48,7 +48,7 @@ export default function ReportTurnaround() {
 
         {/* Stage breakdown - where the time goes */}
         <div className="flex-1 min-w-0 border-l border-gray-100 pl-6">
-          <p className="text-[11px] text-gray-400 tracking-wider mb-2">Where the time goes</p>
+          <p className="text-[11px] text-gray-500 tracking-wider mb-2">Where the time goes</p>
           <div className="flex flex-col gap-1.5">
             {T.stages.map((s) => (
               <div key={s.label} className="flex items-center gap-3">
@@ -63,7 +63,7 @@ export default function ReportTurnaround() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xs text-gray-500 mt-2">
             Bottleneck: {slowest.label.toLowerCase()} ({slowest.days} days)
           </p>
         </div>

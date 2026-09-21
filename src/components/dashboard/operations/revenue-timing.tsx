@@ -35,7 +35,7 @@ export default function RevenueTiming() {
           { label: "Outstanding", value: R.outstanding },
         ].map((k) => (
           <div key={k.label}>
-            <p className="text-xs text-gray-400">{k.label}</p>
+            <p className="text-xs text-gray-500">{k.label}</p>
             <p className="text-2xl font-bold text-gray-900 leading-tight">{k.value}</p>
           </div>
         ))}

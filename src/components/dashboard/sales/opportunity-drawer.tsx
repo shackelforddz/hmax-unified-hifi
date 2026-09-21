@@ -61,7 +61,7 @@ function StageProgress({ current }: { current: string }) {
       {OPP_STAGES.map((s, i) => (
         <div key={s} className="flex-1">
           <div className={`h-1.5 rounded-full ${i <= idx ? "bg-gray-900" : "bg-gray-200"}`} />
-          <p className={`text-[10px] mt-1 text-center ${i === idx ? "text-gray-900" : "text-gray-400"}`}>{s}</p>
+          <p className={`text-[10px] mt-1 text-center ${i === idx ? "text-gray-900" : "text-gray-500"}`}>{s}</p>
         </div>
       ))}
     </div>
@@ -101,7 +101,7 @@ export function LeadActions({ onAction }: { onAction: (label: string) => void })
               onClick={() => { setOpen(false); onAction(label); }}
               className="w-full justify-start gap-2.5 px-4 py-2.5 h-auto text-sm text-gray-700 rounded-none cursor-pointer"
             >
-              <Icon size={15} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+              <Icon size={15} strokeWidth={1.5} className="text-gray-500 shrink-0" />
               {label}
             </Button>
           ))}
@@ -120,7 +120,7 @@ export function LeadBody({ opp, detail, onAction }: { opp: Opportunity; detail: 
       <ContextSummary summary={detail.summary} critical={opp.status === "stalled"}>
         {detail.recommendations.length > 0 && (
           <div className="mt-4">
-            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
+            <p className="text-[11px] text-gray-500 tracking-wider mb-2">Recommended by HMAX</p>
             <div className="flex flex-col gap-2">
               {detail.recommendations.map((r, i) => (
                 <div key={i} className="flex gap-2.5">
@@ -145,7 +145,7 @@ export function LeadBody({ opp, detail, onAction }: { opp: Opportunity; detail: 
         <div className="grid grid-cols-3 gap-x-6 gap-y-4">
           {leadMeta(opp).map((m) => (
             <div key={m.label}>
-              <p className="text-[11px] text-gray-400 tracking-wider">{m.label}</p>
+              <p className="text-[11px] text-gray-500 tracking-wider">{m.label}</p>
               <p className="text-sm text-gray-800 mt-0.5 break-words">{m.value}</p>
             </div>
           ))}
@@ -156,7 +156,7 @@ export function LeadBody({ opp, detail, onAction }: { opp: Opportunity; detail: 
       <Card>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base text-gray-900">Offer readiness</h3>
-          <span className="text-xs text-gray-400">{readyCount} of {opp.requirements.length} complete</span>
+          <span className="text-xs text-gray-500">{readyCount} of {opp.requirements.length} complete</span>
         </div>
         <div className="flex flex-col">
           {opp.requirements.map((r) => (
@@ -164,7 +164,7 @@ export function LeadBody({ opp, detail, onAction }: { opp: Opportunity; detail: 
               {r.done ? (
                 <Check size={15} className="text-gray-900 shrink-0" />
               ) : (
-                <Circle size={15} className="text-gray-300 shrink-0" />
+                <Circle size={15} className="text-gray-500 shrink-0" />
               )}
               <span className={`text-sm ${r.done ? "text-gray-700" : "text-gray-500"}`}>{r.label}</span>
               <span className="ml-auto flex items-center gap-2 shrink-0">
@@ -184,17 +184,17 @@ export function LeadBody({ opp, detail, onAction }: { opp: Opportunity; detail: 
             {detail.assets.map((a) => (
               <div key={a.code} className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-md bg-white border border-gray-100 flex items-center justify-center shrink-0">
-                  <Cpu size={15} className="text-gray-400" />
+                  <Cpu size={15} className="text-gray-500" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-800"><AssetLink asset={a.code} /></p>
-                  <p className="text-xs text-gray-400">{a.note}</p>
+                  <p className="text-xs text-gray-500">{a.note}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-400">No specific assets scoped yet - still in discovery.</p>
+          <p className="text-sm text-gray-500">No specific assets scoped yet - still in discovery.</p>
         )}
       </Card>
 
@@ -208,7 +208,7 @@ export function LeadBody({ opp, detail, onAction }: { opp: Opportunity; detail: 
             { label: "Region", value: detail.related.region },
           ].map((r) => (
             <div key={r.label}>
-              <p className="text-[11px] text-gray-400 tracking-wider">{r.label}</p>
+              <p className="text-[11px] text-gray-500 tracking-wider">{r.label}</p>
               <p className="text-sm text-gray-800 mt-0.5">{r.value}</p>
             </div>
           ))}
@@ -268,7 +268,7 @@ export default function OpportunityDrawer({ opp, detail, onClose, layer, hidden 
               <div className="flex items-start justify-between">
                 <div className="min-w-0">
                   <h2 className="text-2xl text-gray-900">{opp.account}</h2>
-                  <p className="text-sm text-gray-400 mt-0.5">{opp.title}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">{opp.title}</p>
                   <button
                     onClick={() => setViewDoc(opportunityDoc(opp, detail))}
                     className="mt-2 inline-flex items-center gap-1.5 text-xs text-gray-600 underline underline-offset-2 decoration-gray-300 hover:decoration-gray-700 cursor-pointer transition-colors"
@@ -281,14 +281,14 @@ export default function OpportunityDrawer({ opp, detail, onClose, layer, hidden 
                     onClick={() => drawers?.openPage({ kind: "lead", id: opp.id })}
                     aria-label="Open as a page"
                     title="Open as a page"
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <Maximize2 size={15} strokeWidth={1.5} />
                   </button>
                   <button
                     onClick={onClose}
                     aria-label="Close"
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
                   >
                     <X size={18} />
                   </button>
@@ -301,7 +301,7 @@ export default function OpportunityDrawer({ opp, detail, onClose, layer, hidden 
                   ...leadMeta(opp),
                 ].map((s) => (
                   <div key={s.label}>
-                    <p className="text-[11px] text-gray-400 tracking-wider">{s.label}</p>
+                    <p className="text-[11px] text-gray-500 tracking-wider">{s.label}</p>
                     <p className="text-sm text-gray-800 mt-0.5">{s.value}</p>
                   </div>
                 ))}

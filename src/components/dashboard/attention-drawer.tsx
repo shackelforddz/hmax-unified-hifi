@@ -27,7 +27,7 @@ function DocStateBadge({ state }: { state: DocState }) {
   const map: Record<DocState, { label: string; cls: string }> = {
     verified: { label: "Verified", cls: "bg-gray-900 text-white" },
     portal: { label: "Portal", cls: "bg-gray-100 text-gray-600" },
-    conflicting: { label: "Conflicting", cls: "bg-status-critical text-white font-bold" },
+    conflicting: { label: "Conflicting", cls: "bg-status-critical-deep text-white font-bold" },
     missing: { label: "Missing", cls: "border border-status-critical text-status-critical font-bold" },
   };
   const { label, cls } = map[state];
@@ -36,7 +36,7 @@ function DocStateBadge({ state }: { state: DocState }) {
 
 function RiskBadge({ level }: { level: RiskLevel }) {
   const cls =
-    level === "Critical" ? "bg-status-critical text-white font-bold"
+    level === "Critical" ? "bg-status-critical-deep text-white font-bold"
     : level === "High" ? "border border-status-critical text-status-critical font-bold"
     : "bg-gray-200 text-gray-700";
   return <span className={`text-[11px] px-3 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{level}</span>;
@@ -44,7 +44,7 @@ function RiskBadge({ level }: { level: RiskLevel }) {
 
 function InfoBadge({ status }: { status: InfoStatus }) {
   const cls =
-    status === "Conflicting" ? "bg-status-critical text-white font-bold"
+    status === "Conflicting" ? "bg-status-critical-deep text-white font-bold"
     : status === "Partial" ? "bg-gray-200 text-gray-700"
     : "border border-gray-300 text-gray-500";
   return <span className={`text-[11px] px-2.5 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{status}</span>;
@@ -59,7 +59,7 @@ function SectionTitle({ children, action }: { children: React.ReactNode; action?
     <div className="flex items-center justify-between mb-4">
       <h3 className="text-base text-gray-900">{children}</h3>
       {action && (
-        <button className="text-xs text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">{action}</button>
+        <button className="text-xs text-gray-500 hover:text-gray-600 transition-colors cursor-pointer">{action}</button>
       )}
     </div>
   );
@@ -72,7 +72,7 @@ export function AttentionBody({ d, critical, onAction }: { d: CustomerDetail; cr
       <ContextSummary summary={d.contextSummary} critical={critical}>
         {d.recommendedActions && d.recommendedActions.length > 0 && (
           <div className="mt-4">
-            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
+            <p className="text-[11px] text-gray-500 tracking-wider mb-2">Recommended by HMAX</p>
             <div className="flex flex-wrap gap-2">
               {d.recommendedActions.map((a) => (
                 <Button
@@ -98,11 +98,11 @@ export function AttentionBody({ d, critical, onAction }: { d: CustomerDetail; cr
                 {s.done ? (
                   <CheckCircle2 size={15} className="text-gray-900 shrink-0" />
                 ) : (
-                  <Circle size={15} className="text-gray-300 shrink-0" />
+                  <Circle size={15} className="text-gray-500 shrink-0" />
                 )}
                 <span className="text-sm text-gray-700">{s.label}</span>
               </div>
-              <div className="flex gap-3 shrink-0 text-xs text-gray-400 whitespace-nowrap">
+              <div className="flex gap-3 shrink-0 text-xs text-gray-500 whitespace-nowrap">
                 <span>planned {s.planned}</span>
                 {s.actual && <span className="text-gray-600">actual {s.actual}</span>}
               </div>
@@ -113,15 +113,15 @@ export function AttentionBody({ d, critical, onAction }: { d: CustomerDetail; cr
         {d.invoice && (
           <div className="bg-white border border-gray-100 rounded-xl p-4 mt-4 flex flex-col gap-3">
             <div>
-              <p className="text-[11px] text-gray-400 tracking-wider mb-1.5">Invoice readiness</p>
-              <span className="text-xs bg-status-critical text-white font-bold px-2 py-0.5 rounded-full">{d.invoice.readiness}</span>
+              <p className="text-[11px] text-gray-500 tracking-wider mb-1.5">Invoice readiness</p>
+              <span className="text-xs bg-status-critical-deep text-white font-bold px-2 py-0.5 rounded-full">{d.invoice.readiness}</span>
             </div>
             <div>
-              <p className="text-[11px] text-gray-400 tracking-wider mb-1">Blocker</p>
+              <p className="text-[11px] text-gray-500 tracking-wider mb-1">Blocker</p>
               <p className="text-sm text-gray-700">{d.invoice.blocker}</p>
             </div>
             <div>
-              <p className="text-[11px] text-gray-400 tracking-wider mb-1">Critical vendor</p>
+              <p className="text-[11px] text-gray-500 tracking-wider mb-1">Critical vendor</p>
               <p className="text-sm text-gray-700">{d.invoice.criticalVendor}</p>
             </div>
           </div>
@@ -138,13 +138,13 @@ export function AttentionBody({ d, critical, onAction }: { d: CustomerDetail; cr
             { label: "Handover status", value: d.ownership.handoverStatus },
           ].map((o) => (
             <div key={o.label}>
-              <p className="text-[11px] text-gray-400 tracking-wider mb-1">{o.label}</p>
+              <p className="text-[11px] text-gray-500 tracking-wider mb-1">{o.label}</p>
               <p className="text-sm text-gray-700 leading-snug">{o.value}</p>
             </div>
           ))}
         </div>
         <div className="bg-white border border-gray-100 rounded-xl p-4">
-          <p className="text-[11px] text-gray-400 tracking-wider mb-3">Blockers &amp; dependencies</p>
+          <p className="text-[11px] text-gray-500 tracking-wider mb-3">Blockers &amp; dependencies</p>
           <div className="flex flex-col gap-4">
             {d.blockers.map((b, i) => (
               <div key={i}>
@@ -159,19 +159,19 @@ export function AttentionBody({ d, critical, onAction }: { d: CustomerDetail; cr
       {/* Documents & data */}
       <Card>
         <SectionTitle>Documents &amp; data</SectionTitle>
-        <p className="text-xs text-gray-400 mb-3">Provenance is shown for every record. Nothing is copied into this layer.</p>
+        <p className="text-xs text-gray-500 mb-3">Provenance is shown for every record. Nothing is copied into this layer.</p>
         <div>
           <div className="grid grid-cols-[1fr_auto] gap-x-3 pb-2 border-b border-gray-200">
-            <span className="text-[10px] text-gray-400 tracking-wider">Document</span>
-            <span className="text-[10px] text-gray-400 tracking-wider text-right">State</span>
+            <span className="text-[10px] text-gray-500 tracking-wider">Document</span>
+            <span className="text-[10px] text-gray-500 tracking-wider text-right">State</span>
           </div>
           {d.documents.map((doc) => (
             <div key={doc.name} className="grid grid-cols-[1fr_auto] gap-x-3 py-2.5 items-center border-b border-gray-100">
               <div className="flex items-start gap-2 min-w-0">
-                <FileText size={14} className="text-gray-400 shrink-0 mt-0.5" />
+                <FileText size={14} className="text-gray-500 shrink-0 mt-0.5" />
                 <div className="min-w-0">
                   <p className="text-sm text-gray-800 truncate">{doc.name}</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-500">
                     {doc.type} · <span className="bg-gray-100 rounded px-1 py-0.5">{doc.source}</span> · {doc.updated}
                   </p>
                 </div>
@@ -207,7 +207,7 @@ export function AttentionBody({ d, critical, onAction }: { d: CustomerDetail; cr
       {/* Information completeness */}
       <Card>
         <SectionTitle action="Request missing information">Information completeness</SectionTitle>
-        <p className="text-xs text-gray-400 mb-3">{d.infoCompleteness.summary}</p>
+        <p className="text-xs text-gray-500 mb-3">{d.infoCompleteness.summary}</p>
         <div className="flex flex-col">
           {d.infoCompleteness.rows.map((row) => (
             <div key={row.label} className="grid grid-cols-[1fr_auto_auto] gap-3 items-center py-2 border-b border-gray-100 last:border-0">
@@ -222,7 +222,7 @@ export function AttentionBody({ d, critical, onAction }: { d: CustomerDetail; cr
       {/* Timeline */}
       <Card>
         <SectionTitle>Timeline</SectionTitle>
-        <p className="text-xs text-gray-400 mb-4">Events drawn from every connected system, in one sequence</p>
+        <p className="text-xs text-gray-500 mb-4">Events drawn from every connected system, in one sequence</p>
         <div className="flex flex-col">
           {d.timeline.map((ev, i) => (
             <div key={i} className="flex gap-3 pb-4 last:pb-0">
@@ -236,7 +236,7 @@ export function AttentionBody({ d, critical, onAction }: { d: CustomerDetail; cr
                   <p className="text-xs text-gray-500 leading-snug">{ev.detail}</p>
                   <span className="inline-block mt-1"><Tag>{ev.source}</Tag></span>
                 </div>
-                <span className="text-xs text-gray-400 whitespace-nowrap shrink-0">{ev.date}</span>
+                <span className="text-xs text-gray-500 whitespace-nowrap shrink-0">{ev.date}</span>
               </div>
             </div>
           ))}
@@ -246,12 +246,12 @@ export function AttentionBody({ d, critical, onAction }: { d: CustomerDetail; cr
       {/* Related */}
       <Card>
         <SectionTitle>Related</SectionTitle>
-        <p className="text-xs text-gray-400 mb-4">The context around this object, not a copy of it.</p>
+        <p className="text-xs text-gray-500 mb-4">The context around this object, not a copy of it.</p>
         <div className="flex flex-col gap-4">
-          <RelatedGroup label="Customer" icon={<Building2 size={15} className="text-gray-400" />} refs={[d.related.customer]} />
-          <RelatedGroup label="Contract" icon={<FileText size={15} className="text-gray-400" />} refs={[d.related.contract]} link="contract" />
-          <RelatedGroup label="Assets" icon={<Cpu size={15} className="text-gray-400" />} refs={d.related.assets} link="asset" />
-          <RelatedGroup label="Originating lead" icon={<TrendingUp size={15} className="text-gray-400" />} refs={[d.related.opportunity]} />
+          <RelatedGroup label="Customer" icon={<Building2 size={15} className="text-gray-500" />} refs={[d.related.customer]} />
+          <RelatedGroup label="Contract" icon={<FileText size={15} className="text-gray-500" />} refs={[d.related.contract]} link="contract" />
+          <RelatedGroup label="Assets" icon={<Cpu size={15} className="text-gray-500" />} refs={d.related.assets} link="asset" />
+          <RelatedGroup label="Originating lead" icon={<TrendingUp size={15} className="text-gray-500" />} refs={[d.related.opportunity]} />
         </div>
       </Card>
     </div>
@@ -261,14 +261,14 @@ export function AttentionBody({ d, critical, onAction }: { d: CustomerDetail; cr
 function RelatedGroup({ label, icon, refs, link }: { label: string; icon: React.ReactNode; refs: { title: string; sub: string }[]; link?: "asset" | "contract" }) {
   return (
     <div>
-      <p className="text-[11px] text-gray-400 tracking-wider mb-2">{label}</p>
+      <p className="text-[11px] text-gray-500 tracking-wider mb-2">{label}</p>
       <div className="flex flex-col gap-2">
         {refs.map((r) => (
           <div key={r.title} className="flex items-start gap-3">
             <span className="shrink-0 mt-0.5">{icon}</span>
             <div>
               <p className="text-sm text-gray-800 leading-snug">{link === "asset" ? <AssetLink asset={r.title} /> : link === "contract" ? <ContractLink contract={r.title} /> : r.title}</p>
-              <p className="text-xs text-gray-400">{r.sub}</p>
+              <p className="text-xs text-gray-500">{r.sub}</p>
             </div>
           </div>
         ))}
@@ -321,7 +321,7 @@ export function AttentionActions() {
               onClick={() => setOpen(false)}
               className="w-full justify-start gap-2.5 px-4 py-2.5 h-auto text-sm text-gray-700 rounded-none cursor-pointer"
             >
-              <Icon size={15} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+              <Icon size={15} strokeWidth={1.5} className="text-gray-500 shrink-0" />
               {label}
             </Button>
           ))}
@@ -370,20 +370,20 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
               <div className="flex items-start justify-between">
                 <div>
                   <h2 className="text-2xl text-gray-900">{detail.name}</h2>
-                  <p className="text-sm text-gray-400 mt-0.5">{detail.subtitle}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">{detail.subtitle}</p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => drawers?.openPage({ kind: "attention", id: itemId! })}
                     aria-label="Open as a page"
                     title="Open as a page"
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <Maximize2 size={15} strokeWidth={1.5} />
                   </button>
                   <button
                     onClick={onClose}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <X size={18} />
                   </button>
@@ -399,12 +399,12 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
                   { label: "Schedule", value: detail.stats.schedule },
                 ].map((s) => (
                   <div key={s.label}>
-                    <p className="text-[11px] text-gray-400 tracking-wider">{s.label}</p>
+                    <p className="text-[11px] text-gray-500 tracking-wider">{s.label}</p>
                     <p className="text-sm text-gray-800 mt-0.5">{s.value}</p>
                   </div>
                 ))}
                 <div>
-                  <p className="text-[11px] text-gray-400 tracking-wider">Health</p>
+                  <p className="text-[11px] text-gray-500 tracking-wider">Health</p>
                   <div className="flex items-center gap-2 mt-1.5">
                     <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div className="h-full bg-chart-line rounded-full" style={{ width: `${detail.stats.healthPct}%` }} />

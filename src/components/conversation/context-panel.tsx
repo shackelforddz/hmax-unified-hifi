@@ -81,7 +81,7 @@ export default function ContextPanel({ customer }: { customer?: string }) {
             className={`flex-1 py-3 text-sm text-center border-b-2 transition-colors cursor-pointer ${
               tab === t
                 ? "border-gray-900 text-gray-900"
-                : "border-transparent text-gray-400 hover:text-gray-600"
+                : "border-transparent text-gray-500 hover:text-gray-600"
             }`}
           >
             {t}
@@ -119,7 +119,7 @@ export default function ContextPanel({ customer }: { customer?: string }) {
               <div key={city}>
                 <div className="flex justify-between mb-1.5">
                   <span className="text-sm text-gray-600">{city}</span>
-                  <span className="text-sm text-gray-400">{count}</span>
+                  <span className="text-sm text-gray-500">{count}</span>
                 </div>
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div

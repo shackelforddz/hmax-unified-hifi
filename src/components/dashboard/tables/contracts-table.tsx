@@ -5,7 +5,7 @@ import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import { OPS_CONTRACTS, type OpsContract } from "@/lib/operations-data";
 
 function ContractStatusBadge({ status }: { status: OpsContract["status"] }) {
-  if (status === "critical") return <span className="bg-status-critical text-white font-bold text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">Critical</span>;
+  if (status === "critical") return <span className="bg-status-critical-deep text-white font-bold text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">Critical</span>;
   return <span className="border border-gray-400 text-gray-700 text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">At risk</span>;
 }
 
@@ -15,7 +15,7 @@ function ProgressBar({ pct }: { pct: number }) {
       <div className="relative flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
         <div className="h-full bg-chart-line rounded-full" style={{ width: `${pct}%` }} />
       </div>
-      <span className="text-xs text-gray-400 shrink-0">{pct}%</span>
+      <span className="text-xs text-gray-500 shrink-0">{pct}%</span>
     </div>
   );
 }

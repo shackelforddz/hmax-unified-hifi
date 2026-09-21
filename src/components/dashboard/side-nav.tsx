@@ -56,15 +56,13 @@ export default function SideNav() {
   };
 
   return (
-    <nav className="w-20 shrink-0 flex flex-col items-center justify-between p-6">
-      {/* Wordmark, set vertically up the rail */}
-      <div className="relative flex h-16 w-3.5 items-center justify-center shrink-0">
-        {/* flex-none keeps the 64x14 wordmark from being squeezed by the rail */}
-        <div className="flex-none rotate-90">
-          <div className="relative h-3.5 w-16">
-            <Image src="/hmax-logo.svg" alt="HMAX" width={64} height={14} priority className="block w-16 h-3.5" />
-          </div>
-        </div>
+    <nav
+      // px-2, not px-6: the horizontal wordmark needs the rail's full width
+      className="shrink-0 flex flex-col items-center justify-between py-6 px-6"
+    >
+      {/* Wordmark, read straight across the top of the rail */}
+      <div className="flex items-center justify-center shrink-0 pt-6">
+        <Image src="/hmax-logo.svg" alt="HMAX" width={64} height={14} priority className="block w-16 h-3.5" />
       </div>
 
       {/* Utilities + account */}
@@ -101,12 +99,12 @@ export default function SideNav() {
                 <img src={MOCK_USER.avatar} alt="" aria-hidden className="w-9 h-9 rounded-full object-cover bg-gray-200 shrink-0" />
                 <div className="min-w-0">
                   <p className="text-sm text-gray-900 truncate">{MOCK_USER.fullName}</p>
-                  <p className="text-xs text-gray-400 truncate">{MOCK_USER.email}</p>
+                  <p className="text-xs text-gray-500 truncate">{MOCK_USER.email}</p>
                 </div>
               </div>
 
               <div className="px-4 pt-2.5 pb-1">
-                <p className="text-[11px] text-gray-400 tracking-wider">Persona</p>
+                <p className="text-[11px] text-gray-500 tracking-wider">Persona</p>
               </div>
               {PERSONAS.map(({ label, icon: Icon }) => (
                 <button
@@ -114,7 +112,7 @@ export default function SideNav() {
                   onClick={() => switchPersona(label)}
                   className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                 >
-                  <Icon size={15} strokeWidth={1.5} className="text-gray-400" />
+                  <Icon size={15} strokeWidth={1.5} className="text-gray-500" />
                   {label}
                   {selectedRole === label && <Check size={14} className="text-gray-500 ml-auto" />}
                 </button>
@@ -129,7 +127,7 @@ export default function SideNav() {
                 }}
                 className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
               >
-                <LogOut size={15} strokeWidth={1.5} className="text-gray-400" />
+                <LogOut size={15} strokeWidth={1.5} className="text-gray-500" />
                 Log out
               </button>
             </div>

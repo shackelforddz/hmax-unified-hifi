@@ -55,9 +55,9 @@ function DocChartView({ chart }: { chart: DocChart }) {
         <polyline points={line} fill="none" stroke={CHART.line} strokeWidth={2} />
         {points.map((p, i) => <circle key={i} cx={x(i)} cy={y(p.value)} r={2.5} fill={CHART.line} />)}
       </svg>
-      <div className="flex justify-between text-[10px] text-gray-400 px-1">
+      <div className="flex justify-between text-[10px] text-gray-500 px-1">
         {points.map((p) => <span key={p.label}>{p.label}</span>)}
-        {threshold != null && <span className="text-gray-400">limit {threshold}{chart.unit ? ` ${chart.unit}` : ""}</span>}
+        {threshold != null && <span className="text-gray-500">limit {threshold}{chart.unit ? ` ${chart.unit}` : ""}</span>}
       </div>
     </div>
   );
@@ -78,7 +78,7 @@ function DocTableView({ table }: { table: DocTable }) {
     <div className="border border-gray-200 rounded-lg overflow-hidden">
       <div className="grid" style={{ gridTemplateColumns: template }}>
         {table.columns.map((c) => (
-          <div key={c} className="text-[11px] text-gray-400 px-3 py-2 bg-gray-50 border-b border-gray-200">{c}</div>
+          <div key={c} className="text-[11px] text-gray-500 px-3 py-2 bg-gray-50 border-b border-gray-200">{c}</div>
         ))}
         {table.rows.map((row, ri) =>
           row.map((cell, ci) => {
@@ -138,7 +138,7 @@ function DrawingCanvas({ doc }: { doc: ViewDoc }) {
           ...doc.fields.slice(0, 2).map((f) => ({ l: f.label, v: f.value })),
         ].map((c, i) => (
           <div key={i} className={`px-3 py-2 ${i < 3 ? "border-r border-gray-300" : ""}`}>
-            <p className="text-gray-400 tracking-wider">{c.l}</p>
+            <p className="text-gray-500 tracking-wider">{c.l}</p>
             <p className="text-gray-800 mt-0.5 truncate">{c.v}</p>
           </div>
         ))}
@@ -155,10 +155,10 @@ export function DocContent({ doc }: { doc: ViewDoc }) {
       <div className="flex items-start justify-between border-b border-gray-100 pb-4">
         <div>
           <p className="text-sm text-gray-900">Hitachi Energy</p>
-          <p className="text-xs text-gray-400 mt-0.5">{doc.docType}</p>
+          <p className="text-xs text-gray-500 mt-0.5">{doc.docType}</p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-gray-400 tracking-wider">Reference</p>
+          <p className="text-xs text-gray-500 tracking-wider">Reference</p>
           <p className="text-sm text-gray-800 mt-0.5">{doc.ref}</p>
         </div>
       </div>
@@ -170,7 +170,7 @@ export function DocContent({ doc }: { doc: ViewDoc }) {
       <div className="grid grid-cols-2 gap-x-6 gap-y-3">
         {doc.fields.map((f) => (
           <div key={f.label}>
-            <p className="text-[11px] text-gray-400 tracking-wider">{f.label}</p>
+            <p className="text-[11px] text-gray-500 tracking-wider">{f.label}</p>
             <p className="text-sm text-gray-800 mt-0.5">{f.value}</p>
           </div>
         ))}
@@ -179,7 +179,7 @@ export function DocContent({ doc }: { doc: ViewDoc }) {
       {/* Narrative sections - text, tables and charts */}
       {doc.sections.map((s) => (
         <div key={s.heading} className="flex flex-col gap-2.5">
-          <p className="text-[11px] text-gray-400 tracking-wider">{s.heading}</p>
+          <p className="text-[11px] text-gray-500 tracking-wider">{s.heading}</p>
           {s.text && <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{s.text}</p>}
           {s.chart && <DocChartView chart={s.chart} />}
           {s.table && <DocTableView table={s.table} />}
@@ -189,7 +189,7 @@ export function DocContent({ doc }: { doc: ViewDoc }) {
       {/* Inspection photos */}
       {doc.images && doc.images.length > 0 && (
         <div className="flex flex-col gap-2.5">
-          <p className="text-[11px] text-gray-400 tracking-wider">Photos</p>
+          <p className="text-[11px] text-gray-500 tracking-wider">Photos</p>
           <div className="grid grid-cols-3 gap-2">
             {doc.images.map((img) => (
               <div key={img.caption} className="flex flex-col gap-1">
@@ -197,7 +197,7 @@ export function DocContent({ doc }: { doc: ViewDoc }) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/transformer.png" alt={img.caption} className="w-full h-full object-cover grayscale" />
                 </div>
-                <p className="text-[10px] text-gray-400 leading-tight">{img.caption}</p>
+                <p className="text-[10px] text-gray-500 leading-tight">{img.caption}</p>
               </div>
             ))}
           </div>
@@ -224,10 +224,10 @@ export function DocEditor({ doc, onSave, onCancel }: { doc: ViewDoc; onSave: (do
       <div className="flex items-start justify-between border-b border-gray-100 pb-4">
         <div>
           <p className="text-sm text-gray-900">Hitachi Energy</p>
-          <p className="text-xs text-gray-400 mt-0.5">{draft.docType} · editing</p>
+          <p className="text-xs text-gray-500 mt-0.5">{draft.docType} · editing</p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-gray-400 tracking-wider">Reference</p>
+          <p className="text-xs text-gray-500 tracking-wider">Reference</p>
           <p className="text-sm text-gray-800 mt-0.5">{draft.ref}</p>
         </div>
       </div>
@@ -235,7 +235,7 @@ export function DocEditor({ doc, onSave, onCancel }: { doc: ViewDoc; onSave: (do
       <div className="grid grid-cols-2 gap-x-6 gap-y-3">
         {draft.fields.map((f, i) => (
           <label key={f.label} className="block">
-            <span className="block text-[11px] text-gray-400 tracking-wider mb-1">{f.label}</span>
+            <span className="block text-[11px] text-gray-500 tracking-wider mb-1">{f.label}</span>
             <input value={f.value} onChange={(e) => setField(i, e.target.value)} className={input} />
           </label>
         ))}
@@ -243,7 +243,7 @@ export function DocEditor({ doc, onSave, onCancel }: { doc: ViewDoc; onSave: (do
 
       {draft.sections.map((s, i) => (
         <div key={s.heading} className="flex flex-col gap-2.5">
-          <p className="text-[11px] text-gray-400 tracking-wider">{s.heading}</p>
+          <p className="text-[11px] text-gray-500 tracking-wider">{s.heading}</p>
           {s.text !== undefined && (
             <textarea
               value={s.text}
@@ -297,21 +297,21 @@ export default function DocumentViewer({ doc, onClose, onAsk }: Props) {
         {/* Header */}
         <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div className="min-w-0">
-            <p className="text-[11px] text-gray-400 tracking-wider">{doc.docType}</p>
+            <p className="text-[11px] text-gray-500 tracking-wider">{doc.docType}</p>
             <h2 className="text-xl text-gray-900 truncate">{doc.title}</h2>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => window.print()}
               aria-label="Download"
-              className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <Download size={16} />
             </button>
             <button
               onClick={onClose}
               aria-label="Close"
-              className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>

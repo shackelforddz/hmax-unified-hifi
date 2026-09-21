@@ -41,6 +41,7 @@ const NAMES: Record<string, string> = {
   "upcoming-servicing": "Upcoming servicing",
   "delivery-trend": "Delivery performance",
   "revenue-at-risk": "Revenue at risk",
+  "revenue-by-vendor": "Revenue at risk by vendor",
   people: "People",
   "resource-capacity": "Resource & Capacity",
   "field-engineers": "Field engineers",

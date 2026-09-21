@@ -6,7 +6,7 @@ import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import { ASSET_ALERTS, ASSET_DETAILS, type AssetAlert } from "@/lib/sales-data";
 
 function StatusBadge({ status }: { status: AssetAlert["status"] }) {
-  if (status === "critical") return <span className="bg-status-critical text-white font-bold text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">Critical</span>;
+  if (status === "critical") return <span className="bg-status-critical-deep text-white font-bold text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">Critical</span>;
   return <span className="border border-gray-400 text-gray-700 text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap">At risk</span>;
 }
 
@@ -16,7 +16,7 @@ function HealthCell({ health }: { health: number }) {
       <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
         <div className="h-full bg-chart-line rounded-full" style={{ width: `${health}%` }} />
       </div>
-      <span className="text-xs text-gray-400 shrink-0">{health}%</span>
+      <span className="text-xs text-gray-500 shrink-0">{health}%</span>
     </div>
   );
 }
@@ -41,7 +41,7 @@ export default function AssetsTable() {
 
   const toolbar = (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-gray-400">Contract</span>
+      <span className="text-xs text-gray-500">Contract</span>
       <select
         value={contract}
         onChange={(e) => setContract(e.target.value)}

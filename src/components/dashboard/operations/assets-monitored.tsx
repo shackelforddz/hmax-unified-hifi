@@ -23,7 +23,7 @@ export default function AssetsMonitored() {
 
       <div className="flex items-end gap-2 mb-3">
         <span className="text-2xl font-bold text-gray-900 leading-none">{A.total}</span>
-        <span className="flex items-center gap-0.5 text-xs text-gray-400 mb-0.5">
+        <span className="flex items-center gap-0.5 text-xs text-gray-500 mb-0.5">
           <ArrowUp size={11} strokeWidth={2} />
           {A.delta}
         </span>
@@ -56,7 +56,7 @@ export default function AssetsMonitored() {
       </div>
 
       {/* Condition split */}
-      <p className="text-[11px] text-gray-400 tracking-wider mt-3 mb-2">By condition</p>
+      <p className="text-[11px] text-gray-500 tracking-wider mt-3 mb-2">By condition</p>
       <div className="flex h-2.5 rounded-full overflow-hidden bg-gray-100 mb-2">
         {A.breakdown.map((b, i) => (
           <div key={b.label} style={{ width: `${(b.value / total) * 100}%`, backgroundColor: CONDITION[i] }} />

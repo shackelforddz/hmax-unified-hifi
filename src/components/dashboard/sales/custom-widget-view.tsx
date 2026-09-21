@@ -58,7 +58,7 @@ export function ChartBody({ config, fill = false }: { config: CustomWidgetConfig
       <div className={root}>
         <div className="flex items-end gap-2 mb-2">
           <span className="text-2xl font-bold text-gray-900 leading-none">{formatValue(latest, unit)}</span>
-          <span className="text-xs text-gray-400 mb-0.5">
+          <span className="text-xs text-gray-500 mb-0.5">
             {delta >= 0 ? "+" : ""}{delta}{unit === "%" ? "pp" : ""} vs start
           </span>
         </div>
@@ -89,7 +89,7 @@ export function ChartBody({ config, fill = false }: { config: CustomWidgetConfig
             <div key={s.label} className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-sm" style={{ background: GRAYS[i % GRAYS.length] }} />
               <span className="text-xs text-gray-600">{s.label}</span>
-              <span className="text-xs text-gray-400 ml-auto">{formatValue(s.value, unit)}</span>
+              <span className="text-xs text-gray-500 ml-auto">{formatValue(s.value, unit)}</span>
             </div>
           ))}
         </div>
@@ -146,7 +146,7 @@ export default function CustomWidgetView({ config, static: isStatic }: Props) {
       <div className="flex items-start justify-between mb-4 gap-3">
         <h3 className="text-base text-gray-900 leading-snug">{config.title}</h3>
         {isStatic ? (
-          <MessageCircle size={16} strokeWidth={1.5} className="text-gray-300 shrink-0" />
+          <MessageCircle size={16} strokeWidth={1.5} className="text-gray-500 shrink-0" />
         ) : (
           <WidgetChat title={config.title} />
         )}

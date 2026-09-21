@@ -21,7 +21,7 @@ export function StatusBadge({ status }: { status: WoStatus }) {
   const cls =
     status === "blocked" ? "bg-gray-900 text-white"
     : status === "in-progress" ? "bg-gray-200 text-gray-700"
-    : status === "complete" ? "border border-gray-300 text-gray-400"
+    : status === "complete" ? "border border-gray-300 text-gray-500"
     : "border border-gray-300 text-gray-600";
   return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{STATUS_LABEL[status]}</span>;
 }
@@ -32,7 +32,7 @@ export function PriorityBadge({ priority }: { priority: WoPriority }) {
     priority === "critical" ? "bg-gray-900 text-white"
     : priority === "high" ? "bg-gray-700 text-white"
     : priority === "medium" ? "bg-gray-200 text-gray-700"
-    : "border border-gray-300 text-gray-400";
+    : "border border-gray-300 text-gray-500";
   return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{PRIORITY_LABEL[priority]}</span>;
 }
 
@@ -71,7 +71,7 @@ export function WorkOrderActions({ onAction }: { onAction: (label: string) => vo
         <div className="absolute bottom-full mb-2 right-0 w-full min-w-[220px] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-10 animate-pop-in">
           {ACTIONS.map(({ label, icon: Icon }) => (
             <Button key={label} variant="ghost" onClick={() => { setOpen(false); onAction(label); }} className="w-full justify-start gap-2.5 px-4 py-2.5 h-auto text-sm text-gray-700 rounded-none cursor-pointer">
-              <Icon size={15} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+              <Icon size={15} strokeWidth={1.5} className="text-gray-500 shrink-0" />
               {label}
             </Button>
           ))}
@@ -88,7 +88,7 @@ export function WorkOrderBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDe
       <ContextSummary summary={d.summary} critical={w.priority === "critical"}>
         {d.recommendedActions.length > 0 && (
           <div className="mt-4">
-            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
+            <p className="text-[11px] text-gray-500 tracking-wider mb-2">Recommended by HMAX</p>
             <div className="flex flex-wrap gap-2">
               {d.recommendedActions.map((a) => (
                 <Button key={a} onClick={() => onAction(a)} className="rounded-full h-auto px-4 py-1.5 text-xs cursor-pointer">{a}</Button>
@@ -102,7 +102,7 @@ export function WorkOrderBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDe
       <Card>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-base text-gray-900">Progress</h3>
-          <span className="text-xs text-gray-400">{w.progress}% complete · due {w.due}</span>
+          <span className="text-xs text-gray-500">{w.progress}% complete · due {w.due}</span>
         </div>
         <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
           <div className="h-full bg-chart-line rounded-full" style={{ width: `${w.progress}%` }} />
@@ -115,7 +115,7 @@ export function WorkOrderBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDe
         <div className="flex flex-col">
           {d.checklist.map((c) => (
             <div key={c.label} className="flex items-center gap-2.5 py-2 border-b border-gray-100 last:border-0">
-              {c.done ? <CheckCircle2 size={15} className="text-gray-900 shrink-0" /> : <Circle size={15} className="text-gray-300 shrink-0" />}
+              {c.done ? <CheckCircle2 size={15} className="text-gray-900 shrink-0" /> : <Circle size={15} className="text-gray-500 shrink-0" />}
               <span className={`text-sm ${c.done ? "text-gray-700" : "text-gray-500"}`}>{c.label}</span>
             </div>
           ))}
@@ -129,7 +129,7 @@ export function WorkOrderBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDe
           <div className="flex flex-col">
             {d.parts.map((p) => (
               <div key={p.label} className="flex items-center justify-between gap-3 py-2 border-b border-gray-100 last:border-0">
-                <span className="text-sm text-gray-700">{p.label} <span className="text-gray-400">×{p.qty}</span></span>
+                <span className="text-sm text-gray-700">{p.label} <span className="text-gray-500">×{p.qty}</span></span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${PART_CLS[p.status]}`}>{PART_LABEL[p.status]}</span>
               </div>
             ))}
@@ -149,7 +149,7 @@ export function WorkOrderBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDe
               </div>
               <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
                 <p className="text-sm text-gray-800">{t.label}</p>
-                <span className="text-xs text-gray-400 whitespace-nowrap shrink-0">{t.date}</span>
+                <span className="text-xs text-gray-500 whitespace-nowrap shrink-0">{t.date}</span>
               </div>
             </div>
           ))}
@@ -166,7 +166,7 @@ export function WorkOrderBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDe
             { label: "Contract", value: <ContractLink contract={d.related.contract} customer={d.related.customer} /> },
           ].map((r) => (
             <div key={r.label}>
-              <p className="text-[11px] text-gray-400 tracking-wider">{r.label}</p>
+              <p className="text-[11px] text-gray-500 tracking-wider">{r.label}</p>
               <p className="text-sm text-gray-800 mt-0.5">{r.value}</p>
             </div>
           ))}
@@ -211,18 +211,18 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
               <div className="flex items-start justify-between">
                 <div>
                   <h2 className="text-2xl text-gray-900">{w.code}</h2>
-                  <p className="text-sm text-gray-400 mt-0.5">{w.title}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">{w.title}</p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => drawers?.openPage({ kind: "work-order", id: workOrderId! })}
                     aria-label="Open as a page"
                     title="Open as a page"
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <Maximize2 size={15} strokeWidth={1.5} />
                   </button>
-                  <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
+                  <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer">
                     <X size={18} />
                   </button>
                 </div>
@@ -237,7 +237,7 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
                   { label: "Due", value: w.due },
                 ].map((s) => (
                   <div key={s.label}>
-                    <p className="text-[11px] text-gray-400 tracking-wider">{s.label}</p>
+                    <p className="text-[11px] text-gray-500 tracking-wider">{s.label}</p>
                     <p className="text-sm text-gray-800 mt-0.5">{s.value}</p>
                   </div>
                 ))}
@@ -248,7 +248,7 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
               {d ? (
                 <WorkOrderBody w={w} d={d} onAction={runAction} />
               ) : (
-                <p className="text-sm text-gray-400">No further detail recorded for this contract yet.</p>
+                <p className="text-sm text-gray-500">No further detail recorded for this contract yet.</p>
               )}
             </div>
 

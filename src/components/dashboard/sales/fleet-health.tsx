@@ -22,15 +22,15 @@ export default function FleetHealth() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2 mb-2">
         <div>
-          <p className="text-xs text-gray-400">30 days ago</p>
+          <p className="text-xs text-gray-500">30 days ago</p>
           <p className="text-2xl font-bold text-gray-900 leading-tight">{F.past}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-400">Today</p>
+          <p className="text-xs text-gray-500">Today</p>
           <p className="text-2xl font-bold text-gray-900 leading-tight">{F.today}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-400">Change</p>
+          <p className="text-xs text-gray-500">Change</p>
           <p className="text-2xl font-bold text-gray-900 leading-tight">{F.change}</p>
         </div>
       </div>

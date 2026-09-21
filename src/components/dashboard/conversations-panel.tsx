@@ -45,11 +45,11 @@ function EmptyState({
     // message and its openers centred together inside it.
     <div className="h-full min-h-[320px] flex flex-col justify-center gap-6">
       <div className="flex flex-col items-center text-center gap-2">
-        <span className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-gray-400">
+        <span className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-gray-500">
           <MessagesSquare size={22} strokeWidth={1.5} />
         </span>
         <p className="text-base font-bold text-gray-900 leading-5">No active conversations</p>
-        <p className="text-sm text-gray-500 leading-5">
+        <p className="text-sm text-gray-600 leading-5">
           Nothing in progress right now. Start a new conversation, or pick one of the openers below.
         </p>
       </div>
@@ -66,7 +66,7 @@ function EmptyState({
             <span className="flex-1 min-w-0">
               <span className="block text-sm font-bold text-gray-900 leading-5 line-clamp-4">{s.label}</span>
             </span>
-            <ArrowUpRight size={15} strokeWidth={1.5} className="text-gray-400 shrink-0 self-end" />
+            <ArrowUpRight size={15} strokeWidth={1.5} className="text-gray-500 shrink-0 self-end" />
           </button>
         ))}
       </div>
@@ -247,7 +247,7 @@ export default function ConversationsPanel({ conversations, onNewConversation, o
             </div>
           ))
         ) : conversations.length > 0 ? (
-          <p className="text-sm text-gray-400">No conversations match that search.</p>
+          <p className="text-sm text-gray-500">No conversations match that search.</p>
         ) : (
           <EmptyState suggestions={recommended} onStartPrompt={onStartPrompt} />
         )}

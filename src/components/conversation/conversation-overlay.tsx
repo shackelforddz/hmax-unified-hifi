@@ -233,6 +233,23 @@ export default function ConversationOverlay({ visible, onClose, context, initial
     timers.current.push(
       setTimeout(() => push({ role: "ai", kind: "text", text: pb.situation }), 900)
     );
+    // The data the alert was raised from, so the summary can be checked.
+    if (pb.evidence?.length) {
+      timers.current.push(
+        setTimeout(
+          () =>
+            push({
+              role: "ai",
+              kind: "text",
+              text: [
+                "Supporting data",
+                ...pb.evidence!.map((m) => `• ${m.label ? `${m.label}: ` : ""}${m.value}`),
+              ].join("\n"),
+            }),
+          1400
+        )
+      );
+    }
     timers.current.push(
       setTimeout(() => {
         setTyping(false);
@@ -253,7 +270,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
           if (pb.panel) push({ role: "ai", kind: "panel", panel: pb.panel });
         }
         if (pb.suggestedPerson) push({ role: "ai", kind: "suggest-person", suggestion: pb.suggestedPerson });
-      }, 1900)
+      }, pb.evidence?.length ? 2400 : 1900)
     );
     // Keep the widget context / customer in sync for the left pane.
     if (ctx) {

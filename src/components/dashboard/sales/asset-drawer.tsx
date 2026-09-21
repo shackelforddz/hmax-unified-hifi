@@ -30,7 +30,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 function ReadingState({ state }: { state: AssetReading["state"] }) {
   const cls =
-    state === "alert" ? "bg-status-critical text-white font-bold"
+    state === "alert" ? "bg-status-critical-deep text-white font-bold"
     : state === "watch" ? "bg-gray-200 text-gray-700"
     : "border border-gray-300 text-gray-500";
   const label = state === "alert" ? "Alert" : state === "watch" ? "Watch" : "OK";
@@ -38,7 +38,7 @@ function ReadingState({ state }: { state: AssetReading["state"] }) {
 }
 
 function RiskBadge({ level }: { level: "Critical" | "High" | "Medium" }) {
-  const cls = level === "Critical" ? "bg-status-critical text-white font-bold" : level === "High" ? "border border-status-critical text-status-critical font-bold" : "bg-gray-200 text-gray-700";
+  const cls = level === "Critical" ? "bg-status-critical-deep text-white font-bold" : level === "High" ? "border border-status-critical text-status-critical font-bold" : "bg-gray-200 text-gray-700";
   return <span className={`text-[11px] px-3 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{level}</span>;
 }
 
@@ -76,7 +76,7 @@ export function AssetActions({ onAction }: { onAction: (label: string) => void }
               onClick={() => { setOpen(false); onAction(label); }}
               className="w-full justify-start gap-2.5 px-4 py-2.5 h-auto text-sm text-gray-700 rounded-none cursor-pointer"
             >
-              <Icon size={15} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+              <Icon size={15} strokeWidth={1.5} className="text-gray-500 shrink-0" />
               {label}
             </Button>
           ))}
@@ -109,7 +109,7 @@ function GasTrends({ gases }: { gases: GasTrend[] }) {
     <Card>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base text-gray-900">Dissolved gas analysis</h3>
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-gray-500">
           {DGA_MONTHS[0]}-{DGA_MONTHS[DGA_MONTHS.length - 1]} · {over > 0 ? `${over} over limit` : "all within limits"}
         </span>
       </div>
@@ -121,21 +121,21 @@ function GasTrends({ gases }: { gases: GasTrend[] }) {
             <div key={g.gas} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
               <span className="w-24 shrink-0 min-w-0">
                 <span className="block text-sm text-gray-800">{g.gas}</span>
-                <span className="block text-[10px] text-gray-400 truncate">{g.name}</span>
+                <span className="block text-[10px] text-gray-500 truncate">{g.name}</span>
               </span>
               <GasSparkline points={g.points} over={isOver} />
               <span className="flex-1 text-right">
                 <span className={`block text-sm tabular-nums ${isOver ? "text-gray-900" : "text-gray-600"}`}>
                   {g.current.toLocaleString()} {g.unit}
                 </span>
-                <span className="block text-[10px] text-gray-400">
+                <span className="block text-[10px] text-gray-500">
                   limit {g.limit.toLocaleString()} · {rise > 0 ? "+" : ""}
                   {rise.toLocaleString()} over 6 mo
                 </span>
               </span>
               <span
                 className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${
-                  isOver ? "bg-status-critical text-white font-bold" : "border border-gray-200 text-gray-400"
+                  isOver ? "bg-status-critical-deep text-white font-bold" : "border border-gray-200 text-gray-500"
                 }`}
               >
                 {isOver ? "Over limit" : "Normal"}
@@ -157,7 +157,7 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
       <ContextSummary summary={d.contextSummary} critical={d.stats.status === "Critical"}>
         {d.recommendedActions.length > 0 && (
           <div className="mt-4">
-            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
+            <p className="text-[11px] text-gray-500 tracking-wider mb-2">Recommended by HMAX</p>
             <div className="flex flex-wrap gap-2">
               {d.recommendedActions.map((a) => (
                 <Button key={a} onClick={() => onAction(a)} className="rounded-full h-auto px-4 py-1.5 text-xs cursor-pointer">
@@ -187,7 +187,7 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
               { label: "Insulation", value: nameplate.insulationClass },
             ].map((r) => (
               <div key={r.label}>
-                <p className="text-[11px] text-gray-400 tracking-wider">{r.label}</p>
+                <p className="text-[11px] text-gray-500 tracking-wider">{r.label}</p>
                 <p className="text-sm text-gray-800 mt-0.5">{r.value}</p>
               </div>
             ))}
@@ -216,24 +216,24 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
               </span>
               Live sensor faults
             </h3>
-            <span className="text-xs text-gray-400">{faults.length} active</span>
+            <span className="text-xs text-gray-500">{faults.length} active</span>
           </div>
           <div className="flex flex-col">
             {faults.map((f) => (
               <div key={f.id} className="flex items-start gap-3 py-2.5 border-b border-gray-100 last:border-0">
                 <span
                   className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 mt-0.5 ${
-                    f.severity === "critical" ? "bg-status-critical text-white font-bold" : "border border-gray-400 text-gray-700"
+                    f.severity === "critical" ? "bg-status-critical-deep text-white font-bold" : "border border-gray-400 text-gray-700"
                   }`}
                 >
                   {f.severity === "critical" ? "Critical" : "Warning"}
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-800 leading-snug">{f.fault}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-xs text-gray-500 mt-0.5">
                     {f.sensor} · {f.value} against {f.limit}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-500">
                     detected {f.detected} · active {f.active}
                   </p>
                 </div>
@@ -287,7 +287,7 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
                 </div>
                 <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
                   <p className="text-sm text-gray-800">{m.label}</p>
-                  <span className="text-xs text-gray-400 whitespace-nowrap shrink-0">{m.date}</span>
+                  <span className="text-xs text-gray-500 whitespace-nowrap shrink-0">{m.date}</span>
                 </div>
               </div>
             ))}
@@ -325,16 +325,16 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
                 <div key={c.id}>
                   <div className="flex items-center justify-between gap-3 mb-1.5">
                     <span className="text-sm text-gray-900">{c.type}</span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${c.status === "conflict" ? "bg-status-critical text-white font-bold" : "border border-gray-300 text-gray-500"}`}>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${c.status === "conflict" ? "bg-status-critical-deep text-white font-bold" : "border border-gray-300 text-gray-500"}`}>
                       {c.status === "conflict" ? "Conflict" : "OK"}
                     </span>
                   </div>
                   <div className="flex items-baseline gap-2 text-xs">
-                    <span className="text-gray-400 w-16 shrink-0 tracking-wider text-[10px]">Handover</span>
+                    <span className="text-gray-500 w-16 shrink-0 tracking-wider text-[10px]">Handover</span>
                     <span className="text-gray-600 flex-1 min-w-0">{c.handover}</span>
                   </div>
                   <div className="flex items-baseline gap-2 text-xs mt-1">
-                    <span className="text-gray-400 w-16 shrink-0 tracking-wider text-[10px]">Site</span>
+                    <span className="text-gray-500 w-16 shrink-0 tracking-wider text-[10px]">Site</span>
                     <span className={`flex-1 min-w-0 ${c.status === "conflict" ? "text-gray-900" : "text-gray-600"}`}>{c.actual}</span>
                   </div>
                 </div>
@@ -354,7 +354,7 @@ export function DrawerBody({ d, cond, nameplate, assetId, onAction }: { d: Asset
             { label: "Station", value: d.related.station },
           ].map((r) => (
             <div key={r.label}>
-              <p className="text-[11px] text-gray-400 tracking-wider">{r.label}</p>
+              <p className="text-[11px] text-gray-500 tracking-wider">{r.label}</p>
               <p className="text-sm text-gray-800 mt-0.5">{r.value}</p>
             </div>
           ))}
@@ -389,14 +389,14 @@ function DocRow({
           // eslint-disable-next-line @next/next/no-img-element
           <img src="/transformer.png" alt="" aria-hidden className="w-full h-full object-cover grayscale" />
         ) : (
-          <Icon size={15} strokeWidth={1.5} className="text-gray-400" />
+          <Icon size={15} strokeWidth={1.5} className="text-gray-500" />
         )}
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm text-gray-800 truncate group-hover:underline underline-offset-2 decoration-gray-300">{title}</p>
-        <p className="text-xs text-gray-400 truncate">{meta}</p>
+        <p className="text-xs text-gray-500 truncate">{meta}</p>
       </div>
-      <Eye size={15} strokeWidth={1.5} className="text-gray-300 group-hover:text-gray-500 shrink-0 transition-colors" />
+      <Eye size={15} strokeWidth={1.5} className="text-gray-500 group-hover:text-gray-500 shrink-0 transition-colors" />
     </button>
   );
 }
@@ -406,9 +406,9 @@ function DocGroup({ title, count, children }: { title: string; count: number; ch
     <Card>
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-base text-gray-900">{title}</h3>
-        <span className="text-xs text-gray-400">{count}</span>
+        <span className="text-xs text-gray-500">{count}</span>
       </div>
-      {count > 0 ? <div className="flex flex-col">{children}</div> : <p className="text-sm text-gray-400">Nothing on file.</p>}
+      {count > 0 ? <div className="flex flex-col">{children}</div> : <p className="text-sm text-gray-500">Nothing on file.</p>}
     </Card>
   );
 }
@@ -570,13 +570,13 @@ export function ServiceHistoryTab({ id }: { id: string }) {
                   <p className="text-sm text-gray-800 leading-snug">{e.action}</p>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${EVENT_CLS[e.type]}`}>{e.type}</span>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">{e.by} · {e.role} · {e.date}</p>
+                <p className="text-xs text-gray-500 mt-1">{e.by} · {e.role} · {e.date}</p>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-gray-400">No service history recorded.</p>
+        <p className="text-sm text-gray-500">No service history recorded.</p>
       )}
     </Card>
   );
@@ -650,7 +650,7 @@ export default function AssetDrawer({ assetId, onClose, layer, hidden }: Props) 
                   </div>
                   <div>
                     <h2 className="text-2xl text-gray-900">{detail.code}</h2>
-                    <p className="text-sm text-gray-400 mt-0.5">{detail.type} · {detail.location}</p>
+                    <p className="text-sm text-gray-500 mt-0.5">{detail.type} · {detail.location}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
@@ -658,14 +658,14 @@ export default function AssetDrawer({ assetId, onClose, layer, hidden }: Props) 
                     onClick={() => drawers?.openPage({ kind: "asset", id: assetId! })}
                     aria-label="Open as a page"
                     title="Open as a page"
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <Maximize2 size={15} strokeWidth={1.5} />
                   </button>
                   <button
                     onClick={onClose}
                     aria-label="Close"
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <X size={18} />
                   </button>
@@ -680,12 +680,12 @@ export default function AssetDrawer({ assetId, onClose, layer, hidden }: Props) 
                   { label: "Last service", value: detail.stats.lastService },
                 ].map((s) => (
                   <div key={s.label}>
-                    <p className="text-[11px] text-gray-400 tracking-wider">{s.label}</p>
+                    <p className="text-[11px] text-gray-500 tracking-wider">{s.label}</p>
                     <p className="text-sm text-gray-800 mt-0.5">{s.value}</p>
                   </div>
                 ))}
                 <div>
-                  <p className="text-[11px] text-gray-400 tracking-wider">Health</p>
+                  <p className="text-[11px] text-gray-500 tracking-wider">Health</p>
                   <div className="flex items-center gap-2 mt-1.5">
                     <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div className="h-full bg-chart-line rounded-full" style={{ width: `${detail.stats.healthPct}%` }} />
@@ -703,7 +703,7 @@ export default function AssetDrawer({ assetId, onClose, layer, hidden }: Props) 
                   key={t.value}
                   onClick={() => setTab(t.value)}
                   className={`py-3 mr-6 text-sm border-b-2 -mb-px transition-colors cursor-pointer ${
-                    tab === t.value ? "border-gray-900 text-gray-900" : "border-transparent text-gray-400 hover:text-gray-600"
+                    tab === t.value ? "border-gray-900 text-gray-900" : "border-transparent text-gray-500 hover:text-gray-600"
                   }`}
                 >
                   {t.label}

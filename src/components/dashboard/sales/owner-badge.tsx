@@ -44,7 +44,7 @@ export default function OwnerBadge({ owner, className = "" }: { owner: string; c
           {ownerInitials(owner)}
         </span>
       )}
-      <span className="text-xs text-gray-400 whitespace-nowrap">{owner}</span>
+      <span className="text-xs text-gray-500 whitespace-nowrap">{owner}</span>
     </span>
   );
 }

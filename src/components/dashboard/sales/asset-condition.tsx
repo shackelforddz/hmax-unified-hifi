@@ -66,11 +66,11 @@ export function Aging({ d }: { d: AgingData }) {
       {/* Scale */}
       <div className="relative h-4 mt-1">
         {ticks.map((t) => (
-          <span key={t} className="absolute text-[10px] text-gray-400 -translate-x-1/2" style={{ left: pct(t) }}>
+          <span key={t} className="absolute text-[10px] text-gray-500 -translate-x-1/2" style={{ left: pct(t) }}>
             {t}
           </span>
         ))}
-        <span className="absolute right-0 text-[10px] text-gray-400">yr</span>
+        <span className="absolute right-0 text-[10px] text-gray-500">yr</span>
       </div>
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-[11px]">
@@ -94,7 +94,7 @@ export function ScoreCalculation({ factors, total }: { factors: ScoreFactor[]; t
     <div>
       <SectionTitle>Score Calculation</SectionTitle>
       <div className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-0">
-        <div className="grid grid-cols-[80px_1fr] items-center gap-x-3 col-span-2 pb-2 border-b border-gray-200 text-[11px] text-gray-400 tracking-wider">
+        <div className="grid grid-cols-[80px_1fr] items-center gap-x-3 col-span-2 pb-2 border-b border-gray-200 text-[11px] text-gray-500 tracking-wider">
           <span>Factor</span>
           <span>% of Max Value</span>
         </div>
@@ -102,7 +102,7 @@ export function ScoreCalculation({ factors, total }: { factors: ScoreFactor[]; t
           <div key={f.factor} className="grid grid-cols-[80px_1fr_auto] items-center gap-x-3 col-span-2 py-2.5 border-b border-gray-100 last:border-0">
             <span className="text-sm text-gray-700">{f.factor}</span>
             <div className="flex items-center gap-2.5 min-w-0">
-              <span className="text-xs text-gray-400 w-11 shrink-0 text-right">{f.pctOfMax.toFixed(1)}%</span>
+              <span className="text-xs text-gray-500 w-11 shrink-0 text-right">{f.pctOfMax.toFixed(1)}%</span>
               <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div className="h-full bg-chart-line rounded-full" style={{ width: `${f.pctOfMax}%` }} />
               </div>
@@ -162,9 +162,9 @@ export function RiskMatrix({ risk }: { risk: RiskSummary }) {
 function Kpi({ icon: Icon, label, value, accent, small }: { icon: React.ElementType; label: string; value: string; accent?: boolean; small?: boolean }) {
   return (
     <div className="bg-white border border-gray-100 rounded-lg px-3 py-2">
-      <p className="text-[10px] text-gray-400 tracking-wider leading-none mb-1.5">{label}</p>
+      <p className="text-[10px] text-gray-500 tracking-wider leading-none mb-1.5">{label}</p>
       <div className="flex items-center gap-1.5">
-        <Icon size={14} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+        <Icon size={14} strokeWidth={1.5} className="text-gray-500 shrink-0" />
         <span className={`${small ? "text-sm" : "text-lg"} leading-none ${accent ? "text-gray-900 font-semibold" : "text-gray-900"}`}>{value}</span>
       </div>
     </div>
@@ -232,16 +232,16 @@ export function ParameterTrend({ data, rows }: { data: ParameterPoint[]; rows: P
         </div>
         {rows.map((r, i) => (
           <div key={i} className="grid grid-cols-[70px_1fr_auto] gap-x-2 px-3 py-2.5 border-t border-gray-100 items-center">
-            <span className="text-xs text-gray-400">{r.factor}</span>
+            <span className="text-xs text-gray-500">{r.factor}</span>
             <div className="min-w-0">
               <p className="text-sm text-gray-800 truncate">{r.name}</p>
-              <p className="text-[10px] text-gray-400">
+              <p className="text-[10px] text-gray-500">
                 was {r.prev}{r.unit ? ` ${r.unit}` : ""}
               </p>
             </div>
             <span className="text-sm text-gray-900 tabular-nums flex items-center gap-0.5 justify-end">
               {r.current}
-              <ArrowUp size={11} strokeWidth={2.5} className={r.up ? "text-gray-700" : "text-gray-300 rotate-180"} />
+              <ArrowUp size={11} strokeWidth={2.5} className={r.up ? "text-gray-700" : "text-gray-500 rotate-180"} />
             </span>
           </div>
         ))}
@@ -272,7 +272,7 @@ function Bullet({ m }: { m: BulletMetric }) {
         <div className="absolute top-0 bottom-0 border-l-2 border-dashed border-gray-500" style={{ left: pct(m.warning) }} />
         <div className="absolute top-0 bottom-0 border-l-2 border-dashed border-gray-800" style={{ left: pct(m.alarm) }} />
       </div>
-      <div className="flex justify-between text-[9px] text-gray-400 mt-0.5">
+      <div className="flex justify-between text-[9px] text-gray-500 mt-0.5">
         <span>0</span>
         <span>warn {m.warning.toLocaleString()}</span>
         <span>alarm {m.alarm.toLocaleString()}</span>
@@ -298,7 +298,7 @@ function PhaseChart({
     <div>
       <div className="flex items-baseline gap-1.5 mb-1">
         <p className="text-sm font-medium text-gray-700">{title}</p>
-        {unit && <span className="text-[10px] text-gray-400">{unit}</span>}
+        {unit && <span className="text-[10px] text-gray-500">{unit}</span>}
       </div>
       <ResponsiveContainer width="100%" height={130}>
         <LineChart data={series} margin={{ top: 6, right: 8, bottom: 0, left: 0 }}>

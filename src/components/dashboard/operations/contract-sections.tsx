@@ -75,7 +75,7 @@ export default function ContractSections({ d }: { d: ContractSectionsData }) {
             return (
               <div key={pt.label} className="flex items-center gap-3 py-2.5 border-b border-gray-100 last:border-0">
                 <span className="text-sm text-gray-700 flex-1 min-w-0 truncate">{pt.label}</span>
-                <span className="text-xs text-gray-400 shrink-0">×{pt.qty}</span>
+                <span className="text-xs text-gray-500 shrink-0">×{pt.qty}</span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${cls}`}>{label}</span>
               </div>
             );
@@ -93,7 +93,7 @@ export default function ContractSections({ d }: { d: ContractSectionsData }) {
               <div key={m.task} className="flex items-center gap-3 py-2.5 border-b border-gray-100 last:border-0">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-700 truncate">{m.task}</p>
-                  <p className="text-xs text-gray-400">{m.interval} · due {m.due}</p>
+                  <p className="text-xs text-gray-500">{m.interval} · due {m.due}</p>
                 </div>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${cls}`}>{m.status}</span>
               </div>
@@ -112,9 +112,9 @@ export default function ContractSections({ d }: { d: ContractSectionsData }) {
               <div key={f.visit} className="flex items-center gap-3 py-2.5 border-b border-gray-100 last:border-0">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-700 truncate">{f.visit}</p>
-                  <p className="text-xs text-gray-400">{f.engineer} · {f.date}</p>
+                  <p className="text-xs text-gray-500">{f.engineer} · {f.date}</p>
                 </div>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${blocked ? "bg-status-critical text-white font-bold" : "border border-gray-300 text-gray-500"}`}>{f.status}</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${blocked ? "bg-status-critical-deep text-white font-bold" : "border border-gray-300 text-gray-500"}`}>{f.status}</span>
               </div>
             );
           })}
@@ -133,7 +133,7 @@ export default function ContractSections({ d }: { d: ContractSectionsData }) {
             { label: "Outstanding", value: d.finance.outstanding },
           ].map((r) => (
             <div key={r.label}>
-              <p className="text-[11px] text-gray-400 tracking-wider">{r.label}</p>
+              <p className="text-[11px] text-gray-500 tracking-wider">{r.label}</p>
               <p className="text-sm text-gray-800 mt-0.5">{r.value}</p>
             </div>
           ))}
@@ -151,7 +151,7 @@ export default function ContractSections({ d }: { d: ContractSectionsData }) {
                 <span className="text-sm text-gray-500 w-24 shrink-0">{inv.code}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-700 truncate">{inv.milestone}</p>
-                  <p className="text-xs text-gray-400">due {inv.due}</p>
+                  <p className="text-xs text-gray-500">due {inv.due}</p>
                 </div>
                 <span className="text-sm text-gray-700 shrink-0">{inv.amount}</span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${cls}`}>{inv.status}</span>
@@ -174,7 +174,7 @@ export default function ContractSections({ d }: { d: ContractSectionsData }) {
               <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-sm text-gray-800 leading-snug">{pay.event}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{pay.date}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{pay.date}</p>
                 </div>
                 <span className={`text-sm shrink-0 ${pay.amount.startsWith("+") ? "text-gray-700" : "text-gray-500"}`}>{pay.amount}</span>
               </div>
@@ -210,7 +210,7 @@ export default function ContractSections({ d }: { d: ContractSectionsData }) {
               </div>
               <div>
                 <p className="text-sm text-gray-800">{t.name}</p>
-                <p className="text-xs text-gray-400">{t.role}</p>
+                <p className="text-xs text-gray-500">{t.role}</p>
               </div>
             </div>
           ))}
@@ -228,7 +228,7 @@ export default function ContractSections({ d }: { d: ContractSectionsData }) {
               </div>
               <div className="min-w-0">
                 <p className="text-sm text-gray-800">{ct.name}</p>
-                <p className="text-xs text-gray-400">{ct.role}</p>
+                <p className="text-xs text-gray-500">{ct.role}</p>
                 <p className="text-xs text-gray-500 mt-0.5">{ct.email} · {ct.phone}</p>
               </div>
             </div>

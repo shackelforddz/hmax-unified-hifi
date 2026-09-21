@@ -37,7 +37,7 @@ import {
 const READINESS_CLS: Record<string, string> = {
   ready: "bg-gray-100 text-gray-600",
   pending: "bg-amber-50 text-amber-700 border border-amber-200",
-  blocked: "bg-status-critical text-white font-bold",
+  blocked: "bg-status-critical-deep text-white font-bold",
 };
 
 /* An icon per state, so a chip reads before its colour does. */
@@ -56,7 +56,7 @@ function ReadinessChips({ readiness }: { readiness: Readiness }) {
 
   return (
     <div>
-      <p className="text-[10px] text-gray-400 tracking-wider mb-1">Readiness</p>
+      <p className="text-[10px] text-gray-500 tracking-wider mb-1">Readiness</p>
       <div className="relative flex flex-wrap gap-1.5">
         {READINESS_ITEMS.map((item) => {
           const state = readiness[item];
@@ -96,7 +96,7 @@ function SlipBadge({ hours }: { hours: number }) {
   return (
     <span
       className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 font-bold ${
-        late ? "bg-status-critical text-white" : "bg-green-50 text-green-700 border border-green-200"
+        late ? "bg-status-critical-deep text-white" : "bg-green-50 text-green-700 border border-green-200"
       }`}
     >
       {label}
@@ -290,7 +290,7 @@ export default function PmRiskMap() {
               {p.code} · {p.supplier}
             </p>
           </div>
-          <p className="text-xs text-gray-400 whitespace-nowrap">X{p.qty}</p>
+          <p className="text-xs text-gray-500 whitespace-nowrap">X{p.qty}</p>
         </div>
 
         {supplier && (
@@ -342,11 +342,11 @@ export default function PmRiskMap() {
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="text-sm font-bold text-gray-900 leading-snug">{s.contract}</p>
-            <p className="text-xs text-gray-400 truncate">{s.customer}</p>
+            <p className="text-xs text-gray-500 truncate">{s.customer}</p>
           </div>
           <span
             className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${
-              s.status === "critical" ? "bg-status-critical text-white font-bold" : "border border-gray-300 text-gray-500"
+              s.status === "critical" ? "bg-status-critical-deep text-white font-bold" : "border border-gray-300 text-gray-500"
             }`}
           >
             {s.status === "critical" ? "Critical" : "At risk"}
@@ -357,7 +357,7 @@ export default function PmRiskMap() {
         {showPart && s.latePart && partBlock(s, s.latePart)}
 
         <div>
-          <p className="text-[10px] text-gray-400 tracking-wider mb-1">Risks</p>
+          <p className="text-[10px] text-gray-500 tracking-wider mb-1">Risks</p>
           <div className="flex flex-wrap gap-1.5">
             {s.risks.map((t) => (
               <span key={t} className={`text-[10px] px-2 py-0.5 rounded-full ${t === risk ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600"}`}>
@@ -372,7 +372,7 @@ export default function PmRiskMap() {
         {/* What is riding on it commercially */}
         {s.value && (
           <div>
-            <p className="text-[10px] text-gray-400 tracking-wider mb-1">Business impact</p>
+            <p className="text-[10px] text-gray-500 tracking-wider mb-1">Business impact</p>
             <p className="text-xs text-gray-600">{s.value} contract value</p>
           </div>
         )}
@@ -408,7 +408,7 @@ export default function PmRiskMap() {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold text-gray-900 leading-snug">{p.shipment.carrier}</p>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-500">
               {p.shipment.mode} · {p.name} ×{p.qty}
             </p>
           </div>
@@ -448,7 +448,7 @@ export default function PmRiskMap() {
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-gray-900 leading-snug">{sup.name}</p>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-500">
             {sup.location} · {sup.stock}
           </p>
         </div>
@@ -510,7 +510,7 @@ export default function PmRiskMap() {
     if (pin.disruption) {
       return (
         <span className="relative flex items-center">
-          <span className={`relative size-7 rounded-full flex items-center justify-center shadow-md bg-status-critical text-white ${ring}`}>
+          <span className={`relative size-7 rounded-full flex items-center justify-center shadow-md bg-status-critical-deep text-white ${ring}`}>
             <TriangleAlert size={14} />
           </span>
         </span>
@@ -628,7 +628,7 @@ export default function PmRiskMap() {
       r?.kind === "rerouted" || r?.kind === "eta-confirmed" ? (
         <>
           <div className="rounded-lg bg-gray-50 border border-gray-100 p-2.5 flex flex-col gap-1">
-            <p className="text-[11px] text-gray-400">Reply from {contact.name}</p>
+            <p className="text-[11px] text-gray-500">Reply from {contact.name}</p>
             <p className="text-xs text-gray-800 leading-snug">
               {r.kind === "rerouted"
                 ? `Rerouting now via the ${part.reroute.via}. New ETA to site ${shortDate(part.reroute.eta)}.`
@@ -681,7 +681,7 @@ export default function PmRiskMap() {
                 disabled={r?.kind === "awaiting"}
                 aria-pressed={request === q.id}
                 className={`flex-1 h-7 rounded-full text-xs font-bold transition-colors cursor-pointer ${
-                  request === q.id ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                  request === q.id ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {q.label}
@@ -733,11 +733,11 @@ Send to {contact.name.split(" ")[0]}
                 <Store size={15} className="text-gray-700 shrink-0" />
                 <span className="flex-1 min-w-0">
                   <span className="block text-xs text-gray-900 truncate">{sup.name}</span>
-                  <span className="block text-[11px] text-gray-400 truncate">
+                  <span className="block text-[11px] text-gray-500 truncate">
                     {sup.stock} · on site {shortDate(sup.arrives)} · {sup.cost}
                   </span>
                   {sup.recommended && (
-                    <span className="block mt-1 text-[10px] text-gray-400 tracking-wider">Recommended by HMAX</span>
+                    <span className="block mt-1 text-[10px] text-gray-500 tracking-wider">Recommended by HMAX</span>
                   )}
                 </span>
                 <SlipBadge hours={slip(part, sup.arrives)} />
@@ -752,7 +752,7 @@ Send to {contact.name.split(" ")[0]}
     );
   } else {
     overlay = (
-      <div className="absolute top-14 left-4 right-[224px] z-10 flex flex-wrap items-center gap-2" onPointerDown={(e) => e.stopPropagation()}>
+      <div className="absolute top-14 left-4 right-[224px] @max-[620px]:right-4 z-10 flex flex-wrap items-center gap-2" onPointerDown={(e) => e.stopPropagation()}>
         <TabGroup
           value={risk}
           onChange={(v) => {

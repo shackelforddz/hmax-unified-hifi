@@ -255,7 +255,7 @@ export default function DetailPage({ detail }: { detail: Detail }) {
         {/* Header */}
         <div className="">
           <h2 className="text-2xl text-gray-900">{page.title}</h2>
-          <p className="text-sm text-gray-400 mt-0.5">{page.subtitle}</p>
+          <p className="text-sm text-gray-500 mt-0.5">{page.subtitle}</p>
         </div>
 
         {page.tabs && (
@@ -265,7 +265,7 @@ export default function DetailPage({ detail }: { detail: Detail }) {
                 key={t.value}
                 onClick={() => setTab(t.value)}
                 className={`py-3 mr-6 text-sm border-b-2 -mb-px transition-colors cursor-pointer ${
-                  tab === t.value ? "border-gray-900 text-gray-900" : "border-transparent text-gray-400 hover:text-gray-600"
+                  tab === t.value ? "border-gray-900 text-gray-900" : "border-transparent text-gray-500 hover:text-gray-600"
                 }`}
               >
                 {t.label}
@@ -282,7 +282,7 @@ export default function DetailPage({ detail }: { detail: Detail }) {
             <div className="flex flex-col gap-3">
               {page.facts.map((f) => (
                 <div key={f.label}>
-                  <p className="text-[11px] text-gray-400 tracking-wider">{f.label}</p>
+                  <p className="text-[11px] text-gray-500 tracking-wider">{f.label}</p>
                   <p className="text-sm text-gray-800 mt-0.5">{f.value}</p>
                 </div>
               ))}

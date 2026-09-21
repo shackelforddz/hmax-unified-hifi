@@ -19,7 +19,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 function Badge({ badge }: { badge: SlaBadge }) {
   if (badge.verified) {
     return (
-      <span className="inline-flex items-center gap-1 bg-status-critical text-white font-bold text-[11px] px-3 py-0.5 rounded-full whitespace-nowrap">
+      <span className="inline-flex items-center gap-1 bg-status-critical-deep text-white font-bold text-[11px] px-3 py-0.5 rounded-full whitespace-nowrap">
         <Check size={10} strokeWidth={2.5} /> {badge.label}
       </span>
     );
@@ -55,7 +55,7 @@ export function SlaActions({ onAction }: { onAction: (label: string) => void }) 
         <div className="absolute bottom-full mb-2 right-0 w-full min-w-[220px] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-10 animate-pop-in">
           {ACTIONS.map(({ label, icon: Icon }) => (
             <Button key={label} variant="ghost" onClick={() => { setOpen(false); onAction(label); }} className="w-full justify-start gap-2.5 px-4 py-2.5 h-auto text-sm text-gray-700 rounded-none cursor-pointer">
-              <Icon size={15} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+              <Icon size={15} strokeWidth={1.5} className="text-gray-500 shrink-0" />
               {label}
             </Button>
           ))}
@@ -75,15 +75,15 @@ export function SlaBody({ d, onAction }: { d: SlaContractDetail; onAction: (p: s
       <Card>
         <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
           <div>
-            <p className="text-[11px] text-gray-400 tracking-wider mb-1">Service health</p>
+            <p className="text-[11px] text-gray-500 tracking-wider mb-1">Service health</p>
             <Badge badge={d.serviceHealth} />
           </div>
           <div>
-            <p className="text-[11px] text-gray-400 tracking-wider mb-1">Renewal risk</p>
+            <p className="text-[11px] text-gray-500 tracking-wider mb-1">Renewal risk</p>
             <Badge badge={d.risk} />
           </div>
           <div>
-            <p className="text-[11px] text-gray-400 tracking-wider">SLA</p>
+            <p className="text-[11px] text-gray-500 tracking-wider">SLA</p>
             <p className="text-sm text-gray-800 mt-0.5">{d.slaActual} / {d.slaTarget}</p>
           </div>
         </div>
@@ -108,7 +108,7 @@ export function SlaBody({ d, onAction }: { d: SlaContractDetail; onAction: (p: s
         <div className="flex flex-col">
           {d.obligations.map((o) => (
             <div key={o.label} className="flex items-center gap-2.5 py-2 border-b border-gray-100 last:border-0">
-              {o.met ? <Check size={15} className="text-gray-900 shrink-0" /> : <Circle size={15} className="text-gray-300 shrink-0" />}
+              {o.met ? <Check size={15} className="text-gray-900 shrink-0" /> : <Circle size={15} className="text-gray-500 shrink-0" />}
               <span className={`text-sm ${o.met ? "text-gray-700" : "text-gray-500"}`}>{o.label}</span>
               {!o.met && <span className="ml-auto text-[10px] border border-status-critical text-status-critical font-bold rounded-full px-2 py-0.5">At risk</span>}
             </div>
@@ -138,7 +138,7 @@ export function SlaBody({ d, onAction }: { d: SlaContractDetail; onAction: (p: s
             { label: "Region", value: d.region },
           ].map((r) => (
             <div key={r.label}>
-              <p className="text-[11px] text-gray-400 tracking-wider">{r.label}</p>
+              <p className="text-[11px] text-gray-500 tracking-wider">{r.label}</p>
               <p className="text-sm text-gray-800 mt-0.5">{r.value}</p>
             </div>
           ))}
@@ -188,18 +188,18 @@ export default function SlaContractDrawer({ contractId, onClose, layer, hidden }
               <div className="flex items-start justify-between">
                 <div>
                   <h2 className="text-2xl text-gray-900">{d.account}</h2>
-                  <p className="text-sm text-gray-400 mt-0.5">{d.agreement}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">{d.agreement}</p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => drawers?.openPage({ kind: "sla", id: contractId! })}
                     aria-label="Open as a page"
                     title="Open as a page"
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <Maximize2 size={15} strokeWidth={1.5} />
                   </button>
-                  <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
+                  <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer">
                     <X size={18} />
                   </button>
                 </div>
@@ -212,7 +212,7 @@ export default function SlaContractDrawer({ contractId, onClose, layer, hidden }
                   { label: "Owner", value: d.owner },
                 ].map((s) => (
                   <div key={s.label}>
-                    <p className="text-[11px] text-gray-400 tracking-wider">{s.label}</p>
+                    <p className="text-[11px] text-gray-500 tracking-wider">{s.label}</p>
                     <p className="text-sm text-gray-800 mt-0.5">{s.value}</p>
                   </div>
                 ))}

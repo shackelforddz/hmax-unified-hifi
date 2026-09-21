@@ -34,7 +34,7 @@ export default function LoginForm({ role }: { role?: Role }) {
           <h1 className=" text-[1.65rem] text-center leading-snug mb-1">
             Sign in to your workspace
           </h1>
-          <p className="text-sm text-gray-400 text-center mb-6">
+          <p className="text-sm text-gray-500 text-center mb-6">
             Access your Hitachi HMAX cockpit
           </p>
 
@@ -53,7 +53,7 @@ export default function LoginForm({ role }: { role?: Role }) {
             Sign in with Single Sign-On
           </Button>
 
-          <p className="text-sm text-center text-gray-400 mt-4 hover:text-gray-600 cursor-pointer transition-colors">
+          <p className="text-sm text-center text-gray-500 mt-4 hover:text-gray-600 cursor-pointer transition-colors">
             Other sign-in options
           </p>
 
@@ -62,7 +62,7 @@ export default function LoginForm({ role }: { role?: Role }) {
           {/* Demo persona quick links - only on the base login */}
           {!role && (
             <div className="mb-6">
-              <p className="text-xs text-gray-400 text-center mb-2">Jump into a demo persona</p>
+              <p className="text-xs text-gray-500 text-center mb-2">Jump into a demo persona</p>
               <div className="flex items-center justify-center gap-2 flex-wrap">
                 {DEMO_ROLES.map((r) => (
                   <Link
@@ -77,14 +77,14 @@ export default function LoginForm({ role }: { role?: Role }) {
             </div>
           )}
 
-          <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
+          <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500">
             <ShieldAlert size={13} strokeWidth={1.5} />
             <span>Secured by Hitachi IAM Enterprise Guard</span>
           </div>
         </div>
       </main>
 
-      <footer className="flex justify-center items-center gap-4 py-6 text-xs text-gray-400">
+      <footer className="flex justify-center items-center gap-4 py-6 text-xs text-gray-500">
         <a href="#" className="hover:underline">Terms of Service</a>
         <span>•</span>
         <a href="#" className="hover:underline">Privacy Policy</a>

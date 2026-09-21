@@ -1,3 +1,5 @@
+import { CONTRACT_COUNTS, OPS_CONTRACTS } from "@/lib/operations-data";
+
 /* ── Knowledge base ──────────────────────────────────────────────────
    Dummy portfolio data + a lightweight query engine so the assistant can
    return grounded answers to free-text prompts (contracts, assets, KPIs). */
@@ -48,8 +50,10 @@ export const ASSETS: KBAsset[] = [
 ];
 
 export const PORTFOLIO = {
-  activeContracts: 24,
-  contractsAtRisk: 14,
+  // Counted from the contracts themselves, so the assistant and the dashboard
+  // never quote different numbers.
+  activeContracts: CONTRACT_COUNTS.active,
+  contractsAtRisk: CONTRACT_COUNTS.atRisk + CONTRACT_COUNTS.critical,
   portfolioMargin: "18.6%",
   onTimeDelivery: "60%",
   fleetHealthToday: 71,
@@ -266,7 +270,13 @@ export function answerQuery(prompt: string, context?: string): string {
     if (a) return formatAsset(a);
   }
 
-  // Customer / contract lookup
+  // Contract lookup - by its own name ("Sherco HVDC winding replacement") as
+  // well as by the customer, since that is how a drawer asks about one.
+  const named = OPS_CONTRACTS.find((x) => q.includes(x.name.toLowerCase()));
+  const byName = named && CONTRACTS.find((x) => x.customer === named.customer);
+  if (byName) return formatContract(byName);
+
+  // Customer lookup
   const c = CONTRACTS.find((x) => q.includes(x.customer.toLowerCase()));
   if (c) return formatContract(c);
 

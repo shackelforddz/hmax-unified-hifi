@@ -22,7 +22,7 @@ export default function ResourceCapacity() {
             <div key={t.name}>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-sm text-gray-700">{t.name}</span>
-                <span className="text-sm text-gray-400">
+                <span className="text-sm text-gray-500">
                   {t.allocated}/{t.headcount} allocated · <span className={over ? "text-gray-900 font-medium" : "text-gray-500"}>{t.utilization}%</span>
                 </span>
               </div>

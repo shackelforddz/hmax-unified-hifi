@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, LabelList, ResponsiveContainer } from "recharts";
 import { CHART } from "@/lib/chart-theme";
 import { REVENUE_AT_RISK as R, VENDOR_CONCENTRATION as V } from "@/lib/dashboard-data";
@@ -8,12 +7,11 @@ import WidgetChat from "./widget-chat";
 import WidgetAlert, { WidgetAttentionGlow } from "./widget-alert";
 import { ATTENTION_DETAIL, NEEDS_ATTENTION } from "@/lib/widget-attention";
 
-const TITLE = "Revenue at risk";
-
 /* The same money, cut two ways: what is putting it at risk, and who we are
-   exposed to. Recharts spreads unrecognised datum fields onto the rendered
-   <path>, so a field called `display` would land as the SVG display attribute
-   and hide the bar - hence `amountLabel`. */
+   exposed to. A cut each, as its own widget - the two answer different
+   questions and a dashboard rarely wants both. Recharts spreads unrecognised
+   datum fields onto the rendered <path>, so a field called `display` would
+   land as the SVG display attribute and hide the bar - hence `amountLabel`. */
 const BY_TRIGGER = R.bars.map((b) => ({ key: b.label, amount: b.amount, amountLabel: b.display, sub: "" }));
 const BY_VENDOR = V.bars.map((b) => ({
   key: b.name,
@@ -22,8 +20,12 @@ const BY_VENDOR = V.bars.map((b) => ({
   sub: `${b.projects} project${b.projects > 1 ? "s" : ""}`,
 }));
 
-const VIEWS = { "By trigger": BY_TRIGGER, "By vendor": BY_VENDOR };
-type View = keyof typeof VIEWS;
+export type RiskCut = "trigger" | "vendor";
+
+const CUTS: Record<RiskCut, { title: string; caption: string; rows: typeof BY_TRIGGER }> = {
+  trigger: { title: "Revenue at risk", caption: R.caption, rows: BY_TRIGGER },
+  vendor: { title: "Revenue at risk by vendor", caption: "revenue at risk by vendor", rows: BY_VENDOR },
+};
 
 /** Category tick: name over two lines if it needs them, then an optional
  *  sub-label. Written by hand so long trigger names wrap instead of colliding. */
@@ -58,15 +60,9 @@ function CategoryTick({
   );
 }
 
-export default function RevenueAtRisk() {
-  const [view, setView] = useState<View>("By trigger");
-  const rows = VIEWS[view];
+export default function RevenueAtRisk({ by = "trigger" }: { by?: RiskCut }) {
+  const { title: TITLE, caption, rows } = CUTS[by];
   const max = Math.max(...rows.map((b) => b.amount));
-
-  const tab = (active: boolean) =>
-    `h-full flex-1 flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
-      active ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
-    }`;
 
   return (
     <div className="relative overflow-hidden bg-white rounded-xl border border-gray-200 p-5 flex flex-col">
@@ -82,21 +78,12 @@ export default function RevenueAtRisk() {
       {/* Total */}
       <div className="flex items-end gap-2">
         <span className="text-2xl font-bold text-gray-900 leading-none">{R.total}</span>
-        <span className="text-xs text-gray-400 mb-0.5">{R.caption}</span>
-      </div>
-
-      {/* Same total, two cuts */}
-      <div role="tablist" aria-label="Revenue at risk breakdown" className="bg-gray-100 h-8 flex items-center p-[3px] rounded-full mt-3">
-        {(Object.keys(VIEWS) as View[]).map((v) => (
-          <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)} className={tab(view === v)}>
-            {v}
-          </button>
-        ))}
+        <span className="text-xs text-gray-500 mb-0.5">{caption}</span>
       </div>
 
       {/* Chart - grows to fill the tile. The absolute box gives
           ResponsiveContainer a definite height to measure against. */}
-      <div className="relative flex-1 min-h-[170px] mt-2">
+      <div className="relative flex-1 min-h-[170px] mt-4">
         <div className="absolute inset-0">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={rows} margin={{ top: 22, right: 4, bottom: 4, left: 4 }} barCategoryGap="24%">

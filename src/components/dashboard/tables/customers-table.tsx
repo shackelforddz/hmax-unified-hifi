@@ -52,7 +52,7 @@ const ESTATES: Estate[] = [...new Set(OPS_CONTRACTS.map((c) => c.customer))]
 function StatusBadge({ status }: { status: string }) {
   const critical = status === "critical" || status === "Critical";
   const atRisk = status === "at-risk" || status === "At risk";
-  const cls = critical ? "bg-status-critical text-white font-bold" : atRisk ? "border border-gray-400 text-gray-700" : "border border-gray-200 text-gray-400";
+  const cls = critical ? "bg-status-critical-deep text-white font-bold" : atRisk ? "border border-gray-400 text-gray-700" : "border border-gray-200 text-gray-500";
   const label = critical ? "Critical" : atRisk ? "At risk" : status === "In service" ? "In service" : "On track";
   return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{label}</span>;
 }
@@ -64,7 +64,7 @@ function HealthBar({ pct }: { pct: number }) {
       <div className="relative flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
         <div className={`h-full rounded-full ${low ? "bg-status-critical" : "bg-chart-line"}`} style={{ width: `${pct}%` }} />
       </div>
-      <span className={`text-xs shrink-0 ${low ? "text-gray-900" : "text-gray-400"}`}>{pct}%</span>
+      <span className={`text-xs shrink-0 ${low ? "text-gray-900" : "text-gray-500"}`}>{pct}%</span>
     </div>
   );
 }
@@ -73,7 +73,7 @@ function Drillable({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-gray-900">
       {children}
-      <ChevronRight size={13} strokeWidth={1.5} className="text-gray-300" />
+      <ChevronRight size={13} strokeWidth={1.5} className="text-gray-500" />
     </span>
   );
 }

@@ -21,7 +21,7 @@ export function TabGroup({
 }) {
   const tab = (active: boolean) =>
     `h-full flex gap-1.5 items-center justify-center px-2 py-1 rounded-full text-sm font-bold whitespace-nowrap transition-colors cursor-pointer ${
-      active ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+      active ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
     }`;
 
   return (

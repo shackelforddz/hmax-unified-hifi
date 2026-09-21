@@ -31,6 +31,10 @@
 /* Status + chart accents from the hi-fi design. */
 @theme {
   --color-status-critical: #fa000f;
+  /* The same red, deep enough that white text on it clears 4.5:1. Used for
+     filled chips and buttons; the brighter one stays for marks and borders,
+     which only need 3:1. */
+  --color-status-critical-deep: #e3000e;
   --color-status-warning: #f59e0b;
   --color-status-ok: #16a34a;
   --color-chart-line: #3b82f6;

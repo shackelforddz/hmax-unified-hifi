@@ -19,6 +19,7 @@ import { type RiskProfile } from "@/lib/operations-data";
 import AlertsWidget from "@/components/dashboard/alerts-widget";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
+import { useToast } from "@/components/dashboard/toast";
 import OpportunityDrawer from "./opportunity-drawer";
 import { buildPlaybook } from "@/lib/alert-playbooks";
 import type { AlertItem, AlertMetaItem, AlertUrgency } from "@/lib/alerts";
@@ -182,12 +183,18 @@ export default function Opportunities({ category, title, withContext = false, wi
   const [proposed, setProposed] = useState<ProposedOpportunity[]>(withProposals ? PROPOSED_OPPORTUNITIES : []);
   const [drawer, setDrawer] = useState<{ opp: Opportunity; detail: OpportunityDetail } | null>(null);
   const launch = useConversationLauncher();
+  const toast = useToast();
 
   const openDrawer = (opp: Opportunity) => setDrawer({ opp, detail: leadDetail(opp) });
 
   const addProposal = (p: ProposedOpportunity) => {
     setPipeline((pl) => [proposalToOpp(p), ...pl]);
     setProposed((pr) => pr.filter((x) => x.id !== p.id));
+    // The proposal leaves the list it was sitting in, so say where it went.
+    toast({
+      title: `${p.account} added to your pipeline`,
+      detail: `${p.title} is at the top of ${title}, and on the Leads tab.`,
+    });
   };
   const reviewProposal = (p: ProposedOpportunity) => setDrawer({ opp: proposalToOpp(p), detail: proposalDetail(p) });
   const dismissProposal = (id: string) => setProposed((pr) => pr.filter((x) => x.id !== id));

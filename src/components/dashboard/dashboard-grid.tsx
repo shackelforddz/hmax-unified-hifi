@@ -24,6 +24,20 @@ export interface GridItem {
   fixed?: boolean;
 }
 
+/* How wide a widget sits, and what it widens to as the sheet narrows: a
+   third becomes a half, a half becomes the whole row. Container queries, not
+   media queries - the sheet's width depends on the conversation log beside
+   it, so the window is the wrong thing to measure. */
+const SPAN_CLS: Record<number, string> = {
+  4: "col-span-4 @max-[880px]:col-span-6 @max-[660px]:col-span-12",
+  6: "col-span-6 @max-[660px]:col-span-12",
+  8: "col-span-8 @max-[880px]:col-span-12",
+  12: "col-span-12",
+};
+
+/** A two-row block is only a block while it is still wider than its neighbours. */
+const ROW_CLS = "row-span-2 @max-[880px]:row-span-1";
+
 const KEY = (k: string) => `hmax:layout:${k}`;
 
 /* Dashboards whose layout recommendation has been dismissed this session. */
@@ -325,11 +339,11 @@ export default function DashboardGrid({
               <ChevronDown
                 size={14}
                 strokeWidth={1.5}
-                className={`ml-auto shrink-0 text-gray-400 transition-transform ${panelOpen ? "rotate-180" : ""}`}
+                className={`ml-auto shrink-0 text-gray-500 transition-transform ${panelOpen ? "rotate-180" : ""}`}
               />
             </button>
           ) : (
-            <span className="flex-1 min-w-[200px] flex items-center gap-2 h-9 pl-1 text-xs text-gray-400">
+            <span className="flex-1 min-w-[200px] flex items-center gap-2 h-9 pl-1 text-xs text-gray-500">
               {isDefault ? "Default layout" : "Your layout"} · {ordered.length} widgets
               {!isDefault && (
                 <button onClick={resetSaved} className="text-gray-500 hover:text-gray-900 underline underline-offset-2 transition-colors cursor-pointer">
@@ -418,7 +432,7 @@ export default function DashboardGrid({
         />
       )}
 
-      <div className="grid grid-cols-12 gap-4 items-stretch [&>*]:min-w-0 [&>.tile>*:not([data-grid-ui])]:h-full">
+      <div className="@container grid grid-cols-12 gap-4 items-stretch [&>*]:min-w-0 [&>.tile>*:not([data-grid-ui])]:h-full">
         {ordered.map((item) => {
           const size = activeLayout.sizes[item.id];
           const span = size?.span ?? item.span;
@@ -440,13 +454,12 @@ export default function DashboardGrid({
                 drop(item.id);
                 end();
               }}
-              style={{
-                gridColumn: `span ${span} / span ${span}`,
-                ...(rows ? { gridRow: `span ${rows} / span ${rows}` } : {}),
-              }}
+              style={SPAN_CLS[span] ? undefined : { gridColumn: `span ${span} / span ${span}` }}
               // Clicks inside a widget count towards the layout recommendation.
               onPointerDownCapture={() => !editing && recordInteraction(storageKey, item.id)}
-              className={`relative transition-opacity ${item.tile ? "tile" : ""} ${dragging ? "opacity-40" : ""}`}
+              className={`relative transition-opacity ${SPAN_CLS[span] ?? ""} ${
+                rows ? ROW_CLS : ""
+              } ${item.tile ? "tile" : ""} ${dragging ? "opacity-40" : ""}`}
             >
               {/* In the preview, each widget shows how much it's used */}
               {editing && previewing && usage[item.id] ? (

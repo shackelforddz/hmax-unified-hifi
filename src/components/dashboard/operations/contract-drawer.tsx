@@ -71,7 +71,7 @@ export function ContractActions({ onAction }: { onAction: (label: string) => voi
         <div className="absolute bottom-full mb-2 right-0 w-full min-w-[220px] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-10 animate-pop-in">
           {ACTIONS.map(({ label, icon: Icon }) => (
             <Button key={label} variant="ghost" onClick={() => { setOpen(false); onAction(label); }} className="w-full justify-start gap-2.5 px-4 py-2.5 h-auto text-sm text-gray-700 rounded-none cursor-pointer">
-              <Icon size={15} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+              <Icon size={15} strokeWidth={1.5} className="text-gray-500 shrink-0" />
               {label}
             </Button>
           ))}
@@ -88,7 +88,7 @@ export function ContractBody({ c, d, onAction }: { c: OpsContract; d: OpsContrac
       <ContextSummary summary={d.summary} critical={c.status === "critical"}>
         {d.recommendedActions.length > 0 && (
           <div className="mt-4">
-            <p className="text-[11px] text-gray-400 tracking-wider mb-2">Recommended by HMAX</p>
+            <p className="text-[11px] text-gray-500 tracking-wider mb-2">Recommended by HMAX</p>
             <div className="flex flex-wrap gap-2">
               {d.recommendedActions.map((a) => (
                 <Button key={a} onClick={() => onAction(a)} className="rounded-full h-auto px-4 py-1.5 text-xs cursor-pointer">{a}</Button>
@@ -102,12 +102,12 @@ export function ContractBody({ c, d, onAction }: { c: OpsContract; d: OpsContrac
       <Card>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-base text-gray-900">Progress</h3>
-          <span className="text-xs text-gray-400">{c.progress}% of term elapsed</span>
+          <span className="text-xs text-gray-500">{c.progress}% of term elapsed</span>
         </div>
         <div className="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
           <div className="h-full bg-chart-line rounded-full" style={{ width: `${c.progress}%` }} />
         </div>
-        <p className="text-xs text-gray-400 mt-2">Contract term {c.start} → {c.end}</p>
+        <p className="text-xs text-gray-500 mt-2">Contract term {c.start} → {c.end}</p>
       </Card>
 
       {/* Risk profile */}
@@ -130,12 +130,12 @@ export function ContractBody({ c, d, onAction }: { c: OpsContract; d: OpsContrac
           return (
             <div className="mt-4 pt-4 border-t border-gray-100">
               <div className="flex items-center justify-between gap-3 mb-1.5">
-                <p className="text-[11px] text-gray-400 tracking-wider">Scope feasibility</p>
+                <p className="text-[11px] text-gray-500 tracking-wider">Scope feasibility</p>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{label}</span>
               </div>
               <p className="text-sm text-gray-700">{review.scope} · {review.value}</p>
               <p className="text-xs text-gray-500 leading-relaxed mt-1">{review.detail}</p>
-              <p className="text-xs text-gray-400 mt-1.5">Reviewed against handover from {review.from}</p>
+              <p className="text-xs text-gray-500 mt-1.5">Reviewed against handover from {review.from}</p>
             </div>
           );
         })()}
@@ -148,10 +148,10 @@ export function ContractBody({ c, d, onAction }: { c: OpsContract; d: OpsContrac
           {d.milestones.map((m) => (
             <div key={m.label} className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
-                {m.done ? <CheckCircle2 size={15} className="text-gray-900 shrink-0" /> : <Circle size={15} className="text-gray-300 shrink-0" />}
+                {m.done ? <CheckCircle2 size={15} className="text-gray-900 shrink-0" /> : <Circle size={15} className="text-gray-500 shrink-0" />}
                 <span className="text-sm text-gray-700">{m.label}</span>
               </div>
-              <div className="flex gap-3 shrink-0 text-xs text-gray-400 whitespace-nowrap">
+              <div className="flex gap-3 shrink-0 text-xs text-gray-500 whitespace-nowrap">
                 <span>planned {m.planned}</span>
                 {m.actual && <span className="text-gray-600">actual {m.actual}</span>}
               </div>
@@ -172,7 +172,7 @@ export function ContractBody({ c, d, onAction }: { c: OpsContract; d: OpsContrac
             { label: "Region", value: d.related.region },
           ].map((r) => (
             <div key={r.label}>
-              <p className="text-[11px] text-gray-400 tracking-wider">{r.label}</p>
+              <p className="text-[11px] text-gray-500 tracking-wider">{r.label}</p>
               <p className="text-sm text-gray-800 mt-0.5">{r.value}</p>
             </div>
           ))}
@@ -226,18 +226,18 @@ export default function ContractDrawer({ contractId, onClose, layer, hidden }: P
               <div className="flex items-start justify-between">
                 <div>
                   <h2 className="text-2xl text-gray-900">{c.name}</h2>
-                  <p className="text-sm text-gray-400 mt-0.5">{c.customer} · {c.value}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">{c.customer} · {c.value}</p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => drawers?.openPage({ kind: "ops", id: contractId! })}
                     aria-label="Open as a page"
                     title="Open as a page"
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <Maximize2 size={15} strokeWidth={1.5} />
                   </button>
-                  <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
+                  <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer">
                     <X size={18} />
                   </button>
                 </div>
@@ -250,7 +250,7 @@ export default function ContractDrawer({ contractId, onClose, layer, hidden }: P
                   { label: "Value", value: c.value },
                 ].map((s) => (
                   <div key={s.label}>
-                    <p className="text-[11px] text-gray-400 tracking-wider">{s.label}</p>
+                    <p className="text-[11px] text-gray-500 tracking-wider">{s.label}</p>
                     <p className="text-sm text-gray-800 mt-0.5">{s.value}</p>
                   </div>
                 ))}

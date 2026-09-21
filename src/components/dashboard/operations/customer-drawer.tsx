@@ -32,7 +32,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 function StatusBadge({ status }: { status: string }) {
   const critical = status === "critical" || status === "Critical";
   const atRisk = status === "at-risk" || status === "At risk";
-  const cls = critical ? "bg-status-critical text-white font-bold" : atRisk ? "border border-gray-400 text-gray-700" : "border border-gray-200 text-gray-400";
+  const cls = critical ? "bg-status-critical-deep text-white font-bold" : atRisk ? "border border-gray-400 text-gray-700" : "border border-gray-200 text-gray-500";
   const label = critical ? "Critical" : atRisk ? "At risk" : status === "In service" ? "In service" : "On track";
   return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${cls}`}>{label}</span>;
 }
@@ -44,7 +44,7 @@ function HealthBar({ pct }: { pct: number }) {
       <span className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
         <span className={`block h-full rounded-full ${low ? "bg-status-critical" : "bg-chart-line"}`} style={{ width: `${pct}%` }} />
       </span>
-      <span className={`text-xs shrink-0 ${low ? "text-gray-900" : "text-gray-400"}`}>{pct}%</span>
+      <span className={`text-xs shrink-0 ${low ? "text-gray-900" : "text-gray-500"}`}>{pct}%</span>
     </span>
   );
 }
@@ -65,7 +65,7 @@ function DrillRow({ onClick, children }: { onClick: () => void; children: React.
       className="flex items-center gap-3 py-2.5 border-b border-gray-200 last:border-0 cursor-pointer group"
     >
       {children}
-      <ChevronRight size={14} strokeWidth={1.5} className="text-gray-300 group-hover:text-gray-600 transition-colors shrink-0" />
+      <ChevronRight size={14} strokeWidth={1.5} className="text-gray-500 group-hover:text-gray-600 transition-colors shrink-0" />
     </div>
   );
 }
@@ -138,14 +138,14 @@ export function CustomerBody({ customer, onAction }: { customer: string; onActio
             {contacts.map((p) => (
               <div key={p.email}>
                 <p className="text-sm text-gray-800">{p.name}</p>
-                <p className="text-xs text-gray-400">{p.role}</p>
+                <p className="text-xs text-gray-500">{p.role}</p>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
                   <span className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <Mail size={12} strokeWidth={1.5} className="text-gray-400" />
+                    <Mail size={12} strokeWidth={1.5} className="text-gray-500" />
                     {p.email}
                   </span>
                   <span className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <Phone size={12} strokeWidth={1.5} className="text-gray-400" />
+                    <Phone size={12} strokeWidth={1.5} className="text-gray-500" />
                     {p.phone}
                   </span>
                 </div>
@@ -158,14 +158,14 @@ export function CustomerBody({ customer, onAction }: { customer: string; onActio
       <Card>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base text-gray-900">Contracts</h3>
-          <span className="text-xs text-gray-400">{fmtValue(value)} total</span>
+          <span className="text-xs text-gray-500">{fmtValue(value)} total</span>
         </div>
         <div className="flex flex-col">
           {contracts.map((c) => (
             <DrillRow key={c.id} onClick={() => drawers?.openContract({ kind: "ops", id: c.id })}>
               <span className="flex-1 min-w-0">
                 <span className="block text-sm text-gray-700 truncate group-hover:text-gray-900 transition-colors">{c.name}</span>
-                <span className="block text-xs text-gray-400">
+                <span className="block text-xs text-gray-500">
                   {c.value} · {c.owner} · {c.alerts.length} alert{c.alerts.length === 1 ? "" : "s"}
                 </span>
               </span>
@@ -178,14 +178,14 @@ export function CustomerBody({ customer, onAction }: { customer: string; onActio
       <Card>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base text-gray-900">Assets</h3>
-          <span className="text-xs text-gray-400">{avgHealth}% avg health</span>
+          <span className="text-xs text-gray-500">{avgHealth}% avg health</span>
         </div>
         <div className="flex flex-col">
           {assets.map((a) => (
             <DrillRow key={a.code} onClick={() => drawers?.openAsset(a.code.toLowerCase())}>
               <span className="flex-1 min-w-0">
                 <span className="block text-sm text-gray-700 truncate group-hover:text-gray-900 transition-colors">{a.code}</span>
-                <span className="block text-xs text-gray-400 truncate">{a.type}</span>
+                <span className="block text-xs text-gray-500 truncate">{a.type}</span>
               </span>
               <HealthBar pct={a.health} />
               <StatusBadge status={a.status} />
@@ -235,21 +235,21 @@ export default function CustomerDrawer({ customer, onClose }: Props) {
               <div className="flex items-start justify-between">
                 <div className="min-w-0">
                   <h2 className="text-2xl text-gray-900">{customer}</h2>
-                  <p className="text-sm text-gray-400 mt-0.5">{roll?.subtitle ?? ""}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">{roll?.subtitle ?? ""}</p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => drawers?.openPage({ kind: "customer", id: customer! })}
                     aria-label="Open as a page"
                     title="Open as a page"
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     <Maximize2 size={15} strokeWidth={1.5} />
                   </button>
                   <button
                     onClick={onClose}
                     aria-label="Close"
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
                   >
                     <X size={18} />
                   </button>
@@ -258,7 +258,7 @@ export default function CustomerDrawer({ customer, onClose }: Props) {
               <div className="flex flex-wrap gap-x-8 gap-y-3 mt-4">
                 {(roll?.facts ?? []).map((s) => (
                   <div key={s.label}>
-                    <p className="text-[11px] text-gray-400 tracking-wider">{s.label}</p>
+                    <p className="text-[11px] text-gray-500 tracking-wider">{s.label}</p>
                     <p className="text-sm text-gray-800 mt-0.5">{s.value}</p>
                   </div>
                 ))}

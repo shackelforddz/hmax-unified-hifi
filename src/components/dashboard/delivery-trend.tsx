@@ -41,7 +41,7 @@ function ImpactPopover({
           <p className="text-sm text-gray-900">
             {point.label} · {point.value}% on time
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-500 mt-0.5">
             {point.impacts?.length
               ? `${point.impacts.length} contract${point.impacts.length > 1 ? "s" : ""} moved this month`
               : "No contract-level driver recorded"}
@@ -50,7 +50,7 @@ function ImpactPopover({
         <button
           onClick={onClose}
           aria-label="Close"
-          className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-gray-300 hover:text-gray-600 hover:bg-black/5 transition-colors cursor-pointer"
+          className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-600 hover:bg-black/5 transition-colors cursor-pointer"
         >
           <X size={13} strokeWidth={1.5} />
         </button>
@@ -64,7 +64,7 @@ function ImpactPopover({
             className="w-full text-left px-2 py-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
           >
             <p className="text-sm text-gray-800 leading-snug mb-0.5">{impact.contract}</p>
-            <p className="text-xs text-gray-400 mb-1">{impact.customer}</p>
+            <p className="text-xs text-gray-500 mb-1">{impact.customer}</p>
             <p className="text-xs text-gray-500 leading-relaxed">{impact.reason}</p>
           </button>
         ))}
@@ -123,7 +123,7 @@ export default function DeliveryTrend() {
       {/* Big value */}
       <div className="flex items-end gap-2 mb-1">
         <span className="text-2xl font-bold text-gray-900 leading-none">{D.current}</span>
-        <span className="flex items-center gap-0.5 text-xs text-gray-400 mb-0.5">
+        <span className="flex items-center gap-0.5 text-xs text-gray-500 mb-0.5">
           <ArrowDown size={11} strokeWidth={2} />
           {D.delta}
         </span>

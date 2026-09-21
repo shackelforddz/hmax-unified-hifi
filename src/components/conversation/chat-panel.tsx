@@ -46,7 +46,11 @@ function StepTabs({ current, steps = STEP_DEFS }: { current: number; steps?: { n
           <div key={num} className="flex items-center gap-2 shrink-0">
             <div
               className={`size-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${
-                active ? "bg-[#222222] text-white" : done ? "bg-[#222222]/20 text-gray-950" : "border border-[#222222]/20 text-gray-500"
+                active
+                  ? "bg-[#222222] text-white"
+                  : done
+                    ? "bg-status-ok text-white"
+                    : "border border-[#222222]/20 text-gray-500"
               }`}
             >
               {done ? <Check size={10} strokeWidth={2.5} /> : num}
@@ -65,7 +69,7 @@ function StepTabs({ current, steps = STEP_DEFS }: { current: number; steps?: { n
 function InfoBanner({ title, sub }: { title: string; sub: string }) {
   return (
     <div className="flex gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
-      <Info size={15} className="text-gray-400 shrink-0 mt-0.5" />
+      <Info size={15} className="text-gray-500 shrink-0 mt-0.5" />
       <div>
         <p className="text-sm text-gray-700 font-medium leading-snug">{title}</p>
         <p className="text-sm text-gray-500 leading-snug">{sub}</p>
@@ -77,8 +81,25 @@ function InfoBanner({ title, sub }: { title: string; sub: string }) {
 /* ── Step 1: Case Details ────────────────────────────────────────── */
 const CASE_TYPES = ["Corrective", "Preventive", "Mobilisation"];
 
+/* The scope reads differently depending on why the crew is going out, so the
+   case type writes the first draft of it. Changing the type rewrites the
+   draft - it is a starting point, and the field stays editable. */
+const SCOPE_BY_TYPE: Record<string, string> = {
+  Corrective:
+    "Investigate and resolve reported fault on HVDC Units S-12, S-14, and S-19 for Xcel Energy as outlined in OPP-441. Perform diagnostic testing, component replacement, and system re-commissioning.",
+  Preventive:
+    "Execute scheduled annual maintenance and inspection across HVDC Units S-12, S-14, and S-19 per Xcel Energy service agreement OPP-441.",
+  Mobilisation:
+    "Mobilise technical field crew, specialist equipment, and safety gear to Xcel Energy site for preliminary setup on HVDC Units S-12, S-14, and S-19 prior to main service window.",
+};
+
 function StepCase() {
   const [caseType, setCaseType] = useState("Corrective");
+  const [scope, setScope] = useState(SCOPE_BY_TYPE.Corrective);
+  const pickType = (t: string) => {
+    setCaseType(t);
+    setScope(SCOPE_BY_TYPE[t] ?? "");
+  };
   const field = "w-full h-8 px-2.5 text-sm text-gray-950 border border-gray-200 rounded-full outline-none focus:border-gray-400 bg-white";
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -105,7 +126,7 @@ function StepCase() {
           {CASE_TYPES.map((t, i) => (
             <button
               key={t}
-              onClick={() => setCaseType(t)}
+              onClick={() => pickType(t)}
               aria-pressed={caseType === t}
               className={`h-8 px-2 text-sm text-gray-950 border-y border-r border-gray-200 transition-colors cursor-pointer ${
                 i === 0 ? "border-l rounded-l-full" : ""
@@ -117,10 +138,15 @@ function StepCase() {
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs text-gray-500">What needs to happen?</label>
+        <div className="flex items-baseline justify-between gap-3">
+          <label className="text-xs text-gray-500">What needs to happen?</label>
+          <span className="text-[11px] text-gray-500 tracking-wider">Drafted from the case type</span>
+        </div>
         <textarea
+          value={scope}
+          onChange={(e) => setScope(e.target.value)}
           placeholder="Brief description of the fault or scope..."
-          className="w-full h-16 px-2.5 py-2 text-sm text-gray-950 border border-gray-200 rounded-[10px] outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-500"
+          className="w-full h-24 px-2.5 py-2 text-sm text-gray-950 border border-gray-200 rounded-[10px] outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-500"
         />
       </div>
     </div>
@@ -132,6 +158,11 @@ function StepScope() {
   const [urgency, setUrgency] = useState("High");
   const [workTypes, setWorkTypes] = useState(["Inspection", "Diagnostic testing"]);
   const [outage, setOutage] = useState("Yes - planned outage");
+  /* What this customer has allowed before, so the planner starts from the
+     pattern rather than a blank field. */
+  const [window, setWindow] = useState(
+    "Based on past trends: Xcel Energy usually allows access at Weekdays 08:00-16:00 with 2 weeks prior notice."
+  );
 
   const workTypeOpts = [
     "Inspection", "Diagnostic testing", "Condition assessment", "Repair / replacement",
@@ -147,10 +178,6 @@ function StepScope() {
           What work is needed and what site constraints apply? The system has suggested scope based on the open field signals on this account.
         </p>
       </div>
-      <InfoBanner
-        title="Scope pre-suggested from field signals"
-        sub="recurring PD on S-12 (3rd occurrence) · DGA trend on S-11 · 3 units uninspected."
-      />
 
       {/* Urgency */}
       <div>
@@ -173,9 +200,9 @@ function StepScope() {
       {/* Work types needed */}
       <div>
         <label className="text-xs text-gray-500 mb-1 block">
-          Work types needed <span className="text-gray-400">*</span>
+          Work types needed <span className="text-gray-500">*</span>
         </label>
-        <p className="text-xs text-gray-400 mb-2">Select all that apply - pre-selected based on field signals</p>
+        <p className="text-xs text-gray-500 mb-2">Select all that apply - pre-selected based on field signals</p>
         <div className="flex flex-wrap gap-2">
           {workTypeOpts.map((w) => {
             const active = workTypes.includes(w);
@@ -214,11 +241,16 @@ function StepScope() {
 
       {/* Outage window */}
       <div>
-        <label className="text-xs text-gray-500 mb-1 block">Outage window</label>
-        <p className="text-xs text-gray-400 mb-2">When can the customer grant access? Any restricted periods?</p>
+        <div className="flex items-baseline justify-between gap-3 mb-1">
+          <label className="text-xs text-gray-500">Outage window</label>
+          <span className="text-[11px] text-gray-500 tracking-wider">AI suggests</span>
+        </div>
+        <p className="text-xs text-gray-500 mb-2">When can the customer grant access? Any restricted periods?</p>
         <textarea
+          value={window}
+          onChange={(e) => setWindow(e.target.value)}
           placeholder="e.g. Weekdays 06:00–14:00 · 4-week customer notice required"
-          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
+          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-500"
         />
       </div>
     </div>
@@ -280,12 +312,12 @@ function StaffCard({
       />
       <div className="flex-1 min-w-0">
         <p className="text-sm text-gray-800">
-          {member.name} <span className="text-gray-400">· {member.role}</span>
+          {member.name} <span className="text-gray-500">· {member.role}</span>
         </p>
         <p className="text-xs text-gray-500">{member.skills}</p>
-        <p className={`text-xs ${member.conflict ? "text-gray-700 font-medium" : "text-gray-400"}`}>{member.avail}</p>
+        <p className={`text-xs ${member.conflict ? "text-gray-700 font-medium" : "text-gray-500"}`}>{member.avail}</p>
       </div>
-      <GripVertical size={16} className="text-gray-300 shrink-0" />
+      <GripVertical size={16} className="text-gray-500 shrink-0" />
     </div>
   );
 }
@@ -355,10 +387,6 @@ function StepStaffing() {
           The system has checked availability and suggested the best-fit crew for this case type, scope, and site requirements. Confirm, swap, or add.
         </p>
       </div>
-      <InfoBanner
-        title="Suggested from availability calendar and certification database."
-        sub="1 conflict detected - review below."
-      />
 
       {/* Staffed */}
       <div>
@@ -451,7 +479,7 @@ const FIXES: Record<string, Fix[]> = {
 function StockBadge({ kind, label }: { kind: StockKind; label: string }) {
   const cls =
     kind === "out"
-      ? "bg-status-critical text-white font-bold"
+      ? "bg-status-critical-deep text-white font-bold"
       : kind === "low"
       ? "border border-status-warning text-amber-600 font-bold"
       : "bg-gray-100 text-gray-600";
@@ -467,10 +495,23 @@ const INITIAL_PARTS: Part[] = [
   { name: "Nitrogen blanket supply (cylinders)", code: "ERP-5530", qty: "4", supplier: "Air Liquide local depot", stock: "In stock (10)", stockKind: "in", lead: "Ready" },
 ];
 
+/* The three that carry a signature or a border on this kind of job: the
+   custom-built one, the one coming by air, and the hazardous one. */
+const SIGN_OFF_PARTS = [
+  "the transformer gasket set (ERP-2288)",
+  "the HV cable terminations (ERP-7783)",
+  "the nitrogen cylinders (ERP-5530)",
+];
+
 function StepParts() {
   const [parts, setParts] = useState<Part[]>(INITIAL_PARTS);
   // Which part's options are open, by code.
   const [openFix, setOpenFix] = useState<string | null>(null);
+  /* The parts that have needed a customer signature or a customs declaration
+     on past jobs - named, rather than left for the planner to work out. */
+  const [signOff, setSignOff] = useState(
+    `Based on historical trends, ${SIGN_OFF_PARTS.join(", ")} are likely to require customer sign-off and customs clearance.`
+  );
 
   const setQty = (i: number, qty: string) =>
     setParts((prev) => prev.map((p, idx) => (idx === i ? { ...p, qty } : p)));
@@ -505,7 +546,7 @@ function StepParts() {
       {/* Summary + whatever is still blocking the schedule */}
       <div className="flex flex-col gap-2">
         <div className="flex gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
-          <Info size={15} className="text-gray-400 shrink-0 mt-0.5" />
+          <Info size={15} className="text-gray-500 shrink-0 mt-0.5" />
           <p className="text-sm text-gray-700 leading-snug">
             {inStock} parts in stock · {low} low stock · {out} to order
             {longest > 0 && ` · Longest lead time: ${longest} days`}
@@ -542,12 +583,12 @@ function StepParts() {
       <div>
         {/* Head */}
         <div className="grid grid-cols-[1fr_auto_96px_92px_48px_28px] gap-x-3 px-1 pb-2 border-b border-gray-200 items-center">
-          <span className="text-[11px] text-gray-400 tracking-wider">Part</span>
-          <span className="text-[11px] text-gray-400 tracking-wider">Qty</span>
-          <span className="text-[11px] text-gray-400 tracking-wider">Supplier</span>
-          <span className="text-[11px] text-gray-400 tracking-wider">ERP stock</span>
-          <span className="text-[11px] text-gray-400 tracking-wider">Lead</span>
-          <span className="text-[11px] text-gray-400 tracking-wider text-right">OK</span>
+          <span className="text-[11px] text-gray-500 tracking-wider">Part</span>
+          <span className="text-[11px] text-gray-500 tracking-wider">Qty</span>
+          <span className="text-[11px] text-gray-500 tracking-wider">Supplier</span>
+          <span className="text-[11px] text-gray-500 tracking-wider">ERP stock</span>
+          <span className="text-[11px] text-gray-500 tracking-wider">Lead</span>
+          <span className="text-[11px] text-gray-500 tracking-wider text-right">OK</span>
         </div>
         {/* Rows */}
         {parts.map((p, i) => {
@@ -559,7 +600,7 @@ function StepParts() {
               <div className="grid grid-cols-[1fr_auto_96px_92px_48px_28px] gap-x-3 px-1 py-3 items-center">
                 <div className="min-w-0">
                   <p className="text-sm text-gray-800 truncate">{p.name}</p>
-                  <p className="text-xs text-gray-400">{p.code}</p>
+                  <p className="text-xs text-gray-500">{p.code}</p>
                 </div>
                 <input
                   value={p.qty}
@@ -568,12 +609,12 @@ function StepParts() {
                 />
                 <span className="text-xs text-gray-500 truncate">{p.supplier}</span>
                 <StockBadge kind={p.stockKind} label={p.stock} />
-                <span className={`text-xs ${p.stockKind === "out" ? "text-status-critical font-bold" : p.stockKind === "low" ? "text-gray-600" : "text-gray-400"}`}>
+                <span className={`text-xs ${p.stockKind === "out" ? "text-status-critical font-bold" : p.stockKind === "low" ? "text-gray-600" : "text-gray-500"}`}>
                   {p.lead}
                 </span>
                 <button
                   onClick={() => removePart(i)}
-                  className="w-6 h-6 flex items-center justify-center text-gray-300 hover:text-gray-600 transition-colors cursor-pointer justify-self-end"
+                  className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-600 transition-colors cursor-pointer justify-self-end"
                   aria-label={`Remove ${p.name}`}
                 >
                   <X size={15} strokeWidth={1.5} />
@@ -631,10 +672,15 @@ Add part not in ERP
 
       {/* Notes */}
       <div>
-        <label className="text-xs text-gray-500 mb-2 block">Any parts requiring customer sign-off or import clearance?</label>
+        <div className="flex items-baseline justify-between gap-3 mb-2">
+          <label className="text-xs text-gray-500">Any parts requiring customer sign-off or import clearance?</label>
+          <span className="text-[11px] text-gray-500 tracking-wider shrink-0">AI suggests</span>
+        </div>
         <textarea
+          value={signOff}
+          onChange={(e) => setSignOff(e.target.value)}
           placeholder="Note any special handling, customer PO requirements, or customs declarations..."
-          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
+          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-500"
         />
       </div>
     </div>
@@ -644,18 +690,22 @@ Add part not in ERP
 /* ── Step 5: Schedule ────────────────────────────────────────────── */
 type EventType = "inspection" | "parts" | "field" | "report";
 
-const EVENT_TYPES: { type: EventType; label: string; color: string }[] = [
-  { type: "inspection", label: "Inspection", color: "#171717" },
-  { type: "parts", label: "Parts delivery", color: "#737373" },
-  { type: "field", label: "Field work", color: "#A3A3A3" },
-  { type: "report", label: "First report", color: "#D4D4D4" },
-];
+/* A colour each, so a month of dots can be read without the legend: blue for
+   the inspections, amber for a delivery that can slip, violet for the crew on
+   site, green for the report that closes it out. */
 const COLOR_OF: Record<EventType, string> = {
-  inspection: "#171717",
-  parts: "#737373",
-  field: "#A3A3A3",
-  report: "#D4D4D4",
+  inspection: "#3b82f6",
+  parts: "#f59e0b",
+  field: "#a855f7",
+  report: "#16a34a",
 };
+
+const EVENT_TYPES: { type: EventType; label: string; color: string }[] = [
+  { type: "inspection", label: "Inspection", color: COLOR_OF.inspection },
+  { type: "parts", label: "Parts delivery", color: COLOR_OF.parts },
+  { type: "field", label: "Field work", color: COLOR_OF.field },
+  { type: "report", label: "First report", color: COLOR_OF.report },
+];
 
 interface CalEvent {
   id: string;
@@ -733,11 +783,11 @@ function StepSchedule() {
       <div className="border border-gray-200 rounded-xl overflow-hidden">
         {/* Nav */}
         <div className="flex items-center justify-between px-3 py-2.5 border-b border-gray-100">
-          <button className="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
+          <button className="w-7 h-7 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer">
             <ChevronLeft size={14} />
           </button>
           <span className="text-sm text-gray-800">August 2026</span>
-          <button className="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
+          <button className="w-7 h-7 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer">
             <ChevronRight size={14} />
           </button>
         </div>
@@ -745,7 +795,7 @@ function StepSchedule() {
         {/* Weekday header */}
         <div className="grid grid-cols-7 border-b border-gray-100">
           {WEEKDAYS.map((d) => (
-            <div key={d} className="text-[10px] text-gray-400 text-center py-1.5">{d}</div>
+            <div key={d} className="text-[10px] text-gray-500 text-center py-1.5">{d}</div>
           ))}
         </div>
 
@@ -768,7 +818,7 @@ function StepSchedule() {
                   i % 7 === 6 ? "border-r-0" : ""
                 } ${isOver ? "bg-gray-100" : ""}`}
               >
-                <div className={`text-[11px] px-1 ${cell.inMonth ? "text-gray-600" : "text-gray-300"}`}>
+                <div className={`text-[11px] px-1 ${cell.inMonth ? "text-gray-600" : "text-gray-500"}`}>
                   {cell.label}
                 </div>
                 <div className="flex flex-col gap-1 mt-1">
@@ -799,14 +849,14 @@ function StepSchedule() {
           </span>
           <div className="flex-1 min-w-0">
             <p className="text-sm text-gray-900">Sent to {SCHEDULE_CONTACT?.name ?? "the customer"} for confirmation</p>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-500 mt-0.5">
               {events.length} events · {span}
               {SCHEDULE_CONTACT ? ` · ${SCHEDULE_CONTACT.email}` : ""}
             </p>
           </div>
           <button
             onClick={() => setSent(false)}
-            className="shrink-0 text-xs text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
+            className="shrink-0 text-xs text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
             Undo
           </button>
@@ -815,7 +865,7 @@ function StepSchedule() {
         <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3">
           <div className="flex-1 min-w-0">
             <p className="text-sm text-gray-900">Confirm the window with the customer</p>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-500 mt-0.5">
               {events.length} events · {span}
               {SCHEDULE_CONTACT ? ` · ${SCHEDULE_CONTACT.name}, ${SCHEDULE_CONTACT.role}` : ""}
             </p>
@@ -905,7 +955,7 @@ function OppInput({ label, value, star }: { label: string; value: string; star?:
   return (
     <div>
       <label className="text-xs text-gray-500 mb-1.5 block">
-        {label} {star && <span className="text-gray-400">*</span>}
+        {label} {star && <span className="text-gray-500">*</span>}
       </label>
       <input
         type="text"
@@ -962,7 +1012,7 @@ function OppStepScope() {
         <textarea
           placeholder="Summarise the scope of work and technical requirements..."
           defaultValue="Condition-based maintenance across the converter fleet, prioritising units with declining DGA and PD trends."
-          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
+          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-500"
         />
       </div>
     </OppFieldGroup>
@@ -995,7 +1045,7 @@ function OppStepReview() {
       <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
         {rows.map((r, i) => (
           <div key={r.label} className={`flex items-start gap-4 px-4 py-3 ${i < rows.length - 1 ? "border-b border-gray-100" : ""}`}>
-            <span className="text-xs text-gray-400 w-28 shrink-0 pt-0.5">{r.label}</span>
+            <span className="text-xs text-gray-500 w-28 shrink-0 pt-0.5">{r.label}</span>
             <span className="text-sm text-gray-800 flex-1">{r.value}</span>
           </div>
         ))}
@@ -1058,11 +1108,11 @@ function FlowFieldControl({ f }: { f: FlowField }) {
     return (
       <div>
         <label className="text-xs text-gray-500 mb-1.5 block">
-          {f.label} {f.star && <span className="text-gray-400">*</span>}
+          {f.label} {f.star && <span className="text-gray-500">*</span>}
         </label>
         <textarea
           defaultValue={f.value}
-          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-300"
+          className="w-full h-20 px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white placeholder-gray-500"
         />
       </div>
     );
@@ -1071,7 +1121,7 @@ function FlowFieldControl({ f }: { f: FlowField }) {
   return (
     <div>
       <label className="text-xs text-gray-500 mb-1.5 block">
-        {f.label} {f.star && <span className="text-gray-400">*</span>}
+        {f.label} {f.star && <span className="text-gray-500">*</span>}
       </label>
       <input
         type={f.type === "date" ? "date" : "text"}
@@ -1139,7 +1189,7 @@ function FlowWizardCard({
             <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
               {reviewRows.map((r, i) => (
                 <div key={`${r.label}-${i}`} className={`flex items-start gap-4 px-4 py-3 ${i < reviewRows.length - 1 ? "border-b border-gray-100" : ""}`}>
-                  <span className="text-xs text-gray-400 w-32 shrink-0 pt-0.5">{r.label}</span>
+                  <span className="text-xs text-gray-500 w-32 shrink-0 pt-0.5">{r.label}</span>
                   <span className="text-sm text-gray-800 flex-1">{r.value}</span>
                 </div>
               ))}
@@ -1178,7 +1228,7 @@ function ContextCard({ context }: { context: string }) {
         <BarChart2 size={15} strokeWidth={1.5} className="text-gray-500" />
       </div>
       <div className="min-w-0">
-        <p className="text-[11px] text-gray-400 tracking-wider">Context</p>
+        <p className="text-[11px] text-gray-500 tracking-wider">Context</p>
         <p className="text-sm text-gray-800 truncate">{context}</p>
       </div>
     </div>
@@ -1265,7 +1315,7 @@ function SuggestionBlock({ suggestions, onSend }: { suggestions: Suggestions; on
       )}
       {actions.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11px] text-gray-400 tracking-wider">Recommended by HMAX</span>
+          <span className="text-[11px] text-gray-500 tracking-wider">Recommended by HMAX</span>
           {actions.map((a) => (
             <Button
               key={a.label}
@@ -1287,7 +1337,7 @@ function PanelBlock({ panel, onSend, onOpenDoc, onUpdate }: { panel: PlaybookPan
     return (
       <div className="bg-white border border-gray-100 rounded-2xl p-4">
         <p className="text-sm text-gray-900 mb-1">{panel.heading}</p>
-        {panel.note && <p className="text-xs text-gray-400 mb-3 leading-relaxed">{panel.note}</p>}
+        {panel.note && <p className="text-xs text-gray-500 mb-3 leading-relaxed">{panel.note}</p>}
         <div className="flex flex-col gap-2">
           {panel.options.map((o) => (
             <div key={o.id} className={`rounded-xl border p-3 flex items-center gap-3 ${o.recommended ? "border-gray-900" : "border-gray-200"}`}>
@@ -1298,12 +1348,12 @@ function PanelBlock({ panel, onSend, onOpenDoc, onUpdate }: { panel: PlaybookPan
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-gray-900 truncate">{o.title}</p>
-                  {o.recommended && <span className="text-[10px] text-gray-400 tracking-wider shrink-0">Recommended by HMAX</span>}
+                  {o.recommended && <span className="text-[10px] text-gray-500 tracking-wider shrink-0">Recommended by HMAX</span>}
                 </div>
-                {o.subtitle && <p className="text-xs text-gray-400 truncate">{o.subtitle}</p>}
+                {o.subtitle && <p className="text-xs text-gray-500 truncate">{o.subtitle}</p>}
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
                   {o.meta.map((m) => (
-                    <span key={m.label} className="text-xs text-gray-500"><span className="text-gray-400">{m.label}:</span> {m.value}</span>
+                    <span key={m.label} className="text-xs text-gray-500"><span className="text-gray-500">{m.label}:</span> {m.value}</span>
                   ))}
                 </div>
                 {o.tags && o.tags.length > 0 && (
@@ -1330,7 +1380,7 @@ function PanelBlock({ panel, onSend, onOpenDoc, onUpdate }: { panel: PlaybookPan
     return (
       <div className="bg-white border border-gray-100 rounded-2xl p-4">
         <p className="text-sm text-gray-900 mb-1">{panel.heading}</p>
-        {panel.note && <p className="text-xs text-gray-400 mb-3 leading-relaxed">{panel.note}</p>}
+        {panel.note && <p className="text-xs text-gray-500 mb-3 leading-relaxed">{panel.note}</p>}
         <textarea
           defaultValue={panel.value}
           className="w-full h-32 px-3 py-2.5 text-sm text-gray-700 border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none bg-white leading-relaxed"
@@ -1346,18 +1396,18 @@ function PanelBlock({ panel, onSend, onOpenDoc, onUpdate }: { panel: PlaybookPan
   return (
     <div className="bg-white border border-gray-100 rounded-2xl p-4">
       <p className="text-sm text-gray-900 mb-1">{panel.heading}</p>
-      {panel.note && <p className="text-xs text-gray-400 mb-3 leading-relaxed">{panel.note}</p>}
+      {panel.note && <p className="text-xs text-gray-500 mb-3 leading-relaxed">{panel.note}</p>}
       <div className="flex flex-col gap-3">
         {panel.fields.map((f) => (
           <div key={f.label}>
             <div className="flex items-center justify-between gap-2 mb-1">
               <label className="text-xs text-gray-600">{f.label}</label>
-              <span className="text-[11px] text-gray-400">Reach out to {f.owner}</span>
+              <span className="text-[11px] text-gray-500">Reach out to {f.owner}</span>
             </div>
             <input
               type="text"
               placeholder={f.placeholder}
-              className="w-full h-9 px-3 text-sm border border-gray-200 rounded-full outline-none focus:border-gray-400 bg-white placeholder-gray-300"
+              className="w-full h-9 px-3 text-sm border border-gray-200 rounded-full outline-none focus:border-gray-400 bg-white placeholder-gray-500"
             />
           </div>
         ))}
@@ -1409,7 +1459,7 @@ function RecapPanel({ panel, onOpenDoc, onUpdate }: { panel: Extract<PlaybookPan
         <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
           {panel.rows.map((r, i) => (
             <div key={r.label} className={`flex items-start gap-4 px-4 py-2.5 ${i < panel.rows.length - 1 ? "border-b border-gray-100" : ""}`}>
-              <span className="text-xs text-gray-400 w-32 shrink-0 pt-0.5">{r.label}</span>
+              <span className="text-xs text-gray-500 w-32 shrink-0 pt-0.5">{r.label}</span>
               <span className="text-sm text-gray-800 flex-1">{r.value}</span>
             </div>
           ))}
@@ -1427,7 +1477,7 @@ function PersonSuggestionCard({ suggestion, added, onAdd }: { suggestion: { pers
   return (
     <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
       <div className="px-4 py-2.5 border-b border-gray-100 flex items-center gap-2">
-        <UserRoundPlus size={14} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+        <UserRoundPlus size={14} strokeWidth={1.5} className="text-gray-500 shrink-0" />
         <p className="text-xs text-gray-500">Teammate recommended by HMAX</p>
       </div>
       <div className="px-4 py-3 flex items-center gap-3">
@@ -1438,7 +1488,7 @@ function PersonSuggestionCard({ suggestion, added, onAdd }: { suggestion: { pers
           <p className="text-xs text-gray-500 leading-relaxed">{suggestion.reason}</p>
         </div>
         {added ? (
-          <span className="shrink-0 flex items-center gap-1 text-xs text-gray-400">
+          <span className="shrink-0 flex items-center gap-1 text-xs text-gray-500">
             <Check size={13} strokeWidth={1.5} /> Added
           </span>
         ) : (
@@ -1456,7 +1506,7 @@ function EventLine({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-3 mb-5 animate-message-in">
       <hr className="flex-1 border-gray-200" />
-      <p className="text-xs text-gray-400 shrink-0">{text}</p>
+      <p className="text-xs text-gray-500 shrink-0">{text}</p>
       <hr className="flex-1 border-gray-200" />
     </div>
   );
@@ -1467,7 +1517,7 @@ function TaskCard({ task }: { task: AssignedTask }) {
   return (
     <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
       <div className="px-4 py-2.5 border-b border-gray-100 flex items-center gap-2">
-        <ClipboardCheck size={14} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+        <ClipboardCheck size={14} strokeWidth={1.5} className="text-gray-500 shrink-0" />
         <p className="text-xs text-gray-500">Task assigned</p>
       </div>
       <div className="px-4 py-3">
@@ -1479,12 +1529,12 @@ function TaskCard({ task }: { task: AssignedTask }) {
             <img src={task.avatar} alt="" aria-hidden className="w-6 h-6 rounded-full object-cover bg-gray-200 shrink-0" />
             <span className="min-w-0">
               <span className="block text-xs text-gray-700 truncate">{task.assignee}</span>
-              <span className="block text-[11px] text-gray-400 truncate">{task.role}</span>
+              <span className="block text-[11px] text-gray-500 truncate">{task.role}</span>
             </span>
           </span>
           {task.due && (
             <span className="flex items-center gap-1.5 text-xs text-gray-500 whitespace-nowrap">
-              <CalendarClock size={13} strokeWidth={1.5} className="text-gray-400" />
+              <CalendarClock size={13} strokeWidth={1.5} className="text-gray-500" />
               Due {task.due}
             </span>
           )}

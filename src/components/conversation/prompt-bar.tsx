@@ -107,7 +107,7 @@ export default function PromptBar({ value, onChange, onSend, className = "" }: P
             aria-pressed={listening}
             title={listening ? "Stop listening" : "Speak your message"}
             className={`absolute right-1.5 top-1/2 -translate-y-1/2 size-9 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
-              listening ? "bg-status-critical text-white" : "text-gray-500 hover:text-gray-900 hover:bg-black/5"
+              listening ? "bg-status-critical-deep text-white" : "text-gray-500 hover:text-gray-900 hover:bg-black/5"
             }`}
           >
             {listening && <span className="absolute inset-0 rounded-full bg-status-critical/40 animate-ping" />}

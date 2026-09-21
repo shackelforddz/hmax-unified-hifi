@@ -137,11 +137,18 @@ export default function KpiStrip({ kpis }: { kpis: KpiData[] }) {
     return () => window.removeEventListener("keydown", onKey, true);
   }, [openId, close, stacked]);
 
-  const cols = kpis.length === 3 ? "grid-cols-3" : "grid-cols-4";
+  /* Driven by the room available, not the window: the sheet's width depends on
+     the conversation log beside it, so a media query would measure the wrong
+     thing. The counts halve rather than auto-fitting, so the strip never ends
+     on an orphan card. */
+  const cols =
+    kpis.length === 3
+      ? "grid-cols-3 @max-[660px]:grid-cols-1"
+      : "grid-cols-4 @max-[860px]:grid-cols-2 @max-[420px]:grid-cols-1";
 
   return (
     <div className="flex flex-col">
-      <div className={`grid ${cols} gap-4`}>
+      <div className={`@container grid ${cols} gap-4`}>
         {kpis.map((k) => (
           <KpiCard
             key={k.id}

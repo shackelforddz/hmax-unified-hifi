@@ -49,7 +49,7 @@ function CausesPopover({
           <p className="text-sm text-gray-900">
             {point.label} · {point.value}% margin
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-500 mt-0.5">
             {point.causes.length
               ? `${point.causes.length} cause${point.causes.length > 1 ? "s" : ""} against plan`
               : "On plan - no variance recorded"}
@@ -58,7 +58,7 @@ function CausesPopover({
         <button
           onClick={onClose}
           aria-label="Close"
-          className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-gray-300 hover:text-gray-600 hover:bg-black/5 transition-colors cursor-pointer"
+          className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-gray-500 hover:text-gray-600 hover:bg-black/5 transition-colors cursor-pointer"
         >
           <X size={13} strokeWidth={1.5} />
         </button>
@@ -129,7 +129,7 @@ export default function FinancialPerformance() {
           { label: "Cost", value: F.cost },
         ].map((k) => (
           <div key={k.label}>
-            <p className="text-xs text-gray-400">{k.label}</p>
+            <p className="text-xs text-gray-500">{k.label}</p>
             <p className="text-2xl font-bold text-gray-900 leading-tight mt-0.5">{k.value}</p>
           </div>
         ))}

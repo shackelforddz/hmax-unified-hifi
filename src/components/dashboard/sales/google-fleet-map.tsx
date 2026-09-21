@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { Search as SearchIcon } from "lucide-react";
-import WidgetChat from "@/components/dashboard/widget-chat";
+import WidgetChat, { TRIGGER } from "@/components/dashboard/widget-chat";
 import ProgressiveBlur from "@/components/progressive-blur";
 import type { MapProps } from "./fleet-map";
 import type { MapSearch } from "@/components/dashboard/static-map";
@@ -117,7 +117,7 @@ export default function GoogleFleetMap({ apiKey, sites, renderTip, overlay, titl
       {!ready && !failed && <div className="absolute inset-0 bg-gray-100 animate-pulse" />}
       {failed && (
         <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
-          <p className="text-sm text-gray-400">Couldn&apos;t load Google Maps - check the API key.</p>
+          <p className="text-sm text-gray-500">Couldn&apos;t load Google Maps - check the API key.</p>
         </div>
       )}
 
@@ -146,7 +146,7 @@ export default function GoogleFleetMap({ apiKey, sites, renderTip, overlay, titl
           <span className="flex-1" />
           <WidgetChat
             title={title}
-            triggerClassName="w-8 h-8 -mt-1 -mr-1 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer shrink-0"
+            triggerClassName={`${TRIGGER} -mt-1 -mr-1`}
           />
         </div>
       </div>

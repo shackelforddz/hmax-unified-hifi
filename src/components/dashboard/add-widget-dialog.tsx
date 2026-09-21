@@ -225,19 +225,19 @@ function LibraryPane({
                 <span className="flex items-start justify-between gap-2">
                   <span className="text-sm font-bold text-gray-900 leading-5">{w.title}</span>
                   {added ? (
-                    <Check size={15} strokeWidth={2} className="text-gray-400 shrink-0 mt-0.5" />
+                    <Check size={15} strokeWidth={2} className="text-gray-500 shrink-0 mt-0.5" />
                   ) : (
-                    <Plus size={15} strokeWidth={1.5} className="text-gray-400 shrink-0 mt-0.5" />
+                    <Plus size={15} strokeWidth={1.5} className="text-gray-500 shrink-0 mt-0.5" />
                   )}
                 </span>
                 <span className="text-xs text-gray-500 leading-4">{w.description}</span>
-                {added && <span className="text-[10px] text-gray-400">On this dashboard</span>}
+                {added && <span className="text-[10px] text-gray-500">On this dashboard</span>}
               </span>
             </div>
           );
         })}
         {matches.length === 0 && (
-          <p className="col-span-2 text-sm text-gray-400 text-center py-10">No widgets match that search.</p>
+          <p className="col-span-2 text-sm text-gray-500 text-center py-10">No widgets match that search.</p>
         )}
       </div>
     </div>
@@ -286,7 +286,7 @@ function CustomPane({ onAdd }: { onAdd: (config: CustomWidgetConfig) => void }) 
               }
             }}
             placeholder={`e.g. ${examples[0]} over the last 6 months`}
-            className="w-full h-24 px-3 py-2.5 text-sm text-gray-700 placeholder-gray-300 border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none"
+            className="w-full h-24 px-3 py-2.5 text-sm text-gray-700 placeholder-gray-500 border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none"
             autoFocus
           />
           <div className="flex flex-wrap gap-1.5 mt-2">
@@ -309,7 +309,7 @@ function CustomPane({ onAdd }: { onAdd: (config: CustomWidgetConfig) => void }) 
           <div className="flex items-center justify-between gap-2 mb-2">
             <label className="text-xs text-gray-500">Visual</label>
             {(prompt || generated) && (
-              <span className="text-[11px] text-gray-400">
+              <span className="text-[11px] text-gray-500">
                 {manualType ? (
                   <button onClick={() => setManualType(null)} className="underline underline-offset-2 hover:text-gray-700 cursor-pointer">
                     Use suggested
@@ -365,7 +365,7 @@ function CustomPane({ onAdd }: { onAdd: (config: CustomWidgetConfig) => void }) 
           </div>
         ) : (
           <div className="h-[240px] border border-dashed border-gray-200 rounded-xl flex items-center justify-center text-center px-6">
-            <p className="text-sm text-gray-400">Describe what you want to see and generate a preview - the visual is picked to fit.</p>
+            <p className="text-sm text-gray-500">Describe what you want to see and generate a preview - the visual is picked to fit.</p>
           </div>
         )}
       </div>
@@ -395,7 +395,7 @@ export default function AddWidgetDialog({ onDashboard, onAddLibrary, onAddCustom
 
   const tab = (active: boolean) =>
     `h-full flex items-center justify-center px-3 py-1 rounded-full text-sm font-bold whitespace-nowrap transition-colors cursor-pointer ${
-      active ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+      active ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
     }`;
 
   return (
@@ -411,7 +411,7 @@ export default function AddWidgetDialog({ onDashboard, onAddLibrary, onAddCustom
           <button
             onClick={onClose}
             aria-label="Close"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
           >
             <X size={18} />
           </button>
@@ -447,9 +447,9 @@ export default function AddWidgetDialog({ onDashboard, onAddLibrary, onAddCustom
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search widgets"
                   aria-label="Search widgets"
-                  className="flex-1 min-w-0 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+                  className="flex-1 min-w-0 text-sm text-gray-700 placeholder-gray-500 outline-none bg-transparent"
                 />
-                <Search size={15} strokeWidth={1.5} className="text-gray-400 shrink-0" />
+                <Search size={15} strokeWidth={1.5} className="text-gray-500 shrink-0" />
               </div>
             )}
           </div>

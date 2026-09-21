@@ -3,6 +3,7 @@
 import { useState } from "react";
 import DataTable, { type Column } from "@/components/dashboard/data-table";
 import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
+import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { OPPORTUNITIES, type Opportunity, type OppCategory } from "@/lib/sales-data";
 
 function StatusBadge({ status }: { status: Opportunity["status"] }) {
@@ -43,6 +44,7 @@ const FILTERS = ["All", "Renewals", "New leads"] as const;
 
 export default function OpportunitiesTable() {
   const drawers = useDetailDrawers();
+  const launch = useConversationLauncher();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
 
   const rows = OPPORTUNITIES.filter(
@@ -51,20 +53,29 @@ export default function OpportunitiesTable() {
   const renewals = OPPORTUNITIES.filter((o) => o.category === "Renewal").length;
 
   const toolbar = (
-    <div role="tablist" aria-label="Lead type" className="bg-gray-100 h-8 flex items-center p-[3px] rounded-full shrink-0">
-      {FILTERS.map((f) => (
-        <button
-          key={f}
-          role="tab"
-          aria-selected={filter === f}
-          onClick={() => setFilter(f)}
-          className={`h-full px-3 rounded-full text-sm font-bold whitespace-nowrap transition-colors cursor-pointer ${
-            filter === f ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          {f}
-        </button>
-      ))}
+    <div className="flex items-center gap-2">
+      {/* Same CTA the new-business list carries on the overview */}
+      <button
+        onClick={() => launch({ context: "New lead", prompt: "Build a new lead" })}
+        className="h-8 px-3.5 rounded-full border border-dashed border-gray-300 text-sm font-bold text-gray-500 hover:border-gray-400 hover:bg-gray-50 transition-colors cursor-pointer shrink-0"
+      >
+        Build a new lead
+      </button>
+      <div role="tablist" aria-label="Lead type" className="bg-gray-100 h-8 flex items-center p-[3px] rounded-full shrink-0">
+        {FILTERS.map((f) => (
+          <button
+            key={f}
+            role="tab"
+            aria-selected={filter === f}
+            onClick={() => setFilter(f)}
+            className={`h-full px-3 rounded-full text-sm font-bold whitespace-nowrap transition-colors cursor-pointer ${
+              filter === f ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
     </div>
   );
 

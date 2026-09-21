@@ -159,20 +159,29 @@ function StackedDrawer({ layer, depth, onClose }: { layer: Layer; depth: number;
 
 export const useDetailDrawers = () => useContext(DetailDrawersContext);
 
+/* A drawer that is already closed on its first paint must not animate into
+   that state: the browser resolves `translate` from nothing to 100% and runs
+   the transition, which reads as a drawer opening and sliding away on every
+   page load. Transitions are withheld until after that first frame - by the
+   time one is opened, itself a re-render, they are back. */
+let animationsReady = false;
+if (typeof window !== "undefined") requestAnimationFrame(() => (animationsReady = true));
+
 /** Classes and z-index for a drawer: base drawers dim the page, stacked
  *  ones (`layer` set) sit above them with a clear click-to-close backdrop. */
 export function drawerLayer(open: boolean, layer?: number) {
   const stacked = layer !== undefined;
   const z = stacked ? 55 + layer * 2 : undefined;
+  const settle = animationsReady ? "" : "transition-none";
   return {
     backdrop: {
-      className: `fixed inset-0 ${stacked ? "" : "z-40 bg-black/20"} transition-opacity duration-300 ${
+      className: `fixed inset-0 ${stacked ? "" : "z-40 bg-black/20"} transition-opacity duration-300 ${settle} ${
         open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`,
       style: z !== undefined ? { zIndex: z - 1 } : undefined,
     },
     panel: {
-      className: `fixed top-0 right-0 bottom-0 ${stacked ? "" : "z-50"} w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${
+      className: `fixed top-0 right-0 bottom-0 ${stacked ? "" : "z-50"} w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${settle} ${
         open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
       }`,
       style: z !== undefined ? { zIndex: z } : undefined,

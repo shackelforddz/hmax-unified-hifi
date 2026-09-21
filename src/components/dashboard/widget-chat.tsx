@@ -16,6 +16,12 @@ interface Props {
 
 const POPOVER_W = 300;
 
+/* The trigger, per the design: a 32px outlined circle around a 16px glyph,
+   the same shape the alert icon beside it takes. */
+export const TRIGGER =
+  "size-8 shrink-0 rounded-full border border-gray-200 bg-transparent flex items-center justify-center text-gray-900 hover:border-gray-400 transition-colors cursor-pointer";
+
+
 export default function WidgetChat({ title, triggerClassName }: Props) {
   const launch = useConversationLauncher();
   const [open, setOpen] = useState(false);
@@ -87,7 +93,7 @@ export default function WidgetChat({ title, triggerClassName }: Props) {
       <button
         ref={btnRef}
         onClick={toggle}
-        className={triggerClassName ?? "text-gray-300 hover:text-gray-500 transition-colors cursor-pointer shrink-0"}
+        className={triggerClassName ?? TRIGGER}
         aria-label={`Chat about ${title}`}
       >
         <MessageCircle size={16} strokeWidth={1.5} />
@@ -102,7 +108,7 @@ export default function WidgetChat({ title, triggerClassName }: Props) {
             className="z-[60] bg-white rounded-xl shadow-xl border border-gray-100 p-4 animate-pop-in"
           >
             <p className="text-sm text-gray-900 mb-0.5">Ask about {title}</p>
-            <p className="text-xs text-gray-400 mb-3">
+            <p className="text-xs text-gray-500 mb-3">
               Start a conversation with this widget&apos;s data as context.
             </p>
 
@@ -112,12 +118,12 @@ export default function WidgetChat({ title, triggerClassName }: Props) {
               onKeyDown={onKey}
               autoFocus
               placeholder={`e.g. What's driving ${title.toLowerCase()}?`}
-              className="w-full h-20 px-3 py-2 text-sm text-gray-700 placeholder-gray-300 border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none"
+              className="w-full h-20 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 border border-gray-200 rounded-xl outline-none focus:border-gray-400 resize-none"
             />
 
             {starters.length > 0 && (
               <div className="mt-3">
-                <p className="text-[11px] text-gray-400 tracking-wider mb-1.5">Suggested</p>
+                <p className="text-[11px] text-gray-500 tracking-wider mb-1.5">Suggested</p>
                 <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
                   {starters.map((p) => (
                     <button

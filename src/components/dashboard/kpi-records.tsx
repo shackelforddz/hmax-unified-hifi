@@ -9,13 +9,18 @@ import type { KpiData } from "@/lib/dashboard-data";
 
 /* Status chips, in the same vocabulary the contract tables use. */
 const CHIP: Record<KpiTone, string> = {
-  critical: "bg-status-critical text-white font-bold",
+  critical: "bg-status-critical-deep text-white font-bold",
   warn: "border border-gray-400 text-gray-700",
   good: "border border-gray-200 text-gray-500",
 };
 
-/* Four columns: what it is, whose it is, what it contributes, where it stands. */
-const GRID = "grid grid-cols-[minmax(0,2.4fr)_minmax(0,1.7fr)_9rem_minmax(0,7rem)] gap-4 items-baseline";
+/* Four columns: what it is, whose it is, what it contributes, where it stands.
+   On a narrow sheet the second column is the one to lose - a contract's own
+   name and its figure carry the row. */
+const GRID =
+  "grid grid-cols-[minmax(0,2.4fr)_minmax(0,1.7fr)_9rem_minmax(0,7rem)] @max-[620px]:grid-cols-[minmax(0,1fr)_7rem_minmax(0,6rem)] gap-4 @max-[620px]:gap-3 items-baseline";
+/** The column that drops when there isn't room for it. */
+const SECONDARY = "@max-[620px]:hidden";
 
 function Row({ record }: { record: KpiRecord }) {
   const drawers = useDetailDrawers();
@@ -24,7 +29,7 @@ function Row({ record }: { record: KpiRecord }) {
   const body = (
     <>
       <span className="text-sm text-gray-900 truncate">{record.title}</span>
-      <span className="text-sm text-gray-500 truncate">{record.meta}</span>
+      <span className={`text-sm text-gray-500 truncate ${SECONDARY}`}>{record.meta}</span>
       <span className="text-sm font-bold text-gray-900 text-right truncate">{record.value}</span>
       <span className="min-w-0">
         {record.status && (
@@ -67,7 +72,7 @@ export default function KpiRecords({ kpi, onClose }: { kpi: KpiData; onClose: ()
   if (!detail) return null;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="@container bg-white rounded-xl border border-gray-200 overflow-hidden">
       {/* What the number is made of */}
       <div className="flex items-start justify-between gap-4 px-4 pt-3.5 pb-3">
         <div className="min-w-0">
@@ -79,7 +84,7 @@ export default function KpiRecords({ kpi, onClose }: { kpi: KpiData; onClose: ()
         <button
           onClick={onClose}
           aria-label="Close"
-          className="-mt-1 -mr-1 w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
+          className="-mt-1 -mr-1 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
         >
           <X size={16} strokeWidth={1.5} />
         </button>
@@ -88,7 +93,9 @@ export default function KpiRecords({ kpi, onClose }: { kpi: KpiData; onClose: ()
         {[detail.columns.title, detail.columns.meta, detail.columns.value, detail.columns.status].map((c, i) => (
           <span
             key={c + i}
-            className={`text-[11px] text-gray-400 tracking-wider truncate ${i === 2 ? "text-right" : ""}`}
+            className={`text-[11px] text-gray-500 tracking-wider truncate ${i === 2 ? "text-right" : ""} ${
+              i === 1 ? SECONDARY : ""
+            }`}
           >
             {c}
           </span>
@@ -99,14 +106,14 @@ export default function KpiRecords({ kpi, onClose }: { kpi: KpiData; onClose: ()
           <Row key={r.id} record={r} />
         ))}
         {detail.records.length === 0 && (
-          <p className="px-4 py-8 text-sm text-gray-400 text-center border-t border-gray-100">Nothing to list right now.</p>
+          <p className="px-4 py-8 text-sm text-gray-500 text-center border-t border-gray-100">Nothing to list right now.</p>
         )}
       </div>
 
       {/* What to do about it */}
       <div className="px-4 py-6 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-6">
         <div className="min-w-0">
-          <p className="text-[11px] text-gray-400 tracking-wider">Recommended by HMAX</p>
+          <p className="text-[11px] text-gray-500 tracking-wider">Recommended by HMAX</p>
           <p className="text-sm text-gray-700 mt-0.5">
             {detail.action.why}
             {detail.note ? ` ${detail.note}` : ""}

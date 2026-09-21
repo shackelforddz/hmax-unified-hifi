@@ -48,9 +48,9 @@ function WorkRow({
     >
       <div className="flex-1 min-w-0">
         <p className="text-sm text-gray-900 leading-snug line-clamp-2">{title}</p>
-        <p className="text-xs text-gray-400 truncate mt-0.5">{meta}</p>
+        <p className="text-xs text-gray-500 truncate mt-0.5">{meta}</p>
       </div>
-      <ChevronRight size={14} strokeWidth={1.5} className="text-gray-300 group-hover:text-gray-600 transition-colors shrink-0" />
+      <ChevronRight size={14} strokeWidth={1.5} className="text-gray-500 group-hover:text-gray-600 transition-colors shrink-0" />
     </div>
   );
 }
@@ -59,7 +59,7 @@ function SectionLabel({ label, count }: { label: string; count: number }) {
   return (
     <div className="flex items-center justify-between mb-2">
       <p className="text-xs text-gray-500">{label}</p>
-      <span className="text-xs text-gray-400">{count}</span>
+      <span className="text-xs text-gray-500">{count}</span>
     </div>
   );
 }
@@ -86,7 +86,7 @@ function PersonCard({
         <div className="min-w-0 flex-1">
           <h4 className="text-base text-gray-900 leading-tight truncate">{person.name}</h4>
           <p className="text-sm text-gray-500 truncate mt-0.5">{person.role}</p>
-          <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
+          <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
             <MapPin size={12} strokeWidth={1.5} className="shrink-0" />
             <span className="truncate">{person.location}</span>
           </p>
@@ -109,7 +109,7 @@ function PersonCard({
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400">No contracts assigned.</p>
+            <p className="text-sm text-gray-500">No contracts assigned.</p>
           )}
         </div>
 
@@ -134,7 +134,7 @@ function PersonCard({
           kept quiet. Sales roles carry neither. */}
       {skills.length > 0 && (
         <div className="p-4">
-          <p className="text-[11px] text-gray-400 tracking-wider mb-1.5">Competencies &amp; certifications</p>
+          <p className="text-[11px] text-gray-500 tracking-wider mb-1.5">Competencies &amp; certifications</p>
           <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
             {skills.map((name) => (
               <span key={name} className="shrink-0 whitespace-nowrap text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{name}</span>
