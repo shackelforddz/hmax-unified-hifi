@@ -92,7 +92,7 @@ export default function RoleConfirmPage() {
                   <ul className="flex flex-col gap-2">
                     {intro.highlights.map((h) => (
                       <li key={h} className="flex items-start gap-2 text-sm text-gray-600 leading-snug">
-                        <Check size={14} className="text-gray-500 shrink-0 mt-0.5" />
+                        <Check size={14} className="text-status-ok shrink-0 mt-0.5" />
                         {h}
                       </li>
                     ))}

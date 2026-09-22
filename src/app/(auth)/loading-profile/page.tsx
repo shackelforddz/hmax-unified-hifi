@@ -74,7 +74,7 @@ export default function LoadingProfilePage() {
           <div className="space-y-2">
             <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-black rounded-full transition-all duration-[6000ms] ease-in-out"
+                className="h-full bg-chart-line rounded-full transition-all duration-[6000ms] ease-in-out"
                 style={{ width: `${progress}%` }}
               />
             </div>

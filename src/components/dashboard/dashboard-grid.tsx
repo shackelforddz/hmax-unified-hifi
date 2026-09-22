@@ -356,7 +356,7 @@ export default function DashboardGrid({
             onClick={() => setAdding(true)}
             className="h-9 px-3.5 rounded-full bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:border-gray-400 transition-colors cursor-pointer shrink-0"
           >
-            Add widget
+            Add to page
           </button>
           <button
             onClick={startEditing}

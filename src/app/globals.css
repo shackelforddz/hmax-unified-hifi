@@ -38,6 +38,9 @@
   --color-status-warning: #f59e0b;
   --color-status-ok: #16a34a;
   --color-chart-line: #3b82f6;
+  /* The same blue, deep enough for small text on white to clear 4.5:1 - the
+     brighter one stays for bars and marks, which only need 3:1. */
+  --color-chart-line-deep: #2563eb;
 }
 
 @theme inline {

@@ -68,7 +68,7 @@ export default function LoginForm({ role }: { role?: Role }) {
                   <Link
                     key={r.id}
                     href={`/login/${r.id}`}
-                    className="text-xs text-gray-600 border border-gray-200 rounded-full px-3 py-1 hover:border-gray-400 hover:text-gray-900 transition-colors"
+                    className="text-xs text-chart-line-deep border border-chart-line/40 rounded-full px-3 py-1 hover:border-chart-line hover:bg-chart-line/5 transition-colors"
                   >
                     {r.label}
                   </Link>
