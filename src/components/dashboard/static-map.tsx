@@ -95,7 +95,7 @@ export default function StaticMap<P extends MapPin>({
   onSelect,
   tipClassName,
   search,
-  title = "Risk Map",
+  title = "Map view",
 }: Props<P>) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -150,8 +150,11 @@ export default function StaticMap<P extends MapPin>({
 
   // A pin filtered off the map takes its tooltip with it.
   const selected = pins.find((p) => p.id === selectedId) ?? null;
-  const half = tipWidth / 2 + 8;
-  const tipX = selected ? clamp((selected.x / 100) * size.w * view.zoom + view.panX, half, size.w - half) : 0;
+  // On a narrow map the tooltip narrows to fit rather than hanging off the
+  // edge, where the map's overflow would clip it.
+  const tipW = size.w ? Math.min(tipWidth, Math.max(180, size.w - 16)) : tipWidth;
+  const half = tipW / 2 + 8;
+  const tipX = selected ? clamp((selected.x / 100) * size.w * view.zoom + view.panX, half, Math.max(half, size.w - half)) : 0;
   const rawY = selected ? (selected.y / 100) * size.h * view.zoom + view.panY : 0;
   // Measure the open tooltip so it can be kept inside the map.
   const [tipEl, setTipEl] = useState<HTMLDivElement | null>(null);
@@ -240,7 +243,7 @@ export default function StaticMap<P extends MapPin>({
           className={`absolute z-20 -translate-x-1/2 bg-white shadow-xl border animate-message-in max-h-[calc(100%-16px)] overflow-y-auto no-scrollbar ${
             tipClassName?.(selected) ?? "rounded-xl border-gray-100 p-3"
           }`}
-          style={{ left: tipX, top: tipTop, width: tipWidth }}
+          style={{ left: tipX, top: tipTop, width: tipW }}
         >
           {renderTip(selected)}
         </div>

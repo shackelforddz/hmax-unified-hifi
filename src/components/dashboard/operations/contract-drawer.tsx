@@ -18,7 +18,9 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 const RISK_CLS: Record<string, string> = {
-  high: "bg-gray-900 text-white",
+  // High risk reads as a status, not as chrome - the deep red clears 4.5:1
+  // against white text at this size.
+  high: "bg-status-critical-deep text-white font-bold",
   med: "bg-gray-200 text-gray-700",
   low: "border border-gray-300 text-gray-500",
 };

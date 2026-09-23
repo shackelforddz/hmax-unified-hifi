@@ -212,12 +212,12 @@ export default function FleetMap({ mode, alerts = [], categoryOptions = [] }: Pr
           sites={sites}
           renderTip={tip}
           overlay={overlay}
-          title="Risk Map"
+          title="Map view"
           search={{ value: query, onChange: setQuery, placeholder: "Search assets" }}
         />
       ) : (
         <StaticMap
-          title="Risk Map"
+          title="Map view"
           search={{
             value: query,
             onChange: setQuery,

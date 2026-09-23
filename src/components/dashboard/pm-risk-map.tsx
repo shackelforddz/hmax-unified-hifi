@@ -604,7 +604,7 @@ export default function PmRiskMap() {
       <div className="flex items-start gap-2">
         <button
           onClick={closeFlow}
-          aria-label="Back to the risk map"
+          aria-label="Back to the map view"
           className="size-7 -ml-1 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
         >
           <ArrowLeft size={15} />
@@ -788,7 +788,7 @@ Send to {contact.name.split(" ")[0]}
         tipWidth={288}
         tipHeight={flow ? 220 : 380}
         search={flow ? undefined : { value: query, onChange: setQuery, placeholder: "Search contracts" }}
-        title="Risk Map"
+        title="Map view"
       />
     </>
   );

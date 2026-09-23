@@ -252,11 +252,18 @@ export default function ConversationOverlay({ visible, onClose, context, initial
     timers.current.push(
       setTimeout(() => {
         setTyping(false);
+        const fallback = suggestNext(action, ctx);
         const recommendation: Omit<ChatMsg, "id"> = {
           role: "ai",
           kind: "text",
           text: `Recommended by HMAX - ${pb.recommendation}`,
-          suggestions: { prompts: [], actions: pb.steps },
+          // The playbook's own next steps, with follow-ups drawn from what the
+          // alert is about, so the reply always offers both. A playbook that
+          // hands its steps to an options panel falls back to topical ones.
+          suggestions: {
+            prompts: fallback.prompts,
+            actions: pb.steps.length ? pb.steps : fallback.actions,
+          },
         };
         // For a recap (e.g. a reviewed document) the flow reads best as
         // summary → linked document → recommendation + next steps, so the
@@ -414,9 +421,10 @@ export default function ConversationOverlay({ visible, onClose, context, initial
           role: "ai",
           kind: "text",
           text: flow?.done ?? "✓ Done.",
-          suggestions: flow?.doneSuggestions
-            ? { prompts: flow.doneSuggestions, actions: [] }
-            : undefined,
+          suggestions: {
+            prompts: flow?.doneSuggestions ?? [],
+            actions: flow?.doneActions ?? [],
+          },
         });
       }, 1000)
     );

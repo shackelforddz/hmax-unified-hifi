@@ -1574,9 +1574,10 @@ interface ThreadProps {
 }
 
 export function ChatThread({ messages, typing, context, wizardStep, onWizardStep, onGenerate, onOppCreate, onFlowComplete, onOpenDoc, onSend, onUpdatePanel, participantIds = [], onAddPerson }: ThreadProps) {
-  // Next-step buttons sit under the newest reply; thread notices and teammate
-  // suggestions that follow it shouldn't take them away.
-  const lastId = messages.filter((m) => m.kind !== "event" && m.kind !== "suggest-person").at(-1)?.id;
+  // Follow-ups and recommendations sit under the newest reply that carries
+  // them - a panel, task card or teammate suggestion pushed after the answer
+  // shouldn't take them away.
+  const lastSuggestionId = messages.filter((m) => m.suggestions).at(-1)?.id;
 
   // Assistant turns: the HMAX avatar, then the content, kept clear of the
   // right edge so they read as the other side of the conversation.
@@ -1669,8 +1670,9 @@ export function ChatThread({ messages, typing, context, wizardStep, onWizardStep
                   </div>
                 )}
               </div>
-              {/* Proactive suggestions - only under the newest reply, once it has streamed in */}
-              {m.id === lastId && !typing && m.suggestions && (
+              {/* Proactive suggestions - under the newest reply that has any, so a
+                  trailing panel or task card doesn't swallow them */}
+              {m.id === lastSuggestionId && !typing && m.suggestions && (
                 <SuggestionBlock suggestions={m.suggestions} onSend={onSend} />
               )}
             </>

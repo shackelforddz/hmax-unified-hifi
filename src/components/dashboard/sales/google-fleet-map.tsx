@@ -37,7 +37,7 @@ function loadGoogleMaps(key: string): Promise<void> {
   return scriptPromise;
 }
 
-export default function GoogleFleetMap({ apiKey, sites, renderTip, overlay, title = "Risk Map", search }: MapProps & { apiKey: string; title?: string; search?: MapSearch }) {
+export default function GoogleFleetMap({ apiKey, sites, renderTip, overlay, title = "Map view", search }: MapProps & { apiKey: string; title?: string; search?: MapSearch }) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const infoRef = useRef<any>(null);
@@ -100,7 +100,9 @@ export default function GoogleFleetMap({ apiKey, sites, renderTip, overlay, titl
       marker.addListener("click", () => {
         tipRoot.current?.unmount();
         const node = document.createElement("div");
-        node.style.width = "260px";
+        // Narrow the card on a narrow map so it stays inside the widget.
+        const room = (ref.current?.clientWidth ?? 0) - 32;
+        node.style.width = `${room > 0 ? Math.min(260, Math.max(180, room)) : 260}px`;
         tipRoot.current = createRoot(node);
         tipRoot.current.render(renderTipRef.current(site));
         info.setContent(node);
