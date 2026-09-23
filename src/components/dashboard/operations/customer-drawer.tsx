@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract } from "@/lib/operations-data";
 import { CUSTOMER_DETAILS } from "@/lib/dashboard-data";
-import { useDetailDrawers, drawerLayer } from "@/components/dashboard/detail-drawers";
+import { useDetailDrawers, useDrawerLayer } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
+import HealthBar from "@/components/dashboard/health-bar";
 
 /** "Baltic Wind NL" -> "baltic-wind-nl", the CUSTOMER_DETAILS key. */
 function slug(name: string): string {
@@ -35,18 +36,6 @@ function StatusBadge({ status }: { status: string }) {
   const cls = critical ? "bg-status-critical-deep text-white font-bold" : atRisk ? "border border-gray-400 text-gray-700" : "border border-gray-200 text-gray-500";
   const label = critical ? "Critical" : atRisk ? "At risk" : status === "In service" ? "In service" : "On track";
   return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${cls}`}>{label}</span>;
-}
-
-function HealthBar({ pct }: { pct: number }) {
-  const low = pct < 40;
-  return (
-    <span className="flex items-center gap-2 w-24 shrink-0">
-      <span className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-        <span className={`block h-full rounded-full ${low ? "bg-status-critical" : "bg-chart-line"}`} style={{ width: `${pct}%` }} />
-      </span>
-      <span className={`text-xs shrink-0 ${low ? "text-gray-900" : "text-gray-500"}`}>{pct}%</span>
-    </span>
-  );
 }
 
 /** A drill row that hands off to another drawer. */
@@ -187,7 +176,13 @@ export function CustomerBody({ customer, onAction }: { customer: string; onActio
                 <span className="block text-sm text-gray-700 truncate group-hover:text-gray-900 transition-colors">{a.code}</span>
                 <span className="block text-xs text-gray-500 truncate">{a.type}</span>
               </span>
-              <HealthBar pct={a.health} />
+              <HealthBar
+                pct={a.health}
+                lowAt={40}
+                inline
+                className="flex items-center gap-2 w-24 shrink-0"
+                trackClassName="flex-1 h-1.5 bg-gray-200"
+              />
               <StatusBadge status={a.status} />
             </DrillRow>
           ))}
@@ -207,7 +202,7 @@ export default function CustomerDrawer({ customer, onClose }: Props) {
   const drawers = useDetailDrawers();
   const contracts: OpsContract[] = customer ? OPS_CONTRACTS.filter((c) => c.customer === customer) : [];
   const open = !!customer && contracts.length > 0;
-  const shell = drawerLayer(open);
+  const shell = useDrawerLayer(open);
   const launch = useConversationLauncher();
 
   useEffect(() => {

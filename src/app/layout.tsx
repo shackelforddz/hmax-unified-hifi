@@ -34,9 +34,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${hitachiSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-          <Providers>{children}</Providers>
-        </body>
+      {/* Extensions (password managers, Grammarly and the like) add their own
+          attributes to <body> before React hydrates, which reads as a mismatch.
+          Suppressing covers this element's own attributes only - a real
+          mismatch anywhere inside the tree still surfaces. */}
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

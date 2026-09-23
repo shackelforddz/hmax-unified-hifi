@@ -20,6 +20,55 @@ import DocumentViewer, { type ViewDoc } from "@/components/dashboard/sales/docum
 import { type ContextEntity } from "@/components/dashboard/conversation-launcher";
 import { useAppSelector } from "@/store/hooks";
 
+/* ── Pacing a reply ──────────────────────────────────────────────────
+   An assistant reply arrives in stages - the thinking pause, the answer, the
+   supporting data it was drawn from, the recommendation. Those stages used to
+   be loose setTimeouts collected in an array, which meant nothing owned the
+   sequence: sending a second prompt, or closing the overlay, while one was
+   still running left the remaining stages to land in a thread that had moved
+   on or was no longer there. A reply is one of these now, and starting a reply
+   kills the last one outright, so that can't happen by forgetting a call.
+
+   Stages are placed relative to the one before, so a playbook with no
+   supporting data to show simply closes the gap rather than needing its own
+   schedule.
+
+   Deliberately setTimeout rather than a GSAP timeline, even though the shape
+   is the same: this is content pacing, not motion. A timeline runs on
+   requestAnimationFrame, which stops dead in a background tab - a reply would
+   sit unfinished until you looked back at it, instead of being there waiting
+   when you did. For the same reason the delays don't go through `dur()`:
+   asking for reduced motion shouldn't collapse a conversation into one block
+   of text, because none of this travels anywhere. */
+interface ReplySequence {
+  /** Run `fn` this many seconds after the reply started. */
+  at: (seconds: number, fn: () => void) => ReplySequence;
+  /** Run `fn` this many seconds after the stage before it. */
+  then: (gap: number, fn: () => void) => ReplySequence;
+  /** Drop every stage still to come. */
+  kill: () => void;
+}
+
+function replySequence(): ReplySequence {
+  const timers: ReturnType<typeof setTimeout>[] = [];
+  let last = 0;
+  const seq: ReplySequence = {
+    at(seconds, fn) {
+      last = seconds;
+      timers.push(setTimeout(fn, seconds * 1000));
+      return seq;
+    },
+    then(gap, fn) {
+      return seq.at(last + gap, fn);
+    },
+    kill() {
+      timers.forEach(clearTimeout);
+      timers.length = 0;
+    },
+  };
+  return seq;
+}
+
 interface WelcomeSet {
   /** The four starting points shown under the prompt. `prompt` is what's
    *  sent when the card is picked; it defaults to the title. */
@@ -106,7 +155,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
   const [participants, setParticipants] = useState<Person[]>([]);
   const [viewDoc, setViewDoc] = useState<ViewDoc | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const reply = useRef<ReplySequence | null>(null);
   const idRef = useRef(0);
   const nextId = () => ++idRef.current;
   const sessionIdRef = useRef<string | null>(null);
@@ -114,8 +163,16 @@ export default function ConversationOverlay({ visible, onClose, context, initial
   onPersistRef.current = onPersist;
 
   const clearTimers = () => {
-    timers.current.forEach(clearTimeout);
-    timers.current = [];
+    reply.current?.kill();
+    reply.current = null;
+  };
+
+  /** Start a reply, abandoning whatever the last one still had to say. */
+  const beginReply = () => {
+    clearTimers();
+    const seq = replySequence();
+    reply.current = seq;
+    return seq;
   };
 
   const push = (msg: Omit<ChatMsg, "id">) => setMessages((m) => [...m, { id: nextId(), ...msg }]);
@@ -124,7 +181,7 @@ export default function ConversationOverlay({ visible, onClose, context, initial
   // guided wizard, everything else is answered from the knowledge base.
   const respond = (text: string, ctx?: string) => {
     setTyping(true);
-    clearTimers();
+    const tl = beginReply();
     const q = text.toLowerCase();
     const isMob = /mobili[sz]|mobilization plan|mobilisation plan/.test(q);
     const isOpp = /opportunit|\blead/.test(q) && /(build|create|new|start|open)/.test(q);
@@ -133,45 +190,31 @@ export default function ConversationOverlay({ visible, onClose, context, initial
       // The demo mobilization plan is tied to the Xcel Energy contract
       // (Sherco HVDC) - surface its detail in the context pane.
       setActiveEntity((prev) => prev ?? { kind: "contract", id: "ct-sherco" });
-      timers.current.push(
-        setTimeout(() => push({ role: "ai", kind: "text", text: "Of course - let's confirm a few details and I'll draft the plan." }), 1000)
-      );
-      timers.current.push(
-        setTimeout(() => {
+      tl.at(1, () => push({ role: "ai", kind: "text", text: "Of course - let's confirm a few details and I'll draft the plan." }))
+        .at(2.1, () => {
           setTyping(false);
           push({ role: "ai", kind: "wizard" });
-        }, 2100)
-      );
+        });
     } else if (isOpp) {
       setWizardStep(1);
-      timers.current.push(
-        setTimeout(() => push({ role: "ai", kind: "text", text: "Let's build a new lead - I'll walk you through it and pre-fill what I can." }), 1000)
-      );
-      timers.current.push(
-        setTimeout(() => {
+      tl.at(1, () => push({ role: "ai", kind: "text", text: "Let's build a new lead - I'll walk you through it and pre-fill what I can." }))
+        .at(2.1, () => {
           setTyping(false);
           push({ role: "ai", kind: "opp-wizard" });
-        }, 2100)
-      );
+        });
     } else if (flow) {
       setWizardStep(1);
       if (flow.entity) setActiveEntity((prev) => prev ?? flow.entity ?? null);
-      timers.current.push(
-        setTimeout(() => push({ role: "ai", kind: "text", text: flow.intro }), 1000)
-      );
-      timers.current.push(
-        setTimeout(() => {
+      tl.at(1, () => push({ role: "ai", kind: "text", text: flow.intro }))
+        .at(2.1, () => {
           setTyping(false);
           push({ role: "ai", kind: "flow", flowId: flow.id });
-        }, 2100)
-      );
+        });
     } else {
-      timers.current.push(
-        setTimeout(() => {
-          setTyping(false);
-          push({ role: "ai", kind: "text", text: answerQuery(text, ctx), suggestions: suggestNext(text, ctx), visual: visualFor(text, ctx) ?? undefined });
-        }, 1000)
-      );
+      tl.at(1, () => {
+        setTyping(false);
+        push({ role: "ai", kind: "text", text: answerQuery(text, ctx), suggestions: suggestNext(text, ctx), visual: visualFor(text, ctx) ?? undefined });
+      });
     }
   };
 
@@ -226,32 +269,28 @@ export default function ConversationOverlay({ visible, onClose, context, initial
   const startPlaybook = (pb: Playbook, action: string, ctx?: string) => {
     if (!sessionIdRef.current) sessionIdRef.current = `conv-${Date.now()}`;
     setStarted(true);
-    clearTimers();
+    const tl = beginReply();
     setTyping(true);
     push({ role: "user", text: action });
-    timers.current.push(
-      setTimeout(() => push({ role: "ai", kind: "text", text: pb.situation }), 900)
-    );
+    // Each stage is placed a beat after the one before rather than at an
+    // absolute time, so a playbook with no supporting data to show simply
+    // closes the gap instead of needing its own schedule.
+    tl.at(0.9, () => push({ role: "ai", kind: "text", text: pb.situation }));
     // The data the alert was raised from, so the summary can be checked.
     if (pb.evidence?.length) {
-      timers.current.push(
-        setTimeout(
-          () =>
-            push({
-              role: "ai",
-              kind: "text",
-              text: [
-                "Supporting data",
-                ...pb.evidence!.map((m) => `• ${m.label ? `${m.label}: ` : ""}${m.value}`),
-              ].join("\n"),
-            }),
-          1400
-        )
+      tl.then(0.5, () =>
+        push({
+          role: "ai",
+          kind: "text",
+          text: [
+            "Supporting data",
+            ...pb.evidence!.map((m) => `• ${m.label ? `${m.label}: ` : ""}${m.value}`),
+          ].join("\n"),
+        })
       );
     }
-    timers.current.push(
-      setTimeout(() => {
-        setTyping(false);
+    tl.then(0.5, () => {
+      setTyping(false);
         const fallback = suggestNext(action, ctx);
         const recommendation: Omit<ChatMsg, "id"> = {
           role: "ai",
@@ -268,16 +307,19 @@ export default function ConversationOverlay({ visible, onClose, context, initial
         // For a recap (e.g. a reviewed document) the flow reads best as
         // summary → linked document → recommendation + next steps, so the
         // recommendation is pushed last and its next-step buttons show.
-        if (pb.panel?.kind === "recap") {
-          push({ role: "ai", kind: "panel", panel: pb.panel });
-          push(recommendation);
-        } else {
-          push(recommendation);
-          if (pb.panel) push({ role: "ai", kind: "panel", panel: pb.panel });
-        }
-        if (pb.suggestedPerson) push({ role: "ai", kind: "suggest-person", suggestion: pb.suggestedPerson });
-      }, pb.evidence?.length ? 2400 : 1900)
-    );
+      if (pb.panel?.kind === "recap") {
+        push({ role: "ai", kind: "panel", panel: pb.panel });
+        push(recommendation);
+      } else {
+        push(recommendation);
+        if (pb.panel) push({ role: "ai", kind: "panel", panel: pb.panel });
+      }
+    });
+    // Who to bring in is an afterthought to the recommendation, so it lands as
+    // one - a beat later, rather than in the same breath.
+    if (pb.suggestedPerson) {
+      tl.then(0.45, () => push({ role: "ai", kind: "suggest-person", suggestion: pb.suggestedPerson }));
+    }
     // Keep the widget context / customer in sync for the left pane.
     if (ctx) {
       const who = detectCustomer(ctx);
@@ -388,46 +430,40 @@ export default function ConversationOverlay({ visible, onClose, context, initial
   // Final step of the lead wizard - confirm creation.
   const oppCreate = () => {
     setTyping(true);
-    clearTimers();
-    timers.current.push(
-      setTimeout(() => {
-        setTyping(false);
-        push({
+    beginReply().at(1, () => {
+      setTyping(false);
+      push({
           role: "ai",
           kind: "text",
-          text:
-            "✓ Lead created and added to your pipeline.\n\nDuke Energy - Fleet reliability program is now in Discovery (€5.4M, Premium). Next steps: qualify the budget and capture the account & shipping details to move it toward Scoping.",
-          suggestions: {
-            prompts: ["What's needed to reach the Offer stage?", "Show the Duke Energy fleet", "Draft a qualification plan"],
-            actions: [
-              { label: "Capture account details", prompt: "Capture account and shipping details for Duke Energy" },
-              { label: "Assign owner", prompt: "Assign an owner to the Duke Energy lead" },
-            ],
-          },
-        });
-      }, 1000)
-    );
+        text:
+          "✓ Lead created and added to your pipeline.\n\nDuke Energy - Fleet reliability program is now in Discovery (€5.4M, Premium). Next steps: qualify the budget and capture the account & shipping details to move it toward Scoping.",
+        suggestions: {
+          prompts: ["What's needed to reach the Offer stage?", "Show the Duke Energy fleet", "Draft a qualification plan"],
+          actions: [
+            { label: "Capture account details", prompt: "Capture account and shipping details for Duke Energy" },
+            { label: "Assign owner", prompt: "Assign an owner to the Duke Energy lead" },
+          ],
+        },
+      });
+    });
   };
 
   // Final step of a generic guided flow - confirm the action.
   const flowComplete = (flowId: string) => {
     const flow = flowById(flowId);
     setTyping(true);
-    clearTimers();
-    timers.current.push(
-      setTimeout(() => {
-        setTyping(false);
-        push({
-          role: "ai",
-          kind: "text",
-          text: flow?.done ?? "✓ Done.",
-          suggestions: {
-            prompts: flow?.doneSuggestions ?? [],
-            actions: flow?.doneActions ?? [],
-          },
-        });
-      }, 1000)
-    );
+    beginReply().at(1, () => {
+      setTyping(false);
+      push({
+        role: "ai",
+        kind: "text",
+        text: flow?.done ?? "✓ Done.",
+        suggestions: {
+          prompts: flow?.doneSuggestions ?? [],
+          actions: flow?.doneActions ?? [],
+        },
+      });
+    });
   };
 
   // The left context pane only ever shows detail content for a real record -

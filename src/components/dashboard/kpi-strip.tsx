@@ -1,29 +1,30 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import KpiCard from "./kpi-card";
 import { useDetailDrawers } from "./detail-drawers";
 import KpiRecords from "./kpi-records";
 import { kpiDetail } from "@/lib/kpi-detail";
 import type { KpiData } from "@/lib/dashboard-data";
+import { DUR, EASE, dur, gsap, useGSAP } from "@/lib/motion";
 
 /* Opening is a reveal, so it decelerates into place and takes its time;
    closing is a dismissal, so it accelerates away in a good deal less. Content
    leads on the way in (just behind the opening edge) and leaves first on the
    way out, so text is never legible while the panel collapses through it. */
-const EASE_OUT = "cubic-bezier(0.2, 0.8, 0.2, 1)";
 const EASE_IN = "cubic-bezier(0.4, 0, 1, 1)";
-const OPEN_MS = 340;
-const CLOSE_MS = 200;
-/* Swapping between KPIs only resizes an panel that is already there, so it
-   settles faster than an opening one. */
-const SWAP_MS = 240;
+/* How long the panel takes to go, so the records can be unmounted once it has. */
+const CLOSE_MS = DUR.fast * 1000;
 
 type Mode = "open" | "swap";
 
-/* Animating to height:auto isn't possible, so the content is measured and the
-   wrapper transitions to that height - which is what slides the dashboard
-   below it down and back up. */
+/* The wrapper animates to the height of its content, which is what slides the
+   dashboard below it down and back up.
+
+   The height stays an explicit pixel value rather than `auto`: swapping
+   straight from one KPI to another has to animate from the height the panel
+   currently is, and an `auto` wrapper has already reflowed to the new content
+   by the time there is anywhere to read the old height from. */
 function Collapse({
   open,
   mode,
@@ -36,37 +37,61 @@ function Collapse({
   contentKey: string | null;
   children: ReactNode;
 }) {
+  const wrap = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(0);
+  /* What was showing the last time this ran. The panel only travels when that
+     has changed; anything else just asserts the height it should be resting
+     at - the first paint, where a shut panel must not animate into being shut,
+     and Strict Mode's discarded first mount, whose set is reverted underneath
+     the second one. */
+  // undefined until this has run once; null while nothing is showing.
+  const was = useRef<string | null | undefined>(undefined);
 
-  // Measured in a layout effect, not from the ResizeObserver below: the
-  // observer fires a frame late, which left the wrapper at the old height for
-  // one paint - the new list clipped, or a gap under a shorter one. That frame
-  // was the jump when moving between KPIs.
-  useLayoutEffect(() => {
-    const el = inner.current;
-    if (el) setHeight(el.offsetHeight);
-  }, [contentKey]);
+  useGSAP(
+    () => {
+      const w = wrap.current;
+      if (!w) return;
+      // Read from the content, not the wrapper: the wrapper is the thing being
+      // clipped, so its own height is whatever the last tween left behind.
+      const target = open ? inner.current?.offsetHeight ?? 0 : 0;
+      const showing = open ? contentKey ?? "" : null;
 
-  // Still observed, for anything that changes size after it has been measured.
+      const moved = was.current !== undefined && was.current !== showing;
+      was.current = showing;
+      if (!moved) {
+        gsap.set(w, { height: target });
+        return;
+      }
+
+      gsap.to(w, {
+        height: target,
+        duration: dur(open ? (mode === "swap" ? DUR.base : DUR.slow) : DUR.fast),
+        ease: open ? EASE.entrance : EASE.exit,
+        // Toggling a card twice in quick succession used to snap: the second
+        // transition started from the first's end height rather than from
+        // wherever the panel had actually got to. This retargets instead.
+        overwrite: "auto",
+      });
+    },
+    { dependencies: [open, mode, contentKey] }
+  );
+
+  // Anything that changes size after it has settled - a panel that is resting
+  // follows it outright, so it tracks the content rather than lagging a frame.
   useEffect(() => {
     const el = inner.current;
-    if (!el) return;
-    const ro = new ResizeObserver(() => setHeight(el.offsetHeight));
+    const w = wrap.current;
+    if (!el || !w) return;
+    const ro = new ResizeObserver(() => {
+      if (gsap.isTweening(w) || w.offsetHeight === 0) return;
+      gsap.set(w, { height: el.offsetHeight });
+    });
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
 
   return (
-    <div
-      aria-hidden={!open}
-      style={{
-        height: open ? height : 0,
-        transitionDuration: `${open ? (mode === "swap" ? SWAP_MS : OPEN_MS) : CLOSE_MS}ms`,
-        transitionTimingFunction: open ? EASE_OUT : EASE_IN,
-      }}
-      className="overflow-hidden transition-[height] motion-reduce:transition-none"
-    >
+    <div ref={wrap} aria-hidden={!open} className="h-0 overflow-hidden">
       <div ref={inner}>{children}</div>
     </div>
   );
@@ -149,10 +174,11 @@ export default function KpiStrip({ kpis }: { kpis: KpiData[] }) {
   return (
     <div className="flex flex-col">
       <div className={`@container grid ${cols} gap-4`}>
-        {kpis.map((k) => (
+        {kpis.map((k, i) => (
           <KpiCard
             key={k.id}
             {...k}
+            index={i}
             selected={openId === k.id}
             onToggle={kpiDetail(k.id) ? () => (openId === k.id ? close() : openKpi(k)) : undefined}
           />

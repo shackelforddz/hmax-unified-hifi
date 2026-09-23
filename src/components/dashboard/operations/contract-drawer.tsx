@@ -7,7 +7,7 @@ import { useConversationLauncher } from "@/components/dashboard/conversation-lau
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract, type OpsContractDetail, type RiskProfile } from "@/lib/operations-data";
 import { SCOPE_REVIEWS } from "@/lib/reliability-data";
 import ContractSections from "./contract-sections";
-import { drawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
+import { useDrawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 function Card({ children }: { children: React.ReactNode }) {
@@ -201,7 +201,7 @@ export default function ContractDrawer({ contractId, onClose, layer, hidden }: P
   const d = contractId ? OPS_CONTRACT_DETAILS[contractId] ?? null : null;
   const open = !!(c && d) && !hidden;
   const stacked = layer !== undefined;
-  const shell = drawerLayer(open, layer);
+  const shell = useDrawerLayer(open, layer);
   const launch = useConversationLauncher();
   const drawers = useDetailDrawers();
 

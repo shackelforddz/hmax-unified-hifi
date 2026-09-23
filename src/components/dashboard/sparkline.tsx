@@ -1,3 +1,8 @@
+"use client";
+
+import { useRef } from "react";
+import { DUR, EASE, STAGGER, dur, gsap, useGSAP } from "@/lib/motion";
+
 type SparklineVariant =
   | "active-contracts"
   | "contracts-at-risk"
@@ -18,12 +23,34 @@ const PATHS: Record<SparklineVariant, string> = {
 
 interface SparklineProps {
   variant: SparklineVariant;
+  /** Position in the strip, so the lines draw in across it rather than at once. */
+  index?: number;
 }
 
-export default function Sparkline({ variant }: SparklineProps) {
+export default function Sparkline({ variant, index = 0 }: SparklineProps) {
+  const path = useRef<SVGPathElement>(null);
+
+  /* The line draws itself left to right, just behind the number it belongs to,
+     so the trend reads as something measured rather than a static squiggle.
+     Dashing the stroke to its own length and retracting the offset is the only
+     way to reveal a curve along its length. */
+  useGSAP(() => {
+    const el = path.current;
+    if (!el) return;
+    const length = el.getTotalLength();
+    gsap.set(el, { strokeDasharray: length, strokeDashoffset: length });
+    gsap.to(el, {
+      strokeDashoffset: 0,
+      duration: dur(DUR.draw),
+      ease: EASE.standard,
+      delay: dur(index * STAGGER.cards + 0.2),
+    });
+  }, []);
+
   return (
     <svg width="64" height="54" viewBox="0 0 64 54" fill="none">
       <path
+        ref={path}
         d={PATHS[variant]}
         stroke="#3b82f6"
         strokeWidth="1.5"

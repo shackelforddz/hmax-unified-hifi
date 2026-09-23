@@ -11,6 +11,7 @@ import { getAssetDetail, resolveAssetId } from "@/lib/asset-lookup";
 import { OPPORTUNITIES, leadDetail } from "@/lib/sales-data";
 import { resolveContract, type ContractRef } from "@/lib/contract-lookup";
 import { useAppSelector } from "@/store/hooks";
+import { DUR, EASE, dur, gsap, useGSAP } from "@/lib/motion";
 
 /* ── Stacked detail drawers ──────────────────────────────────────────
    Drilling into an asset, contract or lead from inside a drawer slides its
@@ -44,7 +45,9 @@ interface DetailDrawers {
 
 const DetailDrawersContext = createContext<DetailDrawers | null>(null);
 
-const SLIDE_MS = 500;
+/* How long a drawer takes to leave, so the layer can be unmounted once it has
+   actually gone. The slide itself is owned by useDrawerLayer below. */
+const SLIDE_MS = DUR.drawerOut * 1000;
 const noopSubscribe = () => () => {};
 
 export function DetailDrawerProvider({ children }: { children: React.ReactNode }) {
@@ -159,31 +162,78 @@ function StackedDrawer({ layer, depth, onClose }: { layer: Layer; depth: number;
 
 export const useDetailDrawers = () => useContext(DetailDrawersContext);
 
-/* A drawer that is already closed on its first paint must not animate into
-   that state: the browser resolves `translate` from nothing to 100% and runs
-   the transition, which reads as a drawer opening and sliding away on every
-   page load. Transitions are withheld until after that first frame - by the
-   time one is opened, itself a re-render, they are back. */
-let animationsReady = false;
-if (typeof window !== "undefined") requestAnimationFrame(() => (animationsReady = true));
+/* ── The slide ───────────────────────────────────────────────────────
+   Tailwind's shadow-2xl, written out so it can be tweened rather than
+   swapped. A closed drawer sits off-screen to the right, where a shadow would
+   otherwise smudge the viewport edge, so it fades with the panel. */
+const PANEL_OPEN = { xPercent: 0, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" };
+const PANEL_SHUT = { xPercent: 100, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0)" };
 
-/** Classes and z-index for a drawer: base drawers dim the page, stacked
- *  ones (`layer` set) sit above them with a clear click-to-close backdrop. */
-export function drawerLayer(open: boolean, layer?: number) {
+/** The shell of a drawer: a dimming backdrop and the panel that slides over it.
+ *  Base drawers dim the page; stacked ones (`layer` set) sit above them with a
+ *  clear click-to-close backdrop.
+ *
+ *  The slide is a GSAP timeline rather than a CSS transition for one reason:
+ *  drilling from one drawer straight into another used to start a second
+ *  transition while the first was still running, and the two fought over the
+ *  same properties - the panel could settle a few pixels short, or snap. A
+ *  timeline with `overwrite: "auto"` retargets whatever is mid-flight from
+ *  wherever it has actually got to, so an interrupted drawer resolves cleanly.
+ *  Backdrop and panel also share one clock now, instead of two transitions that
+ *  happened to be given the same duration. */
+export function useDrawerLayer(open: boolean, layer?: number) {
+  const backdrop = useRef<HTMLDivElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  /* What `open` was the last time this ran. A drawer only travels when that
+     has actually changed; any other run just asserts the state it should be
+     resting in. That covers the first paint - a drawer already closed must not
+     animate into being closed, or every page load dims behind a drawer sliding
+     away - and it covers React running the effect again without `open` moving,
+     which Strict Mode does on every mount: the set below is reverted with the
+     discarded first pass, so the second pass has to re-apply it rather than
+     tween away from whatever the stylesheet left behind. */
+  const was = useRef<boolean | null>(null);
+
+  useGSAP(
+    () => {
+      const p = panel.current;
+      const b = backdrop.current;
+      if (!p || !b) return;
+
+      const moved = was.current !== null && was.current !== open;
+      was.current = open;
+      if (!moved) {
+        gsap.set(p, open ? PANEL_OPEN : PANEL_SHUT);
+        gsap.set(b, { opacity: open ? 1 : 0 });
+        return;
+      }
+
+      const tl = gsap.timeline({ defaults: { overwrite: "auto" } });
+      if (open) {
+        tl.to(p, { ...PANEL_OPEN, duration: dur(DUR.drawerIn), ease: EASE.entrance }, 0)
+          // The dim leads very slightly, so the page recedes as the panel arrives.
+          .to(b, { opacity: 1, duration: dur(DUR.drawerIn * 0.8), ease: EASE.entrance }, 0);
+      } else {
+        tl.to(p, { ...PANEL_SHUT, duration: dur(DUR.drawerOut), ease: EASE.exit }, 0)
+          .to(b, { opacity: 0, duration: dur(DUR.drawerOut), ease: EASE.exit }, 0);
+      }
+    },
+    { dependencies: [open] }
+  );
+
   const stacked = layer !== undefined;
   const z = stacked ? 55 + layer * 2 : undefined;
-  const settle = animationsReady ? "" : "transition-none";
   return {
     backdrop: {
-      className: `fixed inset-0 ${stacked ? "" : "z-40 bg-black/20"} transition-opacity duration-300 ${settle} ${
-        open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      ref: backdrop,
+      className: `fixed inset-0 ${stacked ? "" : "z-40 bg-black/20"} ${
+        open ? "pointer-events-auto" : "pointer-events-none"
       }`,
       style: z !== undefined ? { zIndex: z - 1 } : undefined,
     },
     panel: {
-      className: `fixed top-0 right-0 bottom-0 ${stacked ? "" : "z-50"} w-[520px] max-w-[92vw] bg-white flex flex-col transition-[translate,box-shadow] duration-500 ease-in-out ${settle} ${
-        open ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
-      }`,
+      ref: panel,
+      className: `fixed top-0 right-0 bottom-0 ${stacked ? "" : "z-50"} w-[520px] max-w-[92vw] bg-white flex flex-col`,
       style: z !== undefined ? { zIndex: z } : undefined,
     },
   };

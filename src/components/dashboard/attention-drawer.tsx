@@ -12,8 +12,9 @@ import {
 } from "@/lib/dashboard-data";
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "./conversation-launcher";
-import { AssetLink, ContractLink, drawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
+import { AssetLink, ContractLink, useDrawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
+import HealthBar from "@/components/dashboard/health-bar";
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
@@ -339,7 +340,7 @@ interface Props {
 export default function AttentionDrawer({ itemId, onClose }: Props) {
   const detail = itemId ? CUSTOMER_DETAILS[itemId] : null;
   const open = !!detail;
-  const shell = drawerLayer(open);
+  const shell = useDrawerLayer(open);
   const launch = useConversationLauncher();
   const drawers = useDetailDrawers();
 
@@ -405,12 +406,11 @@ export default function AttentionDrawer({ itemId, onClose }: Props) {
                 ))}
                 <div>
                   <p className="text-[11px] text-gray-500 tracking-wider">Health</p>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-chart-line rounded-full" style={{ width: `${detail.stats.healthPct}%` }} />
-                    </div>
-                    <span className="text-xs text-gray-500">{detail.stats.healthPct}%</span>
-                  </div>
+                  <HealthBar
+                    pct={detail.stats.healthPct}
+                    className="flex items-center gap-2 mt-1.5"
+                    trackClassName="w-16 h-2 bg-gray-100"
+                  />
                 </div>
               </div>
             </div>

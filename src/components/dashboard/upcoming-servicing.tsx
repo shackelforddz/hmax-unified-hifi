@@ -37,7 +37,7 @@ export default function UpcomingServicing() {
             </div>
             <span className="flex items-center gap-1 text-xs text-gray-500 shrink-0 whitespace-nowrap">
               <Clock size={12} strokeWidth={1.5} />
-              {s.dueIn}
+              {s.dueDays}d
             </span>
             {/* Open the contract this task is scheduled against */}
             <Button

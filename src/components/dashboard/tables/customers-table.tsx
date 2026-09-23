@@ -4,6 +4,7 @@ import { ChevronRight } from "lucide-react";
 import DataTable, { type Column } from "@/components/dashboard/data-table";
 import { useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import { OPS_CONTRACTS, OPS_CONTRACT_DETAILS, type OpsContract } from "@/lib/operations-data";
+import HealthBar from "@/components/dashboard/health-bar";
 
 /* ── Estate roll-up ──────────────────────────────────────────────────
    A customer's estate is everything their contracts cover: the book
@@ -57,18 +58,6 @@ function StatusBadge({ status }: { status: string }) {
   return <span className={`text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}`}>{label}</span>;
 }
 
-function HealthBar({ pct }: { pct: number }) {
-  const low = pct < 40;
-  return (
-    <div className="flex items-center gap-2 min-w-[110px]">
-      <div className="relative flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-        <div className={`h-full rounded-full ${low ? "bg-status-critical" : "bg-chart-line"}`} style={{ width: `${pct}%` }} />
-      </div>
-      <span className={`text-xs shrink-0 ${low ? "text-gray-900" : "text-gray-500"}`}>{pct}%</span>
-    </div>
-  );
-}
-
 function Drillable({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center gap-1.5 text-gray-900">
@@ -84,7 +73,18 @@ const ESTATE_COLUMNS: Column<Estate>[] = [
   { header: "Contracts", cell: (e) => <span className="text-gray-700">{e.contracts.length}</span> },
   { header: "Estate value", cell: (e) => <span className="text-gray-700">{fmtValue(e.value)}</span> },
   { header: "Assets", cell: (e) => <span className="text-gray-700">{e.assets}</span> },
-  { header: "Avg health", cell: (e) => <HealthBar pct={e.avgHealth} />, className: "w-44" },
+  {
+    header: "Avg health",
+    cell: (e) => (
+      <HealthBar
+        pct={e.avgHealth}
+        lowAt={40}
+        className="flex items-center gap-2 min-w-[110px]"
+        trackClassName="flex-1 h-2 bg-gray-100"
+      />
+    ),
+    className: "w-44",
+  },
   { header: "Open alerts", cell: (e) => <span className="text-gray-700">{e.alerts}</span> },
   { header: "Status", cell: (e) => <StatusBadge status={e.status} />, align: "right" },
 ];

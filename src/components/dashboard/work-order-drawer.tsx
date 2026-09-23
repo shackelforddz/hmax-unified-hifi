@@ -5,7 +5,7 @@ import { X, ChevronDown, CheckCircle2, Circle, CalendarClock, ClipboardList, Pac
 import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { WORK_ORDERS, WORK_ORDER_DETAILS, type WorkOrder, type WorkOrderDetail, type WoStatus, type WoPriority } from "@/lib/work-orders-data";
-import { AssetLink, ContractLink, drawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
+import { AssetLink, ContractLink, useDrawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 import { resolveAssetId } from "@/lib/asset-lookup";
 
@@ -186,7 +186,7 @@ export default function WorkOrderDrawer({ workOrderId, onClose }: Props) {
   const w = workOrderId ? WORK_ORDERS.find((x) => x.id === workOrderId) ?? null : null;
   const d = workOrderId ? WORK_ORDER_DETAILS[workOrderId] ?? null : null;
   const open = !!w;
-  const shell = drawerLayer(open);
+  const shell = useDrawerLayer(open);
   const launch = useConversationLauncher();
   const drawers = useDetailDrawers();
 

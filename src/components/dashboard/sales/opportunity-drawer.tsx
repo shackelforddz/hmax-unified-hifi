@@ -7,7 +7,7 @@ import { useConversationLauncher } from "@/components/dashboard/conversation-lau
 import { OPP_STAGES, OPPORTUNITIES, leadMeta, type Opportunity, type OpportunityDetail } from "@/lib/sales-data";
 import OwnerBadge from "./owner-badge";
 import DocumentViewer, { type ViewDoc } from "./document-viewer";
-import { AssetLink, ContractLink, drawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
+import { AssetLink, ContractLink, useDrawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 // The lead rendered as a full brief document.
@@ -231,7 +231,7 @@ interface Props {
 export default function OpportunityDrawer({ opp, detail, onClose, layer, hidden }: Props) {
   const open = !!(opp && detail) && !hidden;
   const stacked = layer !== undefined;
-  const shell = drawerLayer(open, layer);
+  const shell = useDrawerLayer(open, layer);
   const launch = useConversationLauncher();
   const drawers = useDetailDrawers();
   const [viewDoc, setViewDoc] = useState<ViewDoc | null>(null);

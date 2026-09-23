@@ -10,6 +10,7 @@ import { type CustomWidgetConfig } from "@/lib/custom-widget";
 import { recommendedLayout, recordInteraction, usageFor, widgetName, type LayoutSize } from "@/lib/layout-usage";
 import { useAppSelector } from "@/store/hooks";
 import { RecommendationActions, RecommendationCard, RecommendationHead, RecommendationTag } from "./recommendation-card";
+import { DUR, EASE, Flip, STAGGER, dur, gsap, useGSAP } from "@/lib/motion";
 
 /* A widget slot in the dashboard bento grid. Spans are out of 12 columns. */
 export interface GridItem {
@@ -164,6 +165,69 @@ export default function DashboardGrid({
     const live = active.map((id) => byId.get(id)).filter((i): i is GridItem => !!i);
     return [...live.filter((i) => !i.fixed), ...live.filter((i) => i.fixed)];
   }, [active, byId]);
+
+  /* ── Animating the reorder ──────────────────────────────────────
+     A CSS-grid slot change has no property to transition, so the grid used to
+     jump: a widget dropped in a new place simply appeared there, and previewing
+     the recommended layout - the one moment the feature is meant to explain
+     itself - was a hard cut. Flip closes that gap. It records where every
+     widget is, lets React re-order the DOM, then animates each one from where
+     it was to where it now sits.
+
+     The recording is taken in a layout effect rather than in each handler that
+     changes the order: at that point React has already placed the widgets in
+     their new slots but nothing has painted, so the snapshot from the previous
+     commit is exactly the "from" state, and every route into a new layout -
+     drag, preview, cancel, reset, adding a widget - is covered by construction
+     rather than by remembering to call something. */
+  const gridRef = useRef<HTMLDivElement>(null);
+  const snapshot = useRef<Flip.FlipState | null>(null);
+  // Restoring a saved layout on mount changes the order too. That one is not
+  // the user moving anything, so it is not worth animating - widgets flying
+  // into place on every page load would read as a glitch.
+  const armed = useRef(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      armed.current = true;
+    });
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  // Changes when a widget lands somewhere new, changes size, or joins the grid.
+  const layoutSignature = ordered
+    .map((i) => {
+      const size = activeLayout.sizes[i.id];
+      return `${i.id}:${size?.span ?? i.span}:${size ? size.rows : i.rows}`;
+    })
+    .join("|");
+
+  useGSAP(
+    () => {
+      const el = gridRef.current;
+      if (!el) return;
+      const previous = snapshot.current;
+      // Taken before Flip offsets anything, so it holds the settled layout.
+      snapshot.current = Flip.getState(el.children, { props: "opacity" });
+      if (!previous || !armed.current) return;
+
+      Flip.from(previous, {
+        duration: dur(DUR.flip),
+        ease: EASE.standard,
+        // Widgets that moved further set off a touch later, so the grid
+        // resolves as a wave rather than everything sliding in lockstep.
+        stagger: dur(STAGGER.grid),
+        props: "opacity",
+        // A widget that was not in the previous layout has just been added.
+        onEnter: (els) =>
+          gsap.fromTo(
+            els,
+            { opacity: 0, scale: 0.96 },
+            { opacity: 1, scale: 1, duration: dur(DUR.slow), ease: EASE.entrance }
+          ),
+      });
+    },
+    { dependencies: [layoutSignature] }
+  );
 
   const dirty = editing && !sameLayout(activeLayout, layout);
   const isDefault = same(active, defaultOrder) && Object.keys(activeLayout.sizes).length === 0;
@@ -432,7 +496,7 @@ export default function DashboardGrid({
         />
       )}
 
-      <div className="@container grid grid-cols-12 gap-4 items-stretch [&>*]:min-w-0 [&>.tile>*:not([data-grid-ui])]:h-full">
+      <div ref={gridRef} className="@container grid grid-cols-12 gap-4 items-stretch [&>*]:min-w-0 [&>.tile>*:not([data-grid-ui])]:h-full">
         {ordered.map((item) => {
           const size = activeLayout.sizes[item.id];
           const span = size?.span ?? item.span;
@@ -442,6 +506,8 @@ export default function DashboardGrid({
           return (
             <div
               key={item.id}
+              // What Flip matches a widget by across a reorder.
+              data-flip-id={item.id}
               onDragOver={(e) => {
                 if (!dragRef.current) return;
                 e.preventDefault();

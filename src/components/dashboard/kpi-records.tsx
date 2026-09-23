@@ -1,11 +1,13 @@
 "use client";
 
+import { useRef } from "react";
 import { X } from "lucide-react";
 import { useConversationLauncher } from "./conversation-launcher";
 import { useDetailDrawers } from "./detail-drawers";
 import { Button } from "@/components/ui/button";
 import { kpiDetail, type KpiRecord, type KpiTone } from "@/lib/kpi-detail";
 import type { KpiData } from "@/lib/dashboard-data";
+import { DUR, EASE, STAGGER, dur, gsap, useGSAP } from "@/lib/motion";
 
 /* Status chips, in the same vocabulary the contract tables use. */
 const CHIP: Record<KpiTone, string> = {
@@ -69,6 +71,27 @@ function Row({ record }: { record: KpiRecord }) {
 export default function KpiRecords({ kpi, onClose }: { kpi: KpiData; onClose: () => void }) {
   const launch = useConversationLauncher();
   const detail = kpiDetail(kpi.id);
+  const rows = useRef<HTMLDivElement>(null);
+
+  /* The rows arrive one just after the next, so the list reads as records
+     being listed rather than a block of them appearing at once. Kept short: at
+     three hundredths apart, even a long list has finished before anyone has
+     read the first row. */
+  useGSAP(
+    () => {
+      const el = rows.current;
+      if (!el || el.children.length === 0) return;
+      gsap.from(el.children, {
+        opacity: 0,
+        y: 6,
+        duration: dur(DUR.base),
+        ease: EASE.entrance,
+        stagger: dur(STAGGER.rows),
+      });
+    },
+    { dependencies: [kpi.id] }
+  );
+
   if (!detail) return null;
 
   return (
@@ -101,7 +124,7 @@ export default function KpiRecords({ kpi, onClose }: { kpi: KpiData; onClose: ()
           </span>
         ))}
       </div>
-      <div className="max-h-[296px] overflow-y-auto no-scrollbar">
+      <div ref={rows} className="max-h-[296px] overflow-y-auto no-scrollbar">
         {detail.records.map((r) => (
           <Row key={r.id} record={r} />
         ))}

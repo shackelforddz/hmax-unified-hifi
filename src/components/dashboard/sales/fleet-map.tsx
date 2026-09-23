@@ -19,6 +19,7 @@ import {
 import AssetDrawer from "./asset-drawer";
 import OpportunityDrawer from "./opportunity-drawer";
 import GoogleFleetMap from "./google-fleet-map";
+import HealthBar from "@/components/dashboard/health-bar";
 
 /** "sales" filters by region, project manager, contracts and leads; "ops"
  *  filters by contract risk type and shows contract detail on each pin;
@@ -268,17 +269,6 @@ const RISK_LEVEL: Record<string, { label: string; cls: string }> = {
   med: { label: "Med", cls: "bg-gray-200 text-gray-700" },
   low: { label: "Low", cls: "border border-gray-300 text-gray-500" },
 };
-
-function HealthBar({ pct }: { pct: number }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-        <div className="h-full bg-chart-line rounded-full" style={{ width: `${pct}%` }} />
-      </div>
-      <span className="text-xs text-gray-500">{pct}%</span>
-    </div>
-  );
-}
 
 function StatusBadge({ critical, label }: { critical: boolean; label: string }) {
   return (

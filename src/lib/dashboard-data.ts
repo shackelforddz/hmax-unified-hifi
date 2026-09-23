@@ -716,7 +716,8 @@ export interface ServicingVisit {
   interval: string;
   owner: string;
   due: string;
-  dueIn: string;
+  /** Days until it falls due - rendered the same way as waitingDays. */
+  dueDays: number;
   status: ServicingStatus;
   /** The contract whose schedule this task sits on. */
   contractId: string;
@@ -725,11 +726,11 @@ export interface ServicingVisit {
 /* Scheduled maintenance drawn from the service schedules on OPS_CONTRACT_DETAILS,
    flattened across the portfolio, soonest first. */
 export const UPCOMING_SERVICING: ServicingVisit[] = [
-  { customer: "Siemens", task: "Relay function test", interval: "Quarterly", owner: "Sarah M.", due: "12 Sep", dueIn: "tomorrow", status: "at-risk", contractId: "ct-northsea" },
-  { customer: "Xcel Energy", task: "DGA oil sampling", interval: "Monthly", owner: "Daniel B.", due: "16 Sep", dueIn: "in 5 days", status: "on-track", contractId: "ct-sherco" },
-  { customer: "Xcel Energy", task: "Bushing thermography", interval: "Quarterly", owner: "Daniel B.", due: "20 Sep", dueIn: "in 9 days", status: "on-track", contractId: "ct-sherco" },
-  { customer: "Pacific Gas", task: "Relay firmware upgrade", interval: "One-off", owner: "Lena F.", due: "21 Sep", dueIn: "in 10 days", status: "on-track", contractId: "ct-pacific" },
-  { customer: "Siemens", task: "Switchgear inspection", interval: "6-monthly", owner: "Sarah M.", due: "29 Sep", dueIn: "in 18 days", status: "on-track", contractId: "ct-northsea" },
+  { customer: "Siemens", task: "Relay function test", interval: "Quarterly", owner: "Sarah M.", due: "12 Sep", dueDays: 1, status: "at-risk", contractId: "ct-northsea" },
+  { customer: "Xcel Energy", task: "DGA oil sampling", interval: "Monthly", owner: "Daniel B.", due: "16 Sep", dueDays: 5, status: "on-track", contractId: "ct-sherco" },
+  { customer: "Xcel Energy", task: "Bushing thermography", interval: "Quarterly", owner: "Daniel B.", due: "20 Sep", dueDays: 9, status: "on-track", contractId: "ct-sherco" },
+  { customer: "Pacific Gas", task: "Relay firmware upgrade", interval: "One-off", owner: "Lena F.", due: "21 Sep", dueDays: 10, status: "on-track", contractId: "ct-pacific" },
+  { customer: "Siemens", task: "Switchgear inspection", interval: "6-monthly", owner: "Sarah M.", due: "29 Sep", dueDays: 18, status: "on-track", contractId: "ct-northsea" },
 ];
 
 export interface VendorBar {

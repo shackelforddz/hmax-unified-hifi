@@ -15,8 +15,9 @@ import { ASSET_DRAWINGS } from "@/lib/asset-drawings-data";
 import { SITE_CONSTRAINTS } from "@/lib/reliability-data";
 import { Aging, ScoreCalculation, RiskMatrix, ConditionTrend, ParameterTrend, Diagnostics } from "./asset-condition";
 import DocumentViewer, { type ViewDoc } from "./document-viewer";
-import { drawerLayer, ContractLink, useDetailDrawers } from "@/components/dashboard/detail-drawers";
+import { useDrawerLayer, ContractLink, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
+import HealthBar from "@/components/dashboard/health-bar";
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -604,7 +605,7 @@ export default function AssetDrawer({ assetId, onClose, layer, hidden }: Props) 
   const cond = assetId ? ASSET_CONDITION[assetId] ?? null : null;
   const open = !!detail && !hidden;
   const stacked = layer !== undefined;
-  const shell = drawerLayer(open, layer);
+  const shell = useDrawerLayer(open, layer);
   const launch = useConversationLauncher();
   const drawers = useDetailDrawers();
   const [tab, setTab] = useState<DrawerTab>("summary");
@@ -686,12 +687,11 @@ export default function AssetDrawer({ assetId, onClose, layer, hidden }: Props) 
                 ))}
                 <div>
                   <p className="text-[11px] text-gray-500 tracking-wider">Health</p>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-chart-line rounded-full" style={{ width: `${detail.stats.healthPct}%` }} />
-                    </div>
-                    <span className="text-xs text-gray-500">{detail.stats.healthPct}%</span>
-                  </div>
+                  <HealthBar
+                    pct={detail.stats.healthPct}
+                    className="flex items-center gap-2 mt-1.5"
+                    trackClassName="w-16 h-2 bg-gray-100"
+                  />
                 </div>
               </div>
             </div>

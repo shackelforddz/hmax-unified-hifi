@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useConversationLauncher } from "@/components/dashboard/conversation-launcher";
 import { SLA_CONTRACTS, type SlaContractDetail, type SlaBadge } from "@/lib/sales-data";
 import ContractSections from "@/components/dashboard/operations/contract-sections";
-import { AssetLink, drawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
+import { AssetLink, useDrawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 
 function Card({ children }: { children: React.ReactNode }) {
@@ -161,7 +161,7 @@ export default function SlaContractDrawer({ contractId, onClose, layer, hidden }
   const d = contractId ? SLA_CONTRACTS[contractId] ?? null : null;
   const open = !!d && !hidden;
   const stacked = layer !== undefined;
-  const shell = drawerLayer(open, layer);
+  const shell = useDrawerLayer(open, layer);
   const launch = useConversationLauncher();
   const drawers = useDetailDrawers();
 
