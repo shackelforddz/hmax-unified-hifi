@@ -8,6 +8,8 @@ import { WORK_ORDERS, WORK_ORDER_DETAILS, type WorkOrder, type WorkOrderDetail, 
 import { AssetLink, ContractLink, useDrawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
 import { resolveAssetId } from "@/lib/asset-lookup";
+import BarFill from "@/components/dashboard/bar-fill";
+import { useCountUp } from "@/lib/motion";
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">{children}</div>;
@@ -83,6 +85,8 @@ export function WorkOrderActions({ onAction }: { onAction: (label: string) => vo
 }
 
 export function WorkOrderBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDetail; onAction: (p: string) => void }) {
+  const progressText = `${w.progress}% complete · due ${w.due}`;
+  const progressLabel = useCountUp<HTMLSpanElement>(progressText);
   return (
     <div className="flex flex-col gap-4">
       {/* Summary + actions */}
@@ -103,11 +107,10 @@ export function WorkOrderBody({ w, d, onAction }: { w: WorkOrder; d: WorkOrderDe
       <Card>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-base text-gray-900">Progress</h3>
-          <span className="text-xs text-gray-500">{w.progress}% complete · due {w.due}</span>
+          {/* Counted in step with the bar, so the two never disagree mid-fill. */}
+          <span ref={progressLabel} className="text-xs text-gray-500">{progressText}</span>
         </div>
-        <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-          <div className="h-full bg-chart-line rounded-full" style={{ width: `${w.progress}%` }} />
-        </div>
+        <BarFill pct={w.progress} className="h-2.5 bg-gray-100" />
       </Card>
 
       {/* Checklist */}

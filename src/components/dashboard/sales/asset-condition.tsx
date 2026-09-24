@@ -24,6 +24,8 @@ import type {
   PhasePoint,
 } from "@/lib/sales-data";
 import { CHART } from "@/lib/chart-theme";
+import BarFill from "@/components/dashboard/bar-fill";
+import { useCountUp } from "@/lib/motion";
 
 /* Neutrals for axes and scale furniture; every data series is coloured. */
 const INK = "#171717";
@@ -89,6 +91,23 @@ export function Aging({ d }: { d: AgingData }) {
 }
 
 /* ── Score Calculation ───────────────────────────────────────────── */
+/* One scoring factor. Its own component so it can hold the hook that counts the
+   share figure in step with the bar beside it. */
+function FactorRow({ f }: { f: ScoreFactor }) {
+  const share = `${f.pctOfMax.toFixed(1)}%`;
+  const label = useCountUp<HTMLSpanElement>(share);
+  return (
+    <div className="grid grid-cols-[80px_1fr_auto] items-center gap-x-3 col-span-2 py-2.5 border-b border-gray-100 last:border-0">
+      <span className="text-sm text-gray-700">{f.factor}</span>
+      <div className="flex items-center gap-2.5 min-w-0">
+        <span ref={label} className="text-xs text-gray-500 w-11 shrink-0 text-right">{share}</span>
+        <BarFill pct={f.pctOfMax} className="flex-1 h-2 bg-gray-200" />
+      </div>
+      <span className="text-sm text-gray-900 tabular-nums text-right w-10">{f.value.toFixed(1)}</span>
+    </div>
+  );
+}
+
 export function ScoreCalculation({ factors, total }: { factors: ScoreFactor[]; total: number }) {
   return (
     <div>
@@ -99,16 +118,7 @@ export function ScoreCalculation({ factors, total }: { factors: ScoreFactor[]; t
           <span>% of Max Value</span>
         </div>
         {factors.map((f) => (
-          <div key={f.factor} className="grid grid-cols-[80px_1fr_auto] items-center gap-x-3 col-span-2 py-2.5 border-b border-gray-100 last:border-0">
-            <span className="text-sm text-gray-700">{f.factor}</span>
-            <div className="flex items-center gap-2.5 min-w-0">
-              <span className="text-xs text-gray-500 w-11 shrink-0 text-right">{f.pctOfMax.toFixed(1)}%</span>
-              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-chart-line rounded-full" style={{ width: `${f.pctOfMax}%` }} />
-              </div>
-            </div>
-            <span className="text-sm text-gray-900 tabular-nums text-right w-10">{f.value.toFixed(1)}</span>
-          </div>
+          <FactorRow key={f.factor} f={f} />
         ))}
       </div>
       <div className="flex items-center justify-between pt-3 mt-1">

@@ -534,7 +534,21 @@ function reviewDoc(key: string, docType: string, ref: string, title: string, sit
             ],
           },
         },
-        { heading: "Hydrogen trend", chart: { unit: "ppm", threshold: 100, points: [{ label: "Mar", value: 180 }, { label: "Apr", value: 240 }, { label: "May", value: 300 }, { label: "Jun", value: 360 }, { label: "Jul", value: 420 }, { label: "Aug", value: 480 }] } },
+        {
+          heading: "Six-month gas trends (× caution limit)",
+          chart: {
+            unit: "ppm",
+            labels: ["Mar", "Apr", "May", "Jun", "Jul", "Aug"],
+            series: [
+              { name: "H₂", fullName: "Hydrogen", limit: 100, values: [180, 240, 300, 360, 420, 480] },
+              { name: "C₂H₂", fullName: "Acetylene", limit: 1, values: [0.2, 0.6, 1.4, 2.5, 4, 6] },
+              { name: "C₂H₄", fullName: "Ethylene", limit: 50, values: [31, 36, 41, 46, 50, 54] },
+              { name: "CH₄", fullName: "Methane", limit: 120, values: [88, 94, 100, 107, 113, 118] },
+              { name: "C₂H₆", fullName: "Ethane", limit: 65, values: [28, 29, 30, 31, 32, 33] },
+              { name: "CO", fullName: "Carbon monoxide", limit: 350, values: [330, 348, 364, 385, 402, 420] },
+            ],
+          },
+        },
         { heading: "Interpretation", text: situation + " Rising hydrogen with trace acetylene points to a developing thermal fault with possible low-energy arcing, corroborating the Y-phase bushing hotspot." },
       ],
     };

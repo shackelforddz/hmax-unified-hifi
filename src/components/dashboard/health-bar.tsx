@@ -1,19 +1,15 @@
 "use client";
 
-import { useRef } from "react";
-import { DUR, EASE, dur, gsap, useGSAP } from "@/lib/motion";
+import BarFill from "./bar-fill";
+import { useCountUp } from "@/lib/motion";
 
-/* ── One health bar ──────────────────────────────────────────────────
-   There were four of these, drawn slightly differently in four files. They
-   are all the same reading of the same thing, so they are one component now,
-   with the only real differences - how thick, how wide, what colour behind it,
-   and whether it can sit inside a line of text - left as props.
-
-   The bar fills from nothing and the percentage counts with it, on one clock,
-   so the pair reads as a measurement being taken rather than a number with a
-   coloured rectangle beside it. It is scaled rather than widened: the track can
-   be a flex child that resizes with its panel, and scaling leaves the authored
-   width alone instead of replacing it with a pixel value. */
+/* ── A bar with its figure beside it ─────────────────────────────────
+   The common arrangement: the bar, then the percentage it represents. There
+   were four of these drawn slightly differently in four files, so they are one
+   component now, with the only real differences - how thick, how wide, what
+   colour behind it, and whether it can sit inside a line of text - left as
+   props. Bars whose figure sits somewhere else in the layout use BarFill and
+   useCountUp directly instead. */
 
 interface Props {
   pct: number;
@@ -34,60 +30,21 @@ export default function HealthBar({
   className = "flex items-center gap-2",
   trackClassName = "flex-1 h-1.5 bg-gray-100",
 }: Props) {
-  const fill = useRef<HTMLElement>(null);
-  const label = useRef<HTMLElement>(null);
   const low = lowAt !== undefined && pct < lowAt;
-
-  useGSAP(() => {
-    const tl = gsap.timeline();
-    if (fill.current) {
-      tl.from(
-        fill.current,
-        { scaleX: 0, transformOrigin: "left center", duration: dur(DUR.count), ease: EASE.entrance },
-        0
-      );
-    }
-    const el = label.current;
-    if (el) {
-      const proxy = { n: 0 };
-      tl.to(
-        proxy,
-        {
-          n: pct,
-          duration: dur(DUR.count),
-          ease: EASE.entrance,
-          onUpdate: () => {
-            el.textContent = `${Math.round(proxy.n)}%`;
-          },
-          // Land on the figure itself, never on a rounding of the way up.
-          onComplete: () => {
-            el.textContent = `${pct}%`;
-          },
-        },
-        0
-      );
-    }
-  }, [pct]);
+  const label = `${pct}%`;
+  const ref = useCountUp<HTMLSpanElement>(label);
 
   const Box = inline ? "span" : "div";
-  const Bar = inline ? "span" : "div";
-
   return (
     <Box className={className}>
-      <Bar className={`${inline ? "block " : ""}rounded-full overflow-hidden ${trackClassName}`}>
-        <Bar
-          // The ref is on the fill, whose authored width is the figure itself -
-          // so the bar is right even if none of the above ever runs.
-          ref={fill as React.Ref<HTMLDivElement & HTMLSpanElement>}
-          className={`block h-full rounded-full ${low ? "bg-status-critical" : "bg-chart-line"}`}
-          style={{ width: `${pct}%` }}
-        />
-      </Bar>
-      <span
-        ref={label as React.Ref<HTMLSpanElement>}
-        className={`text-xs shrink-0 ${low ? "text-gray-900" : "text-gray-500"}`}
-      >
-        {pct}%
+      <BarFill
+        pct={pct}
+        inline={inline}
+        className={trackClassName}
+        fillClassName={low ? "bg-status-critical" : "bg-chart-line"}
+      />
+      <span ref={ref} className={`text-xs shrink-0 ${low ? "text-gray-900" : "text-gray-500"}`}>
+        {label}
       </span>
     </Box>
   );

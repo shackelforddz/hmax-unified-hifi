@@ -13,6 +13,7 @@
    the finished state with no travel - which is the correct behaviour, not a
    disabled feature. */
 
+import { useRef } from "react";
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
 import { useGSAP } from "@gsap/react";
@@ -125,6 +126,38 @@ export function formatNumeric(n: number, p: NumericParts): string {
       })
     : fixed;
   return `${p.prefix}${body}${p.suffix}`;
+}
+
+/** Counts a written figure up to itself. Put the returned ref on the element
+ *  that holds it, and pass exactly the text that element renders - the tween
+ *  lands back on that string rather than on a rounding of the way up, and the
+ *  element still reads correctly if none of this ever runs.
+ *
+ *  Only the first number in the text is counted; whatever surrounds it is
+ *  carried through, so "55% of term elapsed" counts the 55 and keeps the rest. */
+export function useCountUp<T extends HTMLElement>(text: string, delay = 0) {
+  const ref = useRef<T>(null);
+  useGSAP(() => {
+    const el = ref.current;
+    // Someone who has asked for less motion keeps the figure as written.
+    if (!el || prefersReducedMotion()) return;
+    const parts = parseNumeric(text);
+    if (!parts) return;
+    const proxy = { n: 0 };
+    gsap.to(proxy, {
+      n: parts.value,
+      duration: DUR.count,
+      ease: EASE.entrance,
+      delay,
+      onUpdate: () => {
+        el.textContent = formatNumeric(proxy.n, parts);
+      },
+      onComplete: () => {
+        el.textContent = text;
+      },
+    });
+  }, [text, delay]);
+  return ref;
 }
 
 export { gsap, Flip, useGSAP };

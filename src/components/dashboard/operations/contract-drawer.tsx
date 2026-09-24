@@ -9,6 +9,8 @@ import { SCOPE_REVIEWS } from "@/lib/reliability-data";
 import ContractSections from "./contract-sections";
 import { useDrawerLayer, useDetailDrawers } from "@/components/dashboard/detail-drawers";
 import ContextSummary from "@/components/dashboard/context-summary";
+import BarFill from "@/components/dashboard/bar-fill";
+import { useCountUp } from "@/lib/motion";
 
 function Card({ children }: { children: React.ReactNode }) {
   return <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4">{children}</div>;
@@ -84,6 +86,8 @@ export function ContractActions({ onAction }: { onAction: (label: string) => voi
 }
 
 export function ContractBody({ c, d, onAction }: { c: OpsContract; d: OpsContractDetail; onAction: (p: string) => void }) {
+  const progressText = `${c.progress}% of term elapsed`;
+  const progressLabel = useCountUp<HTMLSpanElement>(progressText);
   return (
     <div className="flex flex-col gap-4">
       {/* Context summary + recommended actions */}
@@ -104,11 +108,10 @@ export function ContractBody({ c, d, onAction }: { c: OpsContract; d: OpsContrac
       <Card>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-base text-gray-900">Progress</h3>
-          <span className="text-xs text-gray-500">{c.progress}% of term elapsed</span>
+          {/* Counted in step with the bar, so the two never disagree mid-fill. */}
+          <span ref={progressLabel} className="text-xs text-gray-500">{progressText}</span>
         </div>
-        <div className="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
-          <div className="h-full bg-chart-line rounded-full" style={{ width: `${c.progress}%` }} />
-        </div>
+        <BarFill pct={c.progress} className="h-2.5 bg-gray-100" />
         <p className="text-xs text-gray-500 mt-2">Contract term {c.start} → {c.end}</p>
       </Card>
 

@@ -3,16 +3,32 @@
 import { useEffect, useState } from "react";
 import { X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CHART } from "@/lib/chart-theme";
+import { CHART, CHART_CATEGORICAL } from "@/lib/chart-theme";
 
 export interface DocTable {
   columns: string[];
   rows: string[][];
 }
+export interface DocSeries {
+  /** Series label, e.g. "H₂". */
+  name: string;
+  /** Full name, shown in the legend. */
+  fullName?: string;
+  /** Caution limit in the series' own unit - values plot as a % of this. */
+  limit: number;
+  /** One reading per x label, oldest first. */
+  values: number[];
+}
 export interface DocChart {
   unit?: string;
   threshold?: number;
-  points: { label: string; value: number }[];
+  /** Single-series form. */
+  points?: { label: string; value: number }[];
+  /** Multi-series form: shared x labels plus one entry per series. Absolute
+      readings span orders of magnitude, so each series plots as a percentage
+      of its own caution limit and one dashed line at 100% reads for all. */
+  labels?: string[];
+  series?: DocSeries[];
 }
 export interface DocSection {
   heading: string;
@@ -33,9 +49,122 @@ export interface ViewDoc {
   images?: { caption: string }[];
 }
 
+/* Several series on one axis. Absolute readings span orders of magnitude, so
+   each series plots as a multiple of its own caution limit on a doubling
+   (log-2) scale - one dashed line at 1x then reads for every gas. */
+function DocMultiChartView({ chart }: { chart: DocChart }) {
+  const labels = chart.labels ?? [];
+  const series = chart.series ?? [];
+  const [hover, setHover] = useState<number | null>(null);
+
+  const w = 560, h = 160, padL = 34, padR = 12, padTop = 12, padBottom = 20;
+  const FLOOR = 0.05; // keeps a trace reading on the scale instead of at -Infinity
+  const ratios = (s: DocSeries) => s.values.map((v) => Math.max(FLOOR, v / s.limit));
+  const all = series.flatMap(ratios);
+  const lo = Math.pow(2, Math.floor(Math.log2(Math.min(1, ...all))));
+  const hi = Math.pow(2, Math.ceil(Math.log2(Math.max(1, ...all))));
+  const ticks: number[] = [];
+  for (let t = lo; t <= hi + 1e-9; t *= 2) ticks.push(t);
+
+  const x = (i: number) => padL + (i * (w - padL - padR)) / Math.max(1, labels.length - 1);
+  const y = (r: number) =>
+    h - padBottom - ((Math.log2(r) - Math.log2(lo)) / (Math.log2(hi) - Math.log2(lo))) * (h - padTop - padBottom);
+  const colour = (i: number) => CHART_CATEGORICAL[i] ?? CHART.compare;
+  const tickLabel = (t: number) => `${t}×`.replace("0.", ".");
+
+  return (
+    <div>
+      <div
+        className="relative"
+        onMouseLeave={() => setHover(null)}
+        onMouseMove={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          const rel = ((e.clientX - r.left) / r.width) * w;
+          const i = Math.round(((rel - padL) / (w - padL - padR)) * (labels.length - 1));
+          setHover(Math.min(labels.length - 1, Math.max(0, i)));
+        }}
+      >
+        <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto">
+          {/* Doubling gridlines, with the caution limit picked out */}
+          {ticks.map((t) => (
+            <g key={t}>
+              <line
+                x1={padL}
+                x2={w - padR}
+                y1={y(t)}
+                y2={y(t)}
+                stroke={t === 1 ? CHART.compare : "#f0f0f0"}
+                strokeDasharray={t === 1 ? "4 3" : undefined}
+                strokeWidth={1}
+              />
+              <text x={padL - 5} y={y(t) + 3} textAnchor="end" fontSize="9" fill="#a3a3a3">{tickLabel(t)}</text>
+            </g>
+          ))}
+          {hover != null && <line x1={x(hover)} x2={x(hover)} y1={padTop} y2={h - padBottom} stroke="#d4d4d4" strokeWidth={1} />}
+          {series.map((s, si) => (
+            <polyline
+              key={s.name}
+              points={ratios(s).map((r, i) => `${x(i)},${y(r)}`).join(" ")}
+              fill="none"
+              stroke={colour(si)}
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          ))}
+          {hover != null &&
+            series.map((s, si) => (
+              <circle key={s.name} cx={x(hover)} cy={y(ratios(s)[hover])} r={3.5} fill={colour(si)} stroke="#ffffff" strokeWidth={2} />
+            ))}
+        </svg>
+
+        {/* Readings at the hovered month, in their own units */}
+        {hover != null && (
+          <div
+            className="absolute top-1 z-10 pointer-events-none bg-white/95 border border-gray-200 rounded-lg shadow-sm px-2.5 py-1.5"
+            style={{ left: `${(x(hover) / w) * 100}%`, transform: hover > (labels.length - 1) / 2 ? "translateX(-108%)" : "translateX(8%)" }}
+          >
+            <p className="text-[10px] text-gray-500 mb-0.5">{labels[hover]}</p>
+            {series.map((s, si) => (
+              <div key={s.name} className="flex items-center gap-2 text-[10px] leading-[15px] whitespace-nowrap">
+                <span className="w-2.5 h-0.5 rounded-full shrink-0" style={{ background: colour(si) }} />
+                <span className="text-gray-600">{s.name}</span>
+                <span className="ml-auto pl-3 text-gray-800 tabular-nums">
+                  {s.values[hover].toLocaleString()}{chart.unit ? ` ${chart.unit}` : ""}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="flex justify-between text-[10px] text-gray-500" style={{ paddingLeft: `${(padL / w) * 100}%`, paddingRight: `${(padR / w) * 100}%` }}>
+        {labels.map((l) => <span key={l}>{l}</span>)}
+      </div>
+
+      {/* Legend - identity is never colour alone */}
+      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2.5">
+        {series.map((s, si) => {
+          const last = s.values[s.values.length - 1];
+          return (
+            <span key={s.name} className="flex items-center gap-1.5 text-[10px] text-gray-500">
+              <span className="w-3 h-0.5 rounded-full shrink-0" style={{ background: colour(si) }} />
+              <span className="text-gray-700">{s.name}</span>
+              <span className={`tabular-nums ${last > s.limit ? "text-gray-900" : ""}`}>
+                {last.toLocaleString()}/{s.limit.toLocaleString()}{chart.unit ? ` ${chart.unit}` : ""}
+              </span>
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* Simple greyscale trend chart for report data. */
 function DocChartView({ chart }: { chart: DocChart }) {
-  const { points, threshold } = chart;
+  if (chart.series?.length) return <DocMultiChartView chart={chart} />;
+  const { points = [], threshold } = chart;
   const w = 560, h = 120, pad = 10;
   const vals = points.map((p) => p.value);
   const max = Math.max(...vals, threshold ?? -Infinity);

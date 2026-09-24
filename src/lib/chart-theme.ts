@@ -22,3 +22,15 @@ export const CHART = {
    *  loading rather than a chart arriving - spread this onto every series. */
   motion: { animationDuration: 600, animationEasing: "ease-out" },
 } as const;
+
+/* Categorical series hues, assigned in fixed order and never cycled. Validated
+   for CVD separation on a white chart surface; slots 3-5 sit under 3:1 contrast,
+   so any chart using them ships visible labels (a legend or the data table). */
+export const CHART_CATEGORICAL = [
+  "#2a78d6", // blue
+  "#eb6834", // orange
+  "#1baf7a", // aqua
+  "#eda100", // yellow
+  "#e87ba4", // magenta
+  "#008300", // green
+] as const;
